@@ -1,12 +1,17 @@
 {
   "name": "ecs",
   "version": "1.0.0",
-  "description": "",
+  "description": "data oriented, functional entity component system",
   "main": "index.js",
   "scripts": {
     "test": "tap test.js"
   },
-  "keywords": [],
+  "keywords": [
+    "game",
+    "gamedev",
+    "ecs",
+    "entity component system"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {

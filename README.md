@@ -1,5 +1,5 @@
 # ecs
-data oriented, functional entity component system
+data oriented, functional entity component system.
 
 
 ## usage example
@@ -7,7 +7,7 @@ data oriented, functional entity component system
 This is a minimal example of what you can do with `ecs`. It's not functional but
 illustrates how to declare your components, systems, and entities.
 
-```javacript
+```javascript
 import ECS      from 'ecs'
 import Keyboard from './my/game/keyboard.js'
 import clamp    from 'clamp'
