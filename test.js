@@ -21,19 +21,6 @@ ECS.addComponentToEntity(world, MONSTER, FROZEN)
 const moveableFilter = ECS.createFilter(world, [ POSITION, HEALTH ])
 
 
-//console.log(JSON.stringify(world, null, 2))
-/*
-const e = ECS.getEntities(world, moveableFilter)
-
-const p = ECS.getComponents(world, PLAYER)
-p.position.x = 4
-p.position.y = 34
-*/
-//console.log('player components', ECS.getComponents(world, PLAYER))
-
-//ECS.removeEntity(world, MONSTER)
-//ECS.removeComponentFromEntity(world, MONSTER, FROZEN)
-
 
 function testSystem (world) {
 	const frozenFilter = ECS.createFilter(world, [ FROZEN ])
