@@ -1,7 +1,7 @@
 {
   "name": "ecs",
-  "version": "1.0.0",
-  "description": "data oriented, functional entity component system",
+  "version": "0.1.0",
+  "description": "a data oriented, functional entity component system",
   "main": "index.js",
   "scripts": {
     "test": "tap test.js"
@@ -12,9 +12,16 @@
     "ecs",
     "entity component system"
   ],
+  "dependencies": {},
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mreinstein/ecs.git"
+  },
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "tap": "^12.6.2"
-  }
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mreinstein/ecs/issues"
+  },
+  "homepage": "https://github.com/mreinstein/ecs#readme"
 }
