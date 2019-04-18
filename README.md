@@ -39,7 +39,7 @@ function keyboardControlSystem (world) {
     // called each game loop
     const onUpdate = function () {
         // get all of the entities in the world that pass the filter
-        for (const entity of ECS.getEntities(world, moveFilter)) {
+        for (const entity of ECS.getEntities(world, moveableFilter)) {
             // update the entity position according to what is pressed
             if (Keyboard.keyPressed('up'))
                 entity.moveable.dy -= 1;
@@ -60,10 +60,10 @@ function keyboardControlSystem (world) {
 
 
 function movementSystem (world) {
-    const moveFilter = ECS.createFilter(world, [ POSITION, MOVEABLE ])
+    const positionMoveFilter = ECS.createFilter(world, [ POSITION, MOVEABLE ])
 
     const onUpdate = function () {
-        for (const entity of ECS.getEntities(world, moveFilter)) {
+        for (const entity of ECS.getEntities(world, positionMoveFilter)) {
             entity.position.x += entity.moveable.dx
             entity.position.y += entity.moveable.dy
         }
@@ -78,7 +78,7 @@ ECS.addSystem(world, movementSystem)
 
 
 function gameLoop() {
-    // iterate through entities and apply elligible system
+    // run onUpdate for all added systems
     ECS.update(world);
 
     requestAnimationFrame(gameLoop);
