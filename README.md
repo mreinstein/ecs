@@ -4,8 +4,8 @@ data oriented, functional entity component system.
 
 ## usage example
 
-This is a minimal example of what you can do with `ecs`. It's not functional but
-illustrates how to declare your components, systems, and entities.
+This is a minimal example of what you can do with `ecs`, illustrating how to declare
+your components, systems, and entities.
 
 ```javascript
 import ECS      from 'ecs'
@@ -14,7 +14,7 @@ import clamp    from 'clamp'
 
 
 // generates a new entity component system
-const world = ECS.createWorld() 
+const world = ECS.createWorld()
 
 
 // define a component type named position and give it a default value
