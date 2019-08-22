@@ -14,7 +14,7 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "tap": "^14.0.0"
+    "tap": "^14.6.1"
   },
   "repository": {
     "type": "git",
