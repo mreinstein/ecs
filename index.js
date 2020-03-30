@@ -207,42 +207,6 @@ function update (world) {
 	}
 }
 
-/*
-function createBehavior (world, fn) {
-	const behaviorId = uid()
-	const behavior = fn()
-	world.behaviors[behaviorId] = behavior
-	return behaviorId
-}
-
-
-// filter which entities the following behavior operates on 
-const EnemyBehaviorFilter = {
-	entity: ut.Entity,
-	bounds: game.Boundaries,
-	speed: game.MoveSpeed,
-	speedChange: game.ChangeOverTime
-}
-
-
-function SampleBehavior () {
-
-	// runs whenever an entity matching the filter is enabled
-	const onEntityEnable = function (entity, data) {
-		//let newSpeed = data.speed.speed + (data.speedChange.changePerSecond * totalTime)
-		//data.speed.speed = newSpeed
-		//let randomX = data.bounds.minX
-	}
-
-	// runs whenever an entity is updated
-	const onEntityUpdate = function (entity, data) {
-		//this.world.addComponent(this.entity)
-		//this.world.destroyEntity(this.data.entity)
-	}
-
-	return { data: EnemyBehaviorFilter, onEntityEnable, onEntityUpdate }
-}
-*/
 
 export default {
 	addComponentToEntity,

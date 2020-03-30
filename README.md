@@ -77,7 +77,7 @@ ECS.addSystem(world, keyboardControlSystem)
 ECS.addSystem(world, movementSystem)
 
 
-function gameLoop() {
+function gameLoop () {
     // run onUpdate for all added systems
     ECS.update(world);
 
