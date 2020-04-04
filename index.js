@@ -144,11 +144,13 @@ function createFilter (world, components) {
 }
 
 
-function getEntities (world, filter) {
+function getEntities (world, archetype) {
 	// we passed in a filter
-	const archetype = Object.keys(filter.uniqueComponentTypeIds)
-	                        .sort((a, b) => a - b)
-	                        .join(',')
+	if (archetype.uniqueComponentTypeIds){
+		archetype = Object.keys(archetype.uniqueComponentTypeIds)
+		                  .sort((a, b) => a - b)
+		                  .join(',')
+	}
 
 	if (!world.filters[archetype])
 		throw new Error(`Archetype ${archetype} not found`)
