@@ -87,7 +87,7 @@ function updateFilter (world, archetype) {
 			const result = { }
 			for (const componentTypeId in filter.uniqueComponentTypeIds) {
 				const name = world.componentTypes[componentTypeId].name
-				result[name] = findComponent(world, entityId, componentTypeId)
+				result[name] = findComponent(world, entityId, componentTypeId).data
 			}
 			world.filters[archetype].entities.push(result)
 		}
