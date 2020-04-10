@@ -50,7 +50,7 @@ function addComponentToEntity (world, entityId, componentTypeId, data={}) {
 	const clonedData =  { ...JSON.parse(JSON.stringify(world.componentTypes[componentTypeId].data)), ...data }
 	data = { ...clonedData, ...data }
 	const componentId = uid()
-	world.components[componentId] = { id: componentId, entityId, componentTypeId, data: clonedData }
+	world.components[componentId] = { id: componentId, entityId, componentTypeId, data }
 
 	world.entityComponents[entityId].push(world.components[componentId])
 
