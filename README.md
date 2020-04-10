@@ -25,7 +25,8 @@ const MOVEABLE = ECS.createComponentType(world, 'moveable', { dx: 0, dy: 0 })
 
 // set up the player
 const PLAYER = ECS.createEntity(world)
-ECS.addComponentToEntity(world, PLAYER, POSITION)
+//                                                4th argument overrides default values
+ECS.addComponentToEntity(world, PLAYER, POSITION, { x: 15, y: 23 })
 ECS.addComponentToEntity(world, PLAYER, MOVEABLE)
 
 

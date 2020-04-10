@@ -29,14 +29,14 @@ function createEntity (world) {
 }
 
 
-function createComponentType (world, name, data) {
+function createComponentType (world, name, data={}) {
 	const typeid = uid()
-	world.componentTypes[typeid] = { typeid, name, data }
+	world.componentTypes[typeid] = { typeid, name }
 	return typeid
 }
 
 
-function addComponentToEntity (world, entityId, componentTypeId) {
+function addComponentToEntity (world, entityId, componentTypeId, data={}) {
 	if (!world.entities[entityId])
 		throw new Error(`Entity ${entityId} not found`)
 
@@ -47,7 +47,8 @@ function addComponentToEntity (world, entityId, componentTypeId) {
 	if (existingComponent)
 		return
 
-	const clonedData = JSON.parse(JSON.stringify(world.componentTypes[componentTypeId].data))
+	const clonedData =  { ...JSON.parse(JSON.stringify(world.componentTypes[componentTypeId].data)), ...data }
+	data = { ...clonedData, ...data }
 	const componentId = uid()
 	world.components[componentId] = { id: componentId, entityId, componentTypeId, data: clonedData }
 
