@@ -31,7 +31,7 @@ function createEntity (world) {
 
 function createComponentType (world, name, data={}) {
 	const typeid = uid()
-	world.componentTypes[typeid] = { typeid, name }
+	world.componentTypes[typeid] = { typeid, name, data }
 	return typeid
 }
 
@@ -47,7 +47,7 @@ function addComponentToEntity (world, entityId, componentTypeId, data={}) {
 	if (existingComponent)
 		return
 
-	const clonedData =  { ...JSON.parse(JSON.stringify(world.componentTypes[componentTypeId].data)), ...data }
+	const clonedData = JSON.parse(JSON.stringify(world.componentTypes[componentTypeId].data))
 	data = { ...clonedData, ...data }
 	const componentId = uid()
 	world.components[componentId] = { id: componentId, entityId, componentTypeId, data }
