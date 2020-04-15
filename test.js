@@ -25,7 +25,7 @@ const moveableFilter = ECS.createFilter(world, [ POSITION, HEALTH ])
 function testSystem (world) {
 	const frozenFilter = ECS.createFilter(world, [ FROZEN ])
 
-	const onUpdate = function () {
+	const onUpdate = function (world, dt) {
 		//const dt = ut.Time.deltaTime()
 		const f = ECS.getEntities(world, frozenFilter)
 		console.log('frozen entities:', f)

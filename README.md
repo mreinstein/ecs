@@ -38,7 +38,7 @@ function keyboardControlSystem (world) {
     const moveableFilter = ECS.createFilter(world, [ MOVEABLE ])
 
     // called each game loop
-    const onUpdate = function () {
+    const onUpdate = function (world, dt) {
         // get all of the entities in the world that pass the filter
         for (const entity of ECS.getEntities(world, moveableFilter)) {
             // update the entity position according to what is pressed
@@ -63,7 +63,7 @@ function keyboardControlSystem (world) {
 function movementSystem (world) {
     const positionMoveFilter = ECS.createFilter(world, [ POSITION, MOVEABLE ])
 
-    const onUpdate = function () {
+    const onUpdate = function (world, dt) {
         for (const entity of ECS.getEntities(world, positionMoveFilter)) {
             entity.position.x += entity.moveable.dx
             entity.position.y += entity.moveable.dy
