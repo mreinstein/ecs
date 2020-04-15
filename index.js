@@ -203,15 +203,26 @@ function addSystem (world, fn) {
 	const system = fn(world)
 	if (!system.onUpdate)
 		system.onUpdate = function () { }
+
+	if (!system.onFixedUpdate)
+		system.onFixedUpdate = function () { }
+
 	world.systems[systemId] = system
 	return systemId
 }
 
 
-function update (world) {
+function fixedUpdate (world, dt) {
 	for (const systemId in world.systems) {
 		const system = world.systems[systemId]
-		system.onUpdate(world)
+		system.onFixedUpdate(world, dt)
+	}
+}
+
+function update (world, dt) {
+	for (const systemId in world.systems) {
+		const system = world.systems[systemId]
+		system.onUpdate(world, dt)
 	}
 }
 
@@ -227,5 +238,6 @@ export default {
 	getComponents,
 	removeEntity,
 	removeComponentFromEntity,
+	fixedUpdate,
 	update
 }
