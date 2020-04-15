@@ -215,14 +215,14 @@ function addSystem (world, fn) {
 function fixedUpdate (world, dt) {
 	for (const systemId in world.systems) {
 		const system = world.systems[systemId]
-		system.onFixedUpdate(world, dt)
+		system.onFixedUpdate(dt)
 	}
 }
 
 function update (world, dt) {
 	for (const systemId in world.systems) {
 		const system = world.systems[systemId]
-		system.onUpdate(world, dt)
+		system.onUpdate(dt)
 	}
 }
 

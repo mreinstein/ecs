@@ -38,21 +38,21 @@ function keyboardControlSystem (world) {
     const moveableFilter = ECS.createFilter(world, [ MOVEABLE ])
 
     // called each game loop
-    const onUpdate = function (world, dt) {
+    const onUpdate = function (dt) {
         // get all of the entities in the world that pass the filter
         for (const entity of ECS.getEntities(world, moveableFilter)) {
             // update the entity position according to what is pressed
             if (Keyboard.keyPressed('up'))
-                entity.moveable.dy -= 1;
+                entity.moveable.dy -= 1
             if (Keyboard.keyPressed('down'))
-                entity.moveable.dy += 1;
+                entity.moveable.dy += 1
             if (Keyboard.keyPressed('left'))
-                entity.moveable.dx -= 1;
+                entity.moveable.dx -= 1
             if (Keyboard.keyPressed('right'))
-                entity.moveable.dx += 1;
+                entity.moveable.dx += 1
 
-           entity.moveable.dx = clamp(entity.moveable.dx, -10, 10);
-           entity.moveable.dy = clamp(entity.moveable.dy, -10, 10);
+           entity.moveable.dx = clamp(entity.moveable.dx, -10, 10)
+           entity.moveable.dy = clamp(entity.moveable.dy, -10, 10)
         }
     }
 
@@ -63,7 +63,7 @@ function keyboardControlSystem (world) {
 function movementSystem (world) {
     const positionMoveFilter = ECS.createFilter(world, [ POSITION, MOVEABLE ])
 
-    const onUpdate = function (world, dt) {
+    const onUpdate = function (dt) {
         for (const entity of ECS.getEntities(world, positionMoveFilter)) {
             entity.position.x += entity.moveable.dx
             entity.position.y += entity.moveable.dy
@@ -78,11 +78,17 @@ ECS.addSystem(world, keyboardControlSystem)
 ECS.addSystem(world, movementSystem)
 
 
-function gameLoop () {
-    // run onUpdate for all added systems
-    ECS.update(world);
+let currentTime = performance.now()
 
-    requestAnimationFrame(gameLoop);
+function gameLoop () {
+    const newTime = performance.now()
+    const frameTime = newTime - currentTime  // in milliseconds, e.g. 16.64356
+    currentTime = newTime
+
+    // run onUpdate for all added systems
+    ECS.update(world, frameTime)
+
+    requestAnimationFrame(gameLoop)
 }
 
 
