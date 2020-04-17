@@ -1,5 +1,9 @@
 # ecs
+
 data oriented, functional entity component system.
+
+
+[![Build Status](https://travis-ci.org/mreinstein/ecs.svg?branch=master)](https://travis-ci.org/mreinstein/ecs)
 
 
 ## usage example
