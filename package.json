@@ -1,10 +1,10 @@
 {
   "name": "ecs",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "a data oriented, functional entity component system",
   "main": "index.js",
   "scripts": {
-    "test": "tap test.js"
+    "test": "tap test/"
   },
   "keywords": [
     "game",
@@ -12,7 +12,9 @@
     "ecs",
     "entity component system"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "remove-array-items": "^2.0.1"
+  },
   "devDependencies": {
     "tap": "^14.10.7"
   },
