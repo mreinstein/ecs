@@ -39,6 +39,23 @@ function addComponentToEntity (world, entity, componentName, componentData) {
 }
 
 
+function removeComponentFromEntity (world, entity, componentName) {
+	
+	delete entity[componentName]
+
+	// remove this entity from any filters that no longer match
+	for (const filterId in world.filters) {
+		if (filterId.indexOf(componentName) >= 0) {
+			// this filter contains the removed component
+			const filter = world.filters[filterId]
+			const filterIdx = filter.indexOf(entity)
+			if (filterIdx >= 0)
+				removeItems(filter, filterIdx, 1)
+		}
+	}
+}
+
+
 function getEntities (world, componentNames) {
 	const filterId = componentNames.join(',')
 	if (!world.filters[filterId])
@@ -101,4 +118,4 @@ function update (world, dt) {
 }
 
 
-export default { createWorld, createEntity, addComponentToEntity, getEntities, removeEntity, addSystem, fixedUpdate, update }
+export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities, removeEntity, addSystem, fixedUpdate, update }
