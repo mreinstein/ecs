@@ -17,7 +17,7 @@ function createEntity (world) {
 }
 
 
-function addComponentToEntity (world, entity, componentName, componentData) {
+function addComponentToEntity (world, entity, componentName, componentData={}) {
 	entity[componentName] = componentData
 
 	// add this entity to any filters that match
