@@ -96,11 +96,18 @@ function removeEntity (world, entity) {
 
 function addSystem (world, fn) {
 	const system = fn(world)
-	if (!system.onUpdate)
-		system.onUpdate = function () { }
 
 	if (!system.onFixedUpdate)
 		system.onFixedUpdate = function () { }
+
+	if (!system.onPreUpdate)
+		system.onPreUpdate = function () { }
+
+	if (!system.onUpdate)
+		system.onUpdate = function () { }
+
+	if (!system.onPostUpdate)
+		system.onPostUpdate = function () { }
 
 	world.systems.push(system)
 }
@@ -112,10 +119,22 @@ function fixedUpdate (world, dt) {
 }
 
 
+function preUpdate (world, dt) {
+	for (const system of world.systems)
+		system.onPreUpdate(dt)
+}
+
+
 function update (world, dt) {
 	for (const system of world.systems)
 		system.onUpdate(dt)
 }
 
 
-export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities, removeEntity, addSystem, fixedUpdate, update }
+function postUpdate (world, dt) {
+	for (const system of world.systems)
+		system.onPostUpdate(dt)
+}
+
+
+export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities, removeEntity, addSystem, fixedUpdate, update, preUpdate, postUpdate }
