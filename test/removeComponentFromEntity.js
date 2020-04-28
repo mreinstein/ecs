@@ -28,3 +28,36 @@ const entities5 = ECS.getEntities(w, [ 'health' ])
 tap.equal(entities3.length, 0)
 tap.equal(entities4.length, 0)
 tap.equal(entities5.length, 2)
+
+
+
+// while iterating over entities, removing a component from an unvisited entity
+// that causes it to no longer match the filter prevents it from being processed
+
+const w2 = ECS.createWorld()
+
+const e3 = ECS.createEntity(w2)
+ECS.addComponentToEntity(w2, e3, 'position', 'e3')
+
+const e4 = ECS.createEntity(w2)
+ECS.addComponentToEntity(w2, e4, 'position', 'e4')
+
+const e5 = ECS.createEntity(w2)
+ECS.addComponentToEntity(w2, e5, 'position', 'e5')
+
+let i = 0
+const processed = { }
+
+for (const entity of ECS.getEntities(w2, [ 'position'])) {
+	processed[entity.position] = true
+	
+	// while processing the first entity in the list, remove the 2nd entity
+	if (i == 0)
+		ECS.removeComponentFromEntity(w2, e4, 'position')
+
+	i++
+}
+
+tap.same(processed, { 'e3': true, 'e5': true }, 'e4 was not processed because the position component was removed.')
+
+
