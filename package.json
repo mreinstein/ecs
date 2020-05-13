@@ -1,6 +1,6 @@
 {
   "name": "ecs",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "a data oriented, functional entity component system",
   "main": "ecs.js",
   "scripts": {
