@@ -14,6 +14,11 @@ ECS.removeEntity(w, someNonEntity)
 tap.equal(w.entities.length, 1, 'removing some other random object doesnt have any effect')
 
 ECS.removeEntity(w, e)
+
+
+tap.same(w.removals.entities, [ 0 ], 'entity is added to deferred entity remove list')
+
+ECS.cleanup(w) // process deferred removals
 tap.equal(w.entities.length, 0, 'entity gets removed from the world')
 
 
@@ -30,13 +35,15 @@ tap.equal(w.filters['a'].length, 1)
 tap.equal(w.filters['a,b'].length, 1)
 
 ECS.removeEntity(w, e2)
+ECS.cleanup(w) // process deferred removals
 
 tap.equal(w.filters['a'].length, 0, 'removing entities removes them from all matching filters')
 tap.equal(w.filters['a,b'].length, 0, 'removing entities removes them from all matching filters')
 
 
 
-// while iterating over entities, removing an unvisited entity prevents it from being processed
+// while iterating over entities, removing an unvisited entity still gets processed
+// because the removal is defferred until the cleanup step
 
 const w2 = ECS.createWorld()
 
@@ -52,7 +59,7 @@ ECS.addComponentToEntity(w2, e5, 'position', 'e5')
 let i = 0
 const processed = { }
 
-for (const entity of ECS.getEntities(w2, [ 'position'])) {
+for (const entity of ECS.getEntities(w2, [ 'position' ])) {
 	processed[entity.position] = true
 
 	// while processing the first entity in the list, remove the 2nd entity
@@ -62,4 +69,4 @@ for (const entity of ECS.getEntities(w2, [ 'position'])) {
 	i++
 }
 
-tap.same(processed, { 'e3': true, 'e5': true }, 'e4 was not processed because it was removed')
+tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred removal')

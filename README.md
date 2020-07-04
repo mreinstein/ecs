@@ -110,8 +110,8 @@ function gameLoop () {
     // run onUpdate for all added systems
     ECS.update(world, frameTime)
 
-    // necessary cleanup step at the end of the loop
-    ECS.emptyListeners(world)
+    // necessary cleanup step at the end of each frame loop
+    ECS.cleanup(world)
     
     requestAnimationFrame(gameLoop)
 }

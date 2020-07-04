@@ -11,5 +11,9 @@ tap.same(w, {
     listeners: {
         added: { },
         removed: { }
+    },
+    removals: {
+        entities: [ ],
+        components: [ ]
     }
 })

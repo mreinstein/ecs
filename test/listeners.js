@@ -18,7 +18,8 @@ tap.same(r2, [ e ], 'setting up an added listener includes entities already matc
 tap.same(w.listeners.added, { "a,b,c": [ e ], "c": [ e ] }, 'clearing listeners should empty out the lists')
 
 
-ECS.emptyListeners(w)
+ECS.cleanup(w)
+
 
 tap.same(w.listeners.added, { "a,b,c": [], "c": [] }, 'emptying listeners should empty out the lists')
 

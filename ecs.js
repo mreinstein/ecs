@@ -1,4 +1,5 @@
-import removeItems from 'remove-array-items'
+import orderedInsert from './ordered-insert.js'
+import removeItems   from 'remove-array-items'
 
 
 function createWorld () {
@@ -9,6 +10,10 @@ function createWorld () {
         listeners: {
             added: { },  // key is the filter, value is the array of entities added this frame
             removed: { } // key is the filter, value is the array of entities removed this frame
+        },
+        removals: {
+            entities: [ ], // indexes into entities array, sorted from highest to lowest
+            components: [ ] // [ entity index, component name ] pairs sorted from highest to lowest
         }
     }
 }
@@ -57,30 +62,36 @@ function removeComponentFromEntity (world, entity, componentName) {
     //  get list of all remove listeners that we match
     const matchingRemoveListeners = [ ]
     for (const filterId in world.listeners.removed) {
-        if (_matchesFilter(filterId, entity))
-            matchingRemoveListeners.push(filterId)
-    }
-
-    delete entity[componentName]
-
-    // find any of the filters that no longer match as a result of removing
-    //the component and add them to the removed list
-    for (const filterId of matchingRemoveListeners) {
-        if (!_matchesFilter(filterId, entity))
+        // if an entity matches a remove filter, but then no longer matches the filter after a component
+        // is removed, it should be flagged as removed in listeners.removed
+        if (_matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ]))
             world.listeners.removed[filterId].push(entity)
     }
 
+    // add this component to the list of deferred removals
+    const idx = world.entities.indexOf(entity)
+    world.removals.components.push(idx, componentName)
+}
 
-    // remove this entity from any filters that no longer match
-    for (const filterId in world.filters) {
-        if (filterId.indexOf(componentName) >= 0) {
-            // this filter contains the removed component
-            const filter = world.filters[filterId]
-            const filterIdx = filter.indexOf(entity)
-            if (filterIdx >= 0)
-                removeItems(filter, filterIdx, 1)
+
+function removeEntity (world, entity) {
+    const idx = world.entities.indexOf(entity)
+    if (idx < 0)
+        return
+
+    // add the entity to all matching remove listener lists
+    for (const filterId in world.listeners.removed) {
+        const matches = _matchesFilter(filterId, entity)
+
+        // if the entity matches the filter and isn't already in the removed list, add it
+        const list = world.listeners.removed[filterId]
+        if (matches && list.indexOf(entity) < 0) {
+            list.push(entity)
         }
     }
+
+    // add this entity to the list of deferred removals
+    orderedInsert(world.removals.entities, idx)
 }
 
 
@@ -116,42 +127,19 @@ function getEntities (world, componentNames, listenerType) {
 
 
 // returns true if an entity contains all the components that match the filter
-function _matchesFilter (filterId, entity) {
+function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
     const componentIds = filterId.split(',')
     // if the entity lacks any components in the filter, it's not in the filter
-    for (const componentId of componentIds)
-        if (!entity[componentId])
+    for (const componentId of componentIds) {
+        const isIgnored = componentIgnoreList.indexOf(componentId) >= 0
+        if (isIgnored)
             return false
 
+        if (!entity[componentId])
+            return false
+    }
+
     return true
-}
-
-
-function removeEntity (world, entity) {
-    const idx = world.entities.indexOf(entity)
-    if (idx < 0)
-        return
-
-    // add the entity to all matching remove listener lists
-    for (const filterId in world.listeners.removed) {
-        const matches = _matchesFilter(filterId, entity)
-
-        // if the entity matches the filter and isn't already in the added list, add it
-        const list = world.listeners.removed[filterId]
-        if (matches && list.indexOf(entity) < 0) {
-            list.push(entity)
-        }
-    }
-
-    removeItems(world.entities, idx, 1)
-
-    // update all filters that match this
-    for (const filterId in world.filters) {
-        const filter = world.filters[filterId]
-        const idx = filter.indexOf(entity)
-        if (idx >= 0)
-            removeItems(filter, idx, 1)
-    }
 }
 
 
@@ -209,5 +197,50 @@ function emptyListeners (world) {
 }
 
 
+function cleanup (world) {
+    emptyListeners(world)
+
+    // process all entity components marked for deferred removal
+    for (let i=0; i < world.removals.components.length; i+=2) {
+        const entityIdx = world.removals.components[i];
+        const componentName = world.removals.components[i+1]
+
+        const entity = world.entities[entityIdx]
+        delete entity[componentName]
+
+        // remove this entity from any filters that no longer match
+        for (const filterId in world.filters) {
+            if (filterId.indexOf(componentName) >= 0) {
+                // this filter contains the removed component
+                const filter = world.filters[filterId]
+                const filterIdx = filter.indexOf(entity)
+                if (filterIdx >= 0)
+                    removeItems(filter, filterIdx, 1)
+            }
+        }
+    }
+
+    world.removals.components.length = 0
+
+
+    // process all entities marked for deferred removal
+    for (const entityIdx of world.removals.entities) {
+        const entity = world.entities[entityIdx]
+
+        removeItems(world.entities, entityIdx, 1)
+
+        // update all filters that match this
+        for (const filterId in world.filters) {
+            const filter = world.filters[filterId]
+            const idx = filter.indexOf(entity)
+            if (idx >= 0)
+                removeItems(filter, idx, 1)
+        }
+    }
+
+    world.removals.entities.length = 0
+}
+
+
 export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities,
-                 removeEntity, addSystem, fixedUpdate, update, preUpdate, postUpdate, emptyListeners }
+                 removeEntity, addSystem, fixedUpdate, update, preUpdate, postUpdate, cleanup }

@@ -20,6 +20,7 @@ tap.equal(entities.length, 1)
 tap.equal(entities2.length, 1)
 
 ECS.removeComponentFromEntity(w, e, 'position')
+ECS.cleanup(w)
 
 const entities3 = ECS.getEntities(w, [ 'position' ])
 const entities4 = ECS.getEntities(w, [ 'position', 'health' ])
@@ -31,8 +32,8 @@ tap.equal(entities5.length, 2)
 
 
 
-// while iterating over entities, removing a component from an unvisited entity
-// that causes it to no longer match the filter prevents it from being processed
+// while iterating over entities, removing a component from an unvisited entity still gets processed
+// because the removal is defferred until the cleanup step
 
 const w2 = ECS.createWorld()
 
@@ -58,6 +59,4 @@ for (const entity of ECS.getEntities(w2, [ 'position'])) {
 	i++
 }
 
-tap.same(processed, { 'e3': true, 'e5': true }, 'e4 was not processed because the position component was removed.')
-
-
+tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred component removal')
