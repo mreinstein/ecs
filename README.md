@@ -42,6 +42,7 @@ ECS.addComponentToEntity(world, PLAYER, 'position', { x: 15, y: 23 })
 ECS.addComponentToEntity(world, PLAYER, 'moveable', { dx: 0, dy: 0 })
 
 
+
 // update entity velocity based on key pressed
 function keyboardControlSystem (world) {
     // called each game loop
@@ -79,8 +80,24 @@ function movementSystem (world) {
 }
 
 
+function rendererSystem (world) {
+    const onUpdate = function (dt) {
+
+        // optional 3rd parameter, can be 'added' or 'removed'. provides the list of entities that were 
+        // added/removed since the last system call which match the filter
+        for (const entity of ECS.getEntities(world, [ 'renderable' ], 'added')) {
+            // do whatever setup you need for newly created renderable here
+        }
+
+    }
+
+    return { onUpdate }
+}
+
+
 ECS.addSystem(world, keyboardControlSystem)
 ECS.addSystem(world, movementSystem)
+ECS.addSystem(world, rendererSystem)
 
 
 let currentTime = performance.now()
@@ -93,6 +110,9 @@ function gameLoop () {
     // run onUpdate for all added systems
     ECS.update(world, frameTime)
 
+    // necessary cleanup step at the end of the loop
+    ECS.emptyListeners(world)
+    
     requestAnimationFrame(gameLoop)
 }
 

@@ -2,139 +2,212 @@ import removeItems from 'remove-array-items'
 
 
 function createWorld () {
-	return {
-		entities: [ ],
-		filters: { },
-		systems: [ ]
-	}
+    return {
+        entities: [ ],
+        filters: { },
+        systems: [ ],
+        listeners: {
+            added: { },  // key is the filter, value is the array of entities added this frame
+            removed: { } // key is the filter, value is the array of entities removed this frame
+        }
+    }
 }
 
 
 function createEntity (world) {
-	const entity = { }
-	world.entities.push(entity)
-	return entity
+    const entity = { }
+    world.entities.push(entity)
+    return entity
 }
 
 
 function addComponentToEntity (world, entity, componentName, componentData={}) {
-	entity[componentName] = componentData
+    entity[componentName] = componentData
 
-	// add this entity to any filters that match
-	for (const filterId in world.filters) {
-		const matches = _matchesFilter(filterId, entity)
+    // add this entity to any filters that match
+    for (const filterId in world.filters) {
+        const matches = _matchesFilter(filterId, entity)
 
-		const filter = world.filters[filterId]
-		const idx = filter.indexOf(entity)
-		if (idx >= 0) {
-			// filter already contains entity and the filter doesn't match the entity, remove it
-			if (!matches)
-				removeItems(filter, idx, 1)
-		} else {
-			// filter doesn't contain the entity yet, and it's not included yet, add it
-			if (matches)
-				filter.push(entity)
-		}
-	}
+        const filter = world.filters[filterId]
+        const idx = filter.indexOf(entity)
+        if (idx >= 0) {
+            // filter already contains entity and the filter doesn't match the entity, remove it
+            if (!matches)
+                removeItems(filter, idx, 1)
+        } else {
+            // filter doesn't contain the entity yet, and it's not included yet, add it
+            if (matches)
+                filter.push(entity)
+        }
+    }
+
+    for (const filterId in world.listeners.added) {
+        const matches = _matchesFilter(filterId, entity)
+
+        // if the entity matches the filter and isn't already in the added list, add it
+        const list = world.listeners.added[filterId]
+        if (matches && list.indexOf(entity) < 0)
+            list.push(entity)
+    }
 }
 
 
 function removeComponentFromEntity (world, entity, componentName) {
-	
-	delete entity[componentName]
+    
+    //  get list of all remove listeners that we match
+    const matchingRemoveListeners = [ ]
+    for (const filterId in world.listeners.removed) {
+        if (_matchesFilter(filterId, entity))
+            matchingRemoveListeners.push(filterId)
+    }
 
-	// remove this entity from any filters that no longer match
-	for (const filterId in world.filters) {
-		if (filterId.indexOf(componentName) >= 0) {
-			// this filter contains the removed component
-			const filter = world.filters[filterId]
-			const filterIdx = filter.indexOf(entity)
-			if (filterIdx >= 0)
-				removeItems(filter, filterIdx, 1)
-		}
-	}
+    delete entity[componentName]
+
+    // find any of the filters that no longer match as a result of removing
+    //the component and add them to the removed list
+    for (const filterId of matchingRemoveListeners) {
+        if (!_matchesFilter(filterId, entity))
+            world.listeners.removed[filterId].push(entity)
+    }
+
+
+    // remove this entity from any filters that no longer match
+    for (const filterId in world.filters) {
+        if (filterId.indexOf(componentName) >= 0) {
+            // this filter contains the removed component
+            const filter = world.filters[filterId]
+            const filterIdx = filter.indexOf(entity)
+            if (filterIdx >= 0)
+                removeItems(filter, filterIdx, 1)
+        }
+    }
 }
 
 
-function getEntities (world, componentNames) {
-	const filterId = componentNames.join(',')
-	if (!world.filters[filterId])
-		world.filters[filterId] = world.entities.filter((e) => _matchesFilter(filterId, e))
+function getEntities (world, componentNames, listenerType) {
+    const filterId = componentNames.join(',')
+    if (!world.filters[filterId])
+        world.filters[filterId] = world.entities.filter((e) => _matchesFilter(filterId, e))
 
-	return world.filters[filterId]
+    if (listenerType === 'added') {
+        // if the filter doesn't exist yet, add it
+        if (!world.listeners.added[filterId]) {
+            world.listeners.added[filterId] = [ ]
+            // add all existing entities that are already matching to the added event
+            for (const entity of world.entities) {
+                if (_matchesFilter(filterId, entity))
+                    world.listeners.added[filterId].push(entity)  
+            }
+        }
+
+        return world.listeners.added[filterId]
+    }
+
+    if (listenerType === 'removed') {
+        // if the filter doesn't exist yet, remove it
+        if (!world.listeners.removed[filterId])
+            world.listeners.removed[filterId] = [ ]
+        
+        return world.listeners.removed[filterId]
+    }
+
+    return world.filters[filterId]
 }
 
 
 // returns true if an entity contains all the components that match the filter
 function _matchesFilter (filterId, entity) {
-	const componentIds = filterId.split(',')
-	// if the entity lacks any components in the filter, it's not in the filter
-	for (const componentId of componentIds)
-		if (!entity[componentId])
-			return false
+    const componentIds = filterId.split(',')
+    // if the entity lacks any components in the filter, it's not in the filter
+    for (const componentId of componentIds)
+        if (!entity[componentId])
+            return false
 
-	return true
+    return true
 }
 
 
 function removeEntity (world, entity) {
-	const idx = world.entities.indexOf(entity)
-	if (idx < 0)
-		return
+    const idx = world.entities.indexOf(entity)
+    if (idx < 0)
+        return
 
-	removeItems(world.entities, idx, 1)
+    // add the entity to all matching remove listener lists
+    for (const filterId in world.listeners.removed) {
+        const matches = _matchesFilter(filterId, entity)
 
-	// update all filters that match this
-	for (const filterId in world.filters) {
-		const filter = world.filters[filterId]
-		const idx = filter.indexOf(entity)
-		if (idx >= 0)
-			removeItems(filter, idx, 1)
-	}
+        // if the entity matches the filter and isn't already in the added list, add it
+        const list = world.listeners.removed[filterId]
+        if (matches && list.indexOf(entity) < 0) {
+            list.push(entity)
+        }
+    }
+
+    removeItems(world.entities, idx, 1)
+
+    // update all filters that match this
+    for (const filterId in world.filters) {
+        const filter = world.filters[filterId]
+        const idx = filter.indexOf(entity)
+        if (idx >= 0)
+            removeItems(filter, idx, 1)
+    }
 }
 
 
 function addSystem (world, fn) {
-	const system = fn(world)
+    const system = fn(world)
 
-	if (!system.onFixedUpdate)
-		system.onFixedUpdate = function () { }
+    if (!system.onFixedUpdate)
+        system.onFixedUpdate = function () { }
 
-	if (!system.onPreUpdate)
-		system.onPreUpdate = function () { }
+    if (!system.onPreUpdate)
+        system.onPreUpdate = function () { }
 
-	if (!system.onUpdate)
-		system.onUpdate = function () { }
+    if (!system.onUpdate)
+        system.onUpdate = function () { }
 
-	if (!system.onPostUpdate)
-		system.onPostUpdate = function () { }
+    if (!system.onPostUpdate)
+        system.onPostUpdate = function () { }
 
-	world.systems.push(system)
+    world.systems.push(system)
 }
 
 
 function fixedUpdate (world, dt) {
-	for (const system of world.systems)
-		system.onFixedUpdate(dt)
+    for (const system of world.systems)
+        system.onFixedUpdate(dt)
 }
 
 
 function preUpdate (world, dt) {
-	for (const system of world.systems)
-		system.onPreUpdate(dt)
+    for (const system of world.systems)
+        system.onPreUpdate(dt)
 }
 
 
 function update (world, dt) {
-	for (const system of world.systems)
-		system.onUpdate(dt)
+    for (const system of world.systems)
+        system.onUpdate(dt)
 }
 
 
 function postUpdate (world, dt) {
-	for (const system of world.systems)
-		system.onPostUpdate(dt)
+    for (const system of world.systems)
+        system.onPostUpdate(dt)
 }
 
 
-export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities, removeEntity, addSystem, fixedUpdate, update, preUpdate, postUpdate }
+// remove all entities that were added/removed this frame from the listener set
+// should be called after postUpdate
+function emptyListeners (world) {
+    for (const filterId in world.listeners.added)
+        world.listeners.added[filterId].length = 0
+
+    for (const filterId in world.listeners.removed)
+        world.listeners.removed[filterId].length = 0
+}
+
+
+export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities,
+                 removeEntity, addSystem, fixedUpdate, update, preUpdate, postUpdate, emptyListeners }

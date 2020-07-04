@@ -4,4 +4,12 @@ import tap from 'tap'
 
 const w = ECS.createWorld()
 
-tap.same(w, { entities: [ ], filters: { }, systems: [ ] })
+tap.same(w, {
+    entities: [ ],
+    filters: { },
+    systems: [ ],
+    listeners: {
+        added: { },
+        removed: { }
+    }
+})
