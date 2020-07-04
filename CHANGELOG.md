@@ -1,3 +1,8 @@
+# 0.8.0
+* implement deferred removal of entities and components
+* rename `emptyListeners` function to `cleanup`
+
+
 # 0.7.0
 * add a 3rd parameter to getEntities to enable querying for added and removed entities that match the filter
 
