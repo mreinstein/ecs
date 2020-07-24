@@ -16,7 +16,7 @@
     "remove-array-items": "^2.0.1"
   },
   "devDependencies": {
-    "tap": "^14.10.7"
+    "tap": "^14.10.8"
   },
   "repository": {
     "type": "git",
