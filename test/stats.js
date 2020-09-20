@@ -107,15 +107,15 @@ async function main () {
             'componentId3': 0
         },
         systems: [
-        {
-            name: 'testSystem',
-            timeElapsed: 0,
-            filters: {
-                'componentId1,componentId2': 0,
-                'componentId3': 0,
+            {
+                name: 'testSystem',
+                timeElapsed: 0,
+                filters: {
+                    'componentId1,componentId2': 0,
+                    'componentId3': 0,
+                }
             }
-        }
-    ],
+        ],
         currentSystem: 0
     }, 'calling cleanup resets stats for the next frame')
 
@@ -135,15 +135,15 @@ async function main () {
             'componentId3': 0
         },
         systems: [
-        {
-            name: 'testSystem',
-            timeElapsed: 0,
-            filters: {
-                'componentId1,componentId2': 0,
-                'componentId3': 0,
+            {
+                name: 'testSystem',
+                timeElapsed: 0,
+                filters: {
+                    'componentId1,componentId2': 0,
+                    'componentId3': 0,
+                }
             }
-        }
-    ],
+        ],
         currentSystem: 0
     }, 'removing an entity cleanups up component and entity counts')
 
