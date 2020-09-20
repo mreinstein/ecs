@@ -118,9 +118,8 @@ function removeEntity (world, entity) {
 
         // if the entity matches the filter and isn't already in the removed list, add it
         const list = world.listeners.removed[filterId]
-        if (matches && list.indexOf(entity) < 0) {
+        if (matches && list.indexOf(entity) < 0)
             list.push(entity)
-        }
     }
 
     // add this entity to the list of deferred removals
