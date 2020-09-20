@@ -15,5 +15,12 @@ tap.same(w, {
     removals: {
         entities: [ ],
         components: [ ]
+    },
+    stats: {
+        entityCount: 0,
+        componentCount: { },
+        filterInvocationCount: { },
+        systems: [ ],
+        currentSystem: 0
     }
 })
