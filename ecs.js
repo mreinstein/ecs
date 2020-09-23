@@ -5,8 +5,8 @@ import removeItems   from 'remove-array-items'
 const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => performance.now())
 
 
-function createWorld () {
-    return {
+function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
+    const world = {
         entities: [ ],
         filters: { },
         systems: [ ],
@@ -20,6 +20,8 @@ function createWorld () {
         },
 
         stats: {
+            // TODO: send world id to support multiple ecs worlds per page
+            /*worldId, */
             entityCount: 0,
             componentCount: { }, // key is component id, value is instance count
             filterInvocationCount: { }, // key is filter id, value is number of times this filter was run this frame
@@ -41,6 +43,16 @@ function createWorld () {
             currentSystem: 0
         }
     }
+
+    if ((typeof window !== 'undefined') && window.__MREINSTEIN_ECS_DEVTOOLS) {
+        window.postMessage({
+            id: 'mreinstein/ecs-source',
+            method: 'worldCreated',
+            data: world.stats,
+        }, '*');
+    }
+
+    return world
 }
 
 
@@ -333,6 +345,15 @@ function cleanup (world) {
     }
 
     world.removals.entities.length = 0
+
+    if ((typeof window !== 'undefined') && window.__MREINSTEIN_ECS_DEVTOOLS) {
+        window.postMessage({
+            id: 'mreinstein/ecs-source',
+            method: 'refreshData',
+            data: world.stats,
+        }, '*');
+    }
+
     setTimeout(_resetStats, 0, world) // defer reset until next frame
 }
 
