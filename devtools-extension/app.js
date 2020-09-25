@@ -1,10 +1,6 @@
 import html     from 'https://cdn.jsdelivr.net/npm/snabby@2/snabby.js'
-//import timeline from 'https://cdn.jsdelivr.net/npm/snabbdom-timeline'
 import timeline from 'https://cdn.jsdelivr.net/gh/mreinstein/snabbdom-timeline/timeline.js'
 
-
-//const ID = Math.ceil(Math.random() * 10000)
-//console.log('invoked devtools scr:', ID)
 
 let currentVnode = document.querySelector('main')
 const model = {
@@ -48,20 +44,7 @@ const model = {
                     data: [ ],
 
                     // optional: settings for grid background lines
-                    gridLines: {
-                        /*
-                        vertical: {
-                            majorColor: '#dedede',
-                            minorColor: '#f3f3f3',
-                            ticksPerMinor: 2.5,
-                            ticksPerMajor: 10
-                        },
-                        horizontal: {
-                            color: '#eeeeee',
-                            lineCount: 2
-                        }
-                        */
-                    }
+                    gridLines: { }
                 }
             ]
         }
@@ -104,20 +87,7 @@ const model = {
                     data: [ ],
 
                     // optional: settings for grid background lines
-                    gridLines: {
-                        /*
-                        vertical: {
-                            majorColor: '#dedede',
-                            minorColor: '#f3f3f3',
-                            ticksPerMinor: 2.5,
-                            ticksPerMajor: 10
-                        },
-                        horizontal: {
-                            color: '#eeeeee',
-                            lineCount: 2
-                        }
-                        */
-                    }
+                    gridLines: { }
                 }
             ]
         }
@@ -197,7 +167,6 @@ function update () {
 
 
 function renderEntityGraph (timelineModel, update) {
-    // TODO: draw the snabbdom timeline here for last 60 seconds of data
     const c = timeline(timelineModel, update)
     timelineModel.container = c
     return c
@@ -226,25 +195,4 @@ function render (model, update) {
 
     </main>`
 }
-
-
-/*
-chrome.runtime.onConnect.addListener(m => {
-    console.log('connection happened, sending init message to bg!')
-    model.worldEntries.length = 0
-    backgroundPageConnection.postMessage({
-        name: 'init',
-        tabId: chrome.devtools.inspectedWindow.tabId
-    })
-})
-
-backgroundPageConnection.onDisconnect.addListener(function () {
-    console.log('background page disconnected :(')
-})
-
-window.panelShowing = function (p) {
-    console.log('panel is showing. backgroundPageConnection:', backgroundPageConnection)
-    console.log('SHOWing:', ID)
-}
-*/
 
