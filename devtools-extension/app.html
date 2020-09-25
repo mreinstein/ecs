@@ -2,11 +2,49 @@
 <html>
   <head>
     <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ECS visualizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECS visualizer</title>
+
+    <style>
+        main {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-areas: "entities"
+                                 "components"
+                                 "queries"
+                                 "systems";
+        }
+
+        .entities {
+            grid-area: entities;
+        }
+
+        .components {
+            grid-area: components;
+        }
+
+        .queries {
+            grid-area: queries;
+        }
+
+        .systems {
+            grid-area: systems;
+        }
+
+        @media (min-width: 720px) {
+            main {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-areas: "entities   queries systems"
+                                     "components queries systems";
+            }
+        }
+
+
+    </style>
   </head>
   <body>
-      <div id="app"></div>
-      <script type="module" src="app.js"></script>
+      <main></main>
+
+      <script type="module" src="app-bundle.js"></script>
   </body>
 </html>

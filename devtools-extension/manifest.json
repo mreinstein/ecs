@@ -41,7 +41,7 @@
 
     "web_accessible_resources": [
         "app.html",
-        "content.js",
+        "app-bundle.js",
         "popups/*.html",
         "assets/*.png"
     ],

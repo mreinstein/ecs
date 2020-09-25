@@ -33,21 +33,22 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       });
     }
   } else {
-    console.log('bg tab active?:', tab.active, '  status:', changeInfo.status)
+    console.log('bg - tab active?:', tab.active, '  status:', changeInfo.status)
   }
 });
 
 
 chrome.runtime.onMessage.addListener(
   function(request, sender) {
+    //console.log('bg message received:', request)
     //if (!sender.tab)
     //    return
     if (request.method === 'worldCreated')
       setIconAndPopup('detected', sender.tab.id)
 
 
-    if(!devtoolConnections[sender.tab?.id])
-        console.log('cant send, tab id not found:', sender.tab?.id)
+    //if (!devtoolConnections[sender.tab?.id])
+    //    console.log('cant send, tab id not found:', sender.tab?.id)
 
     // Receive message from content script and relay to the
     // devTools page for the current tab

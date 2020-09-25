@@ -1,60 +1,250 @@
-var count = 0;
-var app = document.querySelector('#app');
+import html     from 'https://cdn.jsdelivr.net/npm/snabby@2/snabby.js'
+//import timeline from 'https://cdn.jsdelivr.net/npm/snabbdom-timeline'
+import timeline from 'https://cdn.jsdelivr.net/gh/mreinstein/snabbdom-timeline/timeline.js'
 
 
-let backgroundPageConnection = chrome.runtime.connect({
+//const ID = Math.ceil(Math.random() * 10000)
+//console.log('invoked devtools scr:', ID)
+
+let currentVnode = document.querySelector('main')
+const model = {
+    startTime: Date.now(),
+    maxSampleCount: 4000,
+
+    entityCount: {
+        currentCount: 0,
+        maxValue: 0,
+        timeline: {
+            container: undefined,
+            width: 0,
+            graphs: [
+                {
+                    title: 'Entity Count',
+                    label: '',
+                    type: 'linePlot',  // scatterPlot | linePlot
+                    timeRange: {
+                        start: 0,  // seconds
+                        end: 0     // seconds
+                    },
+                    yRange: {
+                        start: 0,
+                        end: 100
+                    },
+
+                    // optional: render a selection control
+                    selection: {
+                        type: 'none',
+                        start: 0,       // seconds | 0
+                        end: Infinity,  // seconds | Infinity
+                        dragging: false
+                    },
+
+                    height: 40,              // pixels
+                    dataColor: 'dodgerblue', // color of data points on the graph
+                    renderTicks: false,
+                    renderValueLabel: false,
+
+                    // the data points to render
+                    data: [ ],
+
+                    // optional: settings for grid background lines
+                    gridLines: {
+                        /*
+                        vertical: {
+                            majorColor: '#dedede',
+                            minorColor: '#f3f3f3',
+                            ticksPerMinor: 2.5,
+                            ticksPerMajor: 10
+                        },
+                        horizontal: {
+                            color: '#eeeeee',
+                            lineCount: 2
+                        }
+                        */
+                    }
+                }
+            ]
+        }
+    },
+
+    componentCount: {
+        totalUniqueComponentTypes: 0,
+        maxValue: 0,
+        timeline: {
+            container: undefined,
+            width: 0,
+            graphs: [
+                {
+                    title: 'Component Count',
+                    label: '',
+                    type: 'linePlot',  // scatterPlot | linePlot
+                    timeRange: {
+                        start: 0,  // seconds
+                        end: 0     // seconds
+                    },
+                    yRange: {
+                        start: 0,
+                        end: 100
+                    },
+
+                    // optional: render a selection control
+                    selection: {
+                        type: 'none',
+                        start: 0,       // seconds | 0
+                        end: Infinity,  // seconds | Infinity
+                        dragging: false
+                    },
+
+                    height: 40,              // pixels
+                    dataColor: 'dodgerblue', // color of data points on the graph
+                    renderTicks: false,
+                    renderValueLabel: false,
+
+                    // the data points to render
+                    data: [ ],
+
+                    // optional: settings for grid background lines
+                    gridLines: {
+                        /*
+                        vertical: {
+                            majorColor: '#dedede',
+                            minorColor: '#f3f3f3',
+                            ticksPerMinor: 2.5,
+                            ticksPerMajor: 10
+                        },
+                        horizontal: {
+                            color: '#eeeeee',
+                            lineCount: 2
+                        }
+                        */
+                    }
+                }
+            ]
+        }
+    }
+}
+
+
+window.MM = model
+
+const backgroundPageConnection = chrome.runtime.connect({
     name: 'mreinstein/ecs-devtools'
 })
-
 
 backgroundPageConnection.postMessage({
     name: 'init',
     tabId: chrome.devtools.inspectedWindow.tabId
-});
-
-
-chrome.runtime.onConnect.addListener(m => {
-    count = 0
-    backgroundPageConnection.postMessage({
-        name: 'init',
-        tabId: chrome.devtools.inspectedWindow.tabId
-    });
 })
 
 
 backgroundPageConnection.onMessage.addListener(function (message) {
     // worldCreated || refreshData || disabled
-    if (message.method === 'disabled')
-        count = 0
-    else
-        count++
+    if (message.method === 'worldCreated') {
+        model.entityCount.currentCount = 0
+        model.entityCount.maxValue = 100
+        model.entityCount.timeline.graphs[0].data.length = 0
 
-    app.innerHTML = `Stats Count:: ${count}`
+        model.componentCount.totalUniqueComponentTypes = 0
+        model.componentCount.maxValue = 100
+        model.componentCount.timeline.graphs[0].data.length = 0
+
+    } else if (message.method === 'refreshData') {
+        const stats = message.data
+        const t = (Date.now() - model.startTime) / 1000
+
+        model.entityCount.maxValue = Math.max(model.entityCount.maxValue, stats.entityCount)
+        model.entityCount.currentCount = stats.entityCount
+
+        model.entityCount.timeline.graphs[0].data.push({ t, value: stats.entityCount })
+        model.entityCount.timeline.graphs[0].yRange.end = Math.round(model.entityCount.maxValue * 1.1)
+
+
+        model.componentCount.totalUniqueComponentTypes = Object.keys(stats.componentCount).length
+        let totalCount = 0
+        for (const componentId in stats.componentCount) {
+            totalCount += stats.componentCount[componentId]
+        }
+
+        model.componentCount.timeline.graphs[0].data.push({ t, value: totalCount })
+        model.componentCount.timeline.graphs[0].label = totalCount
+        model.componentCount.maxValue = Math.max(model.componentCount.maxValue, totalCount)
+        model.componentCount.timeline.graphs[0].yRange.end = Math.round(model.componentCount.maxValue * 1.1)
+
+
+        // limit the number of samples in the graph
+        if (model.entityCount.timeline.graphs[0].data.length > model.maxSampleCount) {
+            model.entityCount.timeline.graphs[0].data.shift()
+            model.entityCount.timeline.graphs[0].timeRange.start = model.entityCount.timeline.graphs[0].data[0].t
+            // TODO: re-calculate entity graph max value
+
+            model.componentCount.timeline.graphs[0].data.shift()
+            model.componentCount.timeline.graphs[0].timeRange.start = model.componentCount.timeline.graphs[0].data[0].t
+            // TODO: re-calculate component graph max value
+        }
+
+        model.entityCount.timeline.graphs[0].timeRange.end = t
+        model.componentCount.timeline.graphs[0].timeRange.end = t
+    }
+
+    update()
 })
 
+
+function update () {
+    const newVnode = render(model, update)
+    currentVnode = html.update(currentVnode, newVnode)
+}
+
+
+function renderEntityGraph (timelineModel, update) {
+    // TODO: draw the snabbdom timeline here for last 60 seconds of data
+    const c = timeline(timelineModel, update)
+    timelineModel.container = c
+    return c
+}
+
+
+function render (model, update) {
+    //const { stats } = model.worldEntries[model.worldEntries.length-1]
+
+    //console.log('cm:', currentModel)
+
+    return html`<main>
+        <div class="entities">
+            <h2>Entities (${model.entityCount.currentCount})</h2>
+            ${renderEntityGraph(model.entityCount.timeline, update)}
+        </div>
+
+        <div class="components">
+            <h2>Components (${model.componentCount.totalUniqueComponentTypes})</h2>
+            ${renderEntityGraph(model.componentCount.timeline, update)}
+        </div>
+
+        <div class="queries"></div>
+
+        <div class="systems"></div>
+
+    </main>`
+}
+
+
+/*
+chrome.runtime.onConnect.addListener(m => {
+    console.log('connection happened, sending init message to bg!')
+    model.worldEntries.length = 0
+    backgroundPageConnection.postMessage({
+        name: 'init',
+        tabId: chrome.devtools.inspectedWindow.tabId
+    })
+})
 
 backgroundPageConnection.onDisconnect.addListener(function () {
-    console.log('background page disconnected :o')
-    console.log('reconnecting')
-    backgroundPageConnection = chrome.runtime.connect({
-        name: 'mreinstein/ecs-devtools'
-    })
-
-    console.log('sending init. tabid:', chrome.devtools.inspectedWindow.tabId)
-    backgroundPageConnection.postMessage({
-        name: 'init',
-        tabId: chrome.devtools.inspectedWindow.tabId
-    });
+    console.log('background page disconnected :(')
 })
 
-
-window.panelShowing = function () {
+window.panelShowing = function (p) {
     console.log('panel is showing. backgroundPageConnection:', backgroundPageConnection)
-
-    console.log('firing an init from panel')
-    backgroundPageConnection.postMessage({
-        name: 'init',
-        tabId: chrome.devtools.inspectedWindow.tabId
-    });
+    console.log('SHOWing:', ID)
 }
+*/
 
