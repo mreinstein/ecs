@@ -69,8 +69,8 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
     if (!world.stats.componentCount[componentName])
         world.stats.componentCount[componentName] = 0
 
-    world.stats.componentCount[componentName] += 1
-
+    if (!entity[componentName])
+        world.stats.componentCount[componentName] += 1
 
     entity[componentName] = componentData
 
