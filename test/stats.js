@@ -37,6 +37,25 @@ async function main () {
     }, 'adding entity and components updates counts')
 
 
+
+    const w2 = ECS.createWorld()
+    const e2 = ECS.createEntity(w2)
+    ECS.addComponentToEntity(w2, e2, 'componentId1')
+    ECS.addComponentToEntity(w2, e2, 'componentId1')
+
+    tap.same(w2.stats, {
+        entityCount: 1,
+        componentCount: {
+            componentId1: 1,
+        },
+        filterInvocationCount: { },
+        systems: [ ],
+        currentSystem: 0
+    }, 'adding the same component name twice should not affect component count')
+
+
+
+
     function testSystem () {
         return {
             onFixedUpdate: function () {
@@ -69,27 +88,14 @@ async function main () {
 
     ECS.fixedUpdate(w)
 
-    tap.same(w.stats, {
-        entityCount: 1,
-        componentCount: {
-            componentId1: 1,
-            componentId2: 1
-        },
-        filterInvocationCount: {
-            'componentId1,componentId2': 1,
-            'componentId3': 1
-        },
-        systems: [
-            {
-                name: 'testSystem',
-                timeElapsed: 0,
-                filters: {
-                    'componentId1,componentId2': 1,
-                    'componentId3': 0, // this is 0 because no entities have this component, so none matched
-                }
-            }
-        ],
-        currentSystem: 0
+    tap.same(w.stats.filterInvocationCount, {
+        'componentId1,componentId2': 1,
+        'componentId3': 1
+    }, 'running the systems updates filter counts')
+
+    tap.same(w.stats.systems[0].filters, {
+        'componentId1,componentId2': 1,
+        'componentId3': 0, // this is 0 because no entities have this component, so none matched
     }, 'running the systems updates filter counts')
 
 
