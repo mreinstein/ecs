@@ -15,6 +15,18 @@
                                  "systems";
         }
 
+        main.col2 {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-areas: "entities components"
+                                 "queries  systems";
+        }
+
+        main.col3 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-areas: "entities   queries systems"
+                                 "components queries systems";
+        }
+
         .entities {
             grid-area: entities;
         }
@@ -29,14 +41,6 @@
 
         .systems {
             grid-area: systems;
-        }
-
-        @media (min-width: 720px) {
-            main {
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-areas: "entities   queries systems"
-                                     "components queries systems";
-            }
         }
 
 

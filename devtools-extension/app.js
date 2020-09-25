@@ -1,11 +1,15 @@
+import debounce from 'lodash.debounce'
 import html     from 'https://cdn.jsdelivr.net/npm/snabby@2/snabby.js'
 import timeline from 'https://cdn.jsdelivr.net/gh/mreinstein/snabbdom-timeline/timeline.js'
 
 
 let currentVnode = document.querySelector('main')
+
 const model = {
     startTime: Date.now(),
     maxSampleCount: 4000,
+
+    mainWidth: 0,
 
     entityCount: {
         currentCount: 0,
@@ -95,7 +99,7 @@ const model = {
 }
 
 
-window.MM = model
+//window.MM = model
 
 const backgroundPageConnection = chrome.runtime.connect({
     name: 'mreinstein/ecs-devtools'
@@ -174,12 +178,28 @@ function renderEntityGraph (timelineModel, update) {
 
 
 function render (model, update) {
-    //const { stats } = model.worldEntries[model.worldEntries.length-1]
 
-    //console.log('cm:', currentModel)
+    const _insertHook = function (vnode) {
+        const main = vnode.elm.parentNode
 
-    return html`<main>
-        <div class="entities">
+        const waitMs = 200
+        const resizeHandler = debounce(function () {
+            model.mainWidth = main.offsetWidth
+            update()
+        }, waitMs)
+
+        const ro = new ResizeObserver(resizeHandler)
+        ro.observe(main);
+    }
+
+    let resp = ''
+    if (model.mainWidth > 1024)
+        resp = 'col3'
+    else if (model.mainWidth > 640)
+        resp = 'col2'
+
+    return html`<main class="${resp}">
+        <div class="entities" key="entities" @hook:insert=${_insertHook}>
             <h2>Entities (${model.entityCount.currentCount})</h2>
             ${renderEntityGraph(model.entityCount.timeline, update)}
         </div>

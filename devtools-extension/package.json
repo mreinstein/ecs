@@ -15,5 +15,8 @@
     "@rollup/plugin-node-resolve": "^9.0.0",
     "rollup": "^2.28.2",
     "rollup-plugin-url-resolve": "^0.1.1"
+  },
+  "dependencies": {
+    "lodash.debounce": "^4.0.8"
   }
 }
