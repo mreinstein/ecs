@@ -1928,12 +1928,12 @@ let currentVnode = document.querySelector('main');
 
 const model = {
     startTime: Date.now(),
-    maxSampleCount: 4000,
+    maxSampleCount: 2000,
 
     mainWidth: 0,
 
     entityCount: {
-        currentCount: 0,
+        instanceCount: 0,
         maxValue: 0,
         timeline: {
             container: undefined,
@@ -1983,6 +1983,64 @@ const model = {
             width: 0,
             graphs: [
                 {
+                    title: 'Components Count',
+                    label: '',
+                    type: 'linePlot',  // scatterPlot | linePlot
+                    timeRange: {
+                        start: 0,  // seconds
+                        end: 0     // seconds
+                    },
+                    yRange: {
+                        start: 0,
+                        end: 100
+                    },
+
+                    // optional: render a selection control
+                    selection: {
+                        type: 'none',
+                        start: 0,       // seconds | 0
+                        end: Infinity,  // seconds | Infinity
+                        dragging: false
+                    },
+
+                    height: 40,              // pixels
+                    dataColor: 'dodgerblue', // color of data points on the graph
+                    renderTicks: false,
+                    renderValueLabel: false,
+
+                    // the data points to render
+                    data: [ ],
+
+                    // optional: settings for grid background lines
+                    gridLines: { }
+                }
+            ]
+        }
+    },
+
+    components: { } // key is component id/name, value is the timeline for each component
+};
+
+
+const backgroundPageConnection = chrome.runtime.connect({
+    name: 'mreinstein/ecs-devtools'
+});
+
+backgroundPageConnection.postMessage({
+    name: 'init',
+    tabId: chrome.devtools.inspectedWindow.tabId
+});
+
+
+function createComponentTimeline (componentId) {
+    return {
+        instanceCount: 0,
+        maxValue: 0,
+        timeline: {
+            container: undefined,
+            width: 0,
+            graphs: [
+                {
                     title: 'Component Count',
                     label: '',
                     type: 'linePlot',  // scatterPlot | linePlot
@@ -2017,25 +2075,15 @@ const model = {
             ]
         }
     }
-};
-
-
-//window.MM = model
-
-const backgroundPageConnection = chrome.runtime.connect({
-    name: 'mreinstein/ecs-devtools'
-});
-
-backgroundPageConnection.postMessage({
-    name: 'init',
-    tabId: chrome.devtools.inspectedWindow.tabId
-});
+}
 
 
 backgroundPageConnection.onMessage.addListener(function (message) {
     // worldCreated || refreshData || disabled
     if (message.method === 'worldCreated') {
-        model.entityCount.currentCount = 0;
+        // reset the model
+
+        model.entityCount.instanceCount = 0;
         model.entityCount.maxValue = 100;
         model.entityCount.timeline.graphs[0].data.length = 0;
 
@@ -2043,12 +2091,14 @@ backgroundPageConnection.onMessage.addListener(function (message) {
         model.componentCount.maxValue = 100;
         model.componentCount.timeline.graphs[0].data.length = 0;
 
+        model.components = { };
+
     } else if (message.method === 'refreshData') {
         const stats = message.data;
         const t = (Date.now() - model.startTime) / 1000;
 
         model.entityCount.maxValue = Math.max(model.entityCount.maxValue, stats.entityCount);
-        model.entityCount.currentCount = stats.entityCount;
+        model.entityCount.instanceCount = stats.entityCount;
 
         model.entityCount.timeline.graphs[0].data.push({ t, value: stats.entityCount });
         model.entityCount.timeline.graphs[0].yRange.end = Math.round(model.entityCount.maxValue * 1.1);
@@ -2057,7 +2107,31 @@ backgroundPageConnection.onMessage.addListener(function (message) {
         model.componentCount.totalUniqueComponentTypes = Object.keys(stats.componentCount).length;
         let totalCount = 0;
         for (const componentId in stats.componentCount) {
-            totalCount += stats.componentCount[componentId];
+            const componentCount = stats.componentCount[componentId];
+
+            totalCount += componentCount;
+
+            if (!model.components[componentId])
+                model.components[componentId] = createComponentTimeline();
+
+            const ct = model.components[componentId];
+
+            ct.maxValue = Math.max(ct.maxValue, componentCount + 10);
+            ct.instanceCount = componentCount;
+            ct.timeline.graphs[0].data.push({ t, value: componentCount });
+            ct.timeline.graphs[0].yRange.end = Math.round(ct.maxValue * 1.1);
+
+            ct.timeline.graphs[0].label = componentCount;
+
+            //console.log(componentId, 'count:', ct.instanceCount, 'mv:', ct.maxValue)
+
+            // limit the number of samples in the graph
+            if (ct.timeline.graphs[0].data.length > model.maxSampleCount) {
+                ct.timeline.graphs[0].data.shift();
+                ct.timeline.graphs[0].timeRange.start = ct.timeline.graphs[0].data[0].t;
+            }
+
+            ct.timeline.graphs[0].timeRange.end = t;
         }
 
         model.componentCount.timeline.graphs[0].data.push({ t, value: totalCount });
@@ -2098,6 +2172,16 @@ function renderEntityGraph (timelineModel, update) {
 }
 
 
+function renderComponentGraphs(components, update) {
+    return Object.keys(components).map((componentId) => {
+        const c = components[componentId];
+        return index`<div class="component-graph-row">
+        <div>${componentId}</div>${renderEntityGraph(c.timeline, update)}
+        </div>`
+    })
+}
+
+
 function render (model, update) {
 
     const _insertHook = function (vnode) {
@@ -2121,13 +2205,14 @@ function render (model, update) {
 
     return index`<main class="${resp}">
         <div class="entities" key="entities" @hook:insert=${_insertHook}>
-            <h2>Entities (${model.entityCount.currentCount})</h2>
+            <h2>Entities (${model.entityCount.instanceCount})</h2>
             ${renderEntityGraph(model.entityCount.timeline, update)}
         </div>
 
         <div class="components">
             <h2>Components (${model.componentCount.totalUniqueComponentTypes})</h2>
             ${renderEntityGraph(model.componentCount.timeline, update)}
+            ${renderComponentGraphs(model.components, update)}
         </div>
 
         <div class="queries"></div>
