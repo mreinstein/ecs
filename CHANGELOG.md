@@ -1,5 +1,5 @@
 # 0.9.0
-* implement a `not` filter for components
+* implement a not filter for components
 
 
 # 0.8.0
