@@ -58,7 +58,7 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
 
 
 function removeComponentFromEntity (world, entity, componentName) {
-    
+
     //  get list of all remove listeners that we match
     const matchingRemoveListeners = [ ]
     for (const filterId in world.listeners.removed) {
@@ -107,7 +107,7 @@ function getEntities (world, componentNames, listenerType) {
             // add all existing entities that are already matching to the added event
             for (const entity of world.entities) {
                 if (_matchesFilter(filterId, entity))
-                    world.listeners.added[filterId].push(entity)  
+                    world.listeners.added[filterId].push(entity)
             }
         }
 
@@ -118,7 +118,7 @@ function getEntities (world, componentNames, listenerType) {
         // if the filter doesn't exist yet, remove it
         if (!world.listeners.removed[filterId])
             world.listeners.removed[filterId] = [ ]
-        
+
         return world.listeners.removed[filterId]
     }
 
@@ -135,7 +135,10 @@ function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
         if (isIgnored)
             return false
 
-        if (!entity[componentId])
+        if (componentId.startsWith('!') && entity[componentId.slice(1)])
+            return false
+
+        if (!componentId.startsWith('!') && !entity[componentId])
             return false
     }
 

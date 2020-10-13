@@ -83,7 +83,7 @@ function movementSystem (world) {
 function rendererSystem (world) {
     const onUpdate = function (dt) {
 
-        // optional 3rd parameter, can be 'added' or 'removed'. provides the list of entities that were 
+        // optional 3rd parameter, can be 'added' or 'removed'. provides the list of entities that were
         // added/removed since the last system call which match the filter
         for (const entity of ECS.getEntities(world, [ 'renderable' ], 'added')) {
             // do whatever setup you need for newly created renderable here
@@ -112,11 +112,21 @@ function gameLoop () {
 
     // necessary cleanup step at the end of each frame loop
     ECS.cleanup(world)
-    
+
     requestAnimationFrame(gameLoop)
 }
 
 
 // finally start the game loop
 gameLoop()
+```
+
+
+### not filter
+
+Sometimes it's useful to query by components that are _not_ present:
+
+```javascript
+// get all entities that have a transform component but lack a hero component
+const entities = ECS.getEntities(world, [ 'transform', '!hero' ])
 ```
