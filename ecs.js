@@ -189,13 +189,17 @@ function getEntities (world, componentNames, listenerType) {
 // returns true if an entity contains all the components that match the filter
 function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
     const componentIds = filterId.split(',')
+
     // if the entity lacks any components in the filter, it's not in the filter
     for (const componentId of componentIds) {
         const isIgnored = componentIgnoreList.indexOf(componentId) >= 0
         if (isIgnored)
             return false
 
-        if (!entity[componentId])
+        if (componentId.startsWith('!') && entity[componentId.slice(1)])
+            return false
+
+        if (!componentId.startsWith('!') && !entity[componentId])
             return false
     }
 
