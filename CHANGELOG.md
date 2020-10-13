@@ -1,3 +1,7 @@
+# 0.9.0
+* implement a `not` filter for components
+
+
 # 0.8.0
 * implement deferred removal of entities and components
 * rename `emptyListeners` function to `cleanup`
@@ -27,4 +31,3 @@
 # 0.4.0
 * total API do-over
 * initial unit tests
-
