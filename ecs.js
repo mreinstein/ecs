@@ -59,7 +59,7 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
 
 function removeComponentFromEntity (world, entity, componentName) {
 
-    //  get list of all remove listeners that we match
+    // get list of all remove listeners that we match
     const matchingRemoveListeners = [ ]
     for (const filterId in world.listeners.removed) {
         // if an entity matches a remove filter, but then no longer matches the filter after a component
@@ -213,9 +213,14 @@ function cleanup (world) {
 
         // remove this entity from any filters that no longer match
         for (const filterId in world.filters) {
-            if (filterId.indexOf(componentName) >= 0) {
+            const filter = world.filters[filterId]
+
+            if (_matchesFilter(filterId, entity) && (filter.indexOf(entity) < 0)) {
+                // entity matches filter and it's not in the filter add it
+                filter.push(entity)
+            } else if (filterId.indexOf(componentName) >= 0) {
+                // entity doesn't match filter and it's in the filter remove it
                 // this filter contains the removed component
-                const filter = world.filters[filterId]
                 const filterIdx = filter.indexOf(entity)
                 if (filterIdx >= 0)
                     removeItems(filter, filterIdx, 1)
