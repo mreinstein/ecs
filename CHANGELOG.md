@@ -1,3 +1,7 @@
+# 0.9.1
+* fix not filter querying
+
+
 # 0.9.0
 * implement a not filter for components
 
