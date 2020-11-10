@@ -1,5 +1,5 @@
 # 0.9.1
-* fix not filter querying
+* fix not filter querying #12
 
 
 # 0.9.0
