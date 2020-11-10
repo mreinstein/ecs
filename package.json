@@ -1,7 +1,7 @@
 {
   "name": "ecs",
   "version": "0.9.0",
-  "description": "a data oriented, functional entity component system",
+  "description": "data oriented, functional entity component system",
   "main": "ecs.js",
   "scripts": {
     "test": "tap test/"
