@@ -8,6 +8,7 @@
     <style>
         main {
             display: grid;
+            grid-gap: 10px;
             grid-template-columns: 1fr;
             grid-template-areas: "entities"
                                  "components"
@@ -33,6 +34,7 @@
 
         .components {
             grid-area: components;
+            display: grid;
         }
 
         .queries {
@@ -44,8 +46,9 @@
         }
 
         .component-graph-row {
-          display: grid;
-          grid-template-columns: 1fr 2fr;
+           padding-top: 10px;
+           display: grid;
+           grid-template-columns: 1fr 2fr;
         }
 
 

@@ -29,7 +29,7 @@
     "devtools_page": "devtools.html",
 
     "background": {
-        "page": "background.html",
+        "scripts": [ "background.js" ],
         "persistent": false
     },
 
@@ -43,6 +43,7 @@
         "app.html",
         "app-bundle.js",
         "popups/*.html",
+        "popups/*.js",
         "assets/*.png"
     ],
 

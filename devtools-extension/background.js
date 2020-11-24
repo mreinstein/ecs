@@ -1,6 +1,5 @@
 
 function setIconAndPopup(type, tabId) {
-
   chrome.browserAction.setIcon({
     tabId: tabId,
     path: {
@@ -32,6 +31,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         method: 'disabled'
       });
     }
+  } else if (tab.active && changeInfo.status === 'complete') {
+    // the tab was refreshed, send message to devtools indicating
+    // we should stop drawing ecs data
+    devtoolConnections[tabId]?.postMessage({
+      id: 'mreinstein/ecs-devtools',
+      method: 'tab-complete'
+    });
+
   } else {
     console.log('bg - tab active?:', tab.active, '  status:', changeInfo.status)
   }
@@ -46,12 +53,12 @@ chrome.runtime.onMessage.addListener(
     if (request.method === 'worldCreated')
       setIconAndPopup('detected', sender.tab.id)
 
-
     //if (!devtoolConnections[sender.tab?.id])
     //    console.log('cant send, tab id not found:', sender.tab?.id)
 
+    //console.log('relaying msg. size:', request)
     // Receive message from content script and relay to the
-    // devTools page for the current tab
+    // devTools page for that tab
     devtoolConnections[sender.tab?.id]?.postMessage(request)
   }
 )
@@ -68,7 +75,7 @@ chrome.runtime.onConnect.addListener(function (port) {
         // DevTools page, so we need to send it explicitly.
         if (sender.name === 'mreinstein/ecs-devtools' && message.name == 'init') {
           devtoolConnections[message.tabId] = port
-          console.log('tabid:', message.tabId, 'received a new devtools connection')
+          //console.log('tabid:', message.tabId, 'received a new devtools connection')
           return
         }
     }
@@ -77,7 +84,7 @@ chrome.runtime.onConnect.addListener(function (port) {
     port.onMessage.addListener(devToolsListener)
 
     port.onDisconnect.addListener(function () {
-        console.log('port connection closed')
+        console.log('port connection closed!')
 
         port.onMessage.removeListener(devToolsListener)
 

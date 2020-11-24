@@ -1,4 +1,4 @@
-import debounce from 'lodash.debounce'
+import debounce from 'https://cdn.skypack.dev/lodash.debounce'
 import html     from 'https://cdn.jsdelivr.net/npm/snabby@2/snabby.js'
 import timeline from 'https://cdn.jsdelivr.net/gh/mreinstein/snabbdom-timeline/timeline.js'
 
@@ -7,7 +7,7 @@ let currentVnode = document.querySelector('main')
 
 const model = {
     startTime: Date.now(),
-    maxSampleCount: 2000,
+    maxSampleCount: 1000,
 
     mainWidth: 0,
 
@@ -17,11 +17,13 @@ const model = {
         timeline: {
             container: undefined,
             width: 0,
+            renderer: 'canvas',
             graphs: [
                 {
                     title: 'Entity Count',
                     label: '',
                     type: 'linePlot',  // scatterPlot | linePlot
+                    linePlotAreaColor: 'rgba(41, 147, 251, 0.3)', // color to fill area if in linePlot mode
                     timeRange: {
                         start: 0,  // seconds
                         end: 0     // seconds
@@ -60,11 +62,13 @@ const model = {
         timeline: {
             container: undefined,
             width: 0,
+            renderer: 'canvas',
             graphs: [
                 {
                     title: 'Components Count',
                     label: '',
                     type: 'linePlot',  // scatterPlot | linePlot
+                    linePlotAreaColor: 'rgba(41, 147, 251, 0.3)', // color to fill area if in linePlot mode
                     timeRange: {
                         start: 0,  // seconds
                         end: 0     // seconds
@@ -118,11 +122,13 @@ function createComponentTimeline (componentId) {
         timeline: {
             container: undefined,
             width: 0,
+            renderer: 'canvas',
             graphs: [
                 {
                     title: 'Component Count',
                     label: '',
                     type: 'linePlot',  // scatterPlot | linePlot
+                    linePlotAreaColor: 'rgba(41, 147, 251, 0.3)', // color to fill area if in linePlot mode
                     timeRange: {
                         start: 0,  // seconds
                         end: 0     // seconds
@@ -159,7 +165,7 @@ function createComponentTimeline (componentId) {
 
 backgroundPageConnection.onMessage.addListener(function (message) {
     // worldCreated || refreshData || disabled
-    if (message.method === 'worldCreated') {
+    if (message.method === 'worldCreated' || message.method === 'tab-complete') {
         // reset the model
 
         model.entityCount.instanceCount = 0
@@ -169,6 +175,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
         model.componentCount.totalUniqueComponentTypes = 0
         model.componentCount.maxValue = 100
         model.componentCount.timeline.graphs[0].data.length = 0
+        model.componentCount.timeline.graphs[0].label = ''
 
         model.components = { }
 
@@ -201,8 +208,6 @@ backgroundPageConnection.onMessage.addListener(function (message) {
             ct.timeline.graphs[0].yRange.end = Math.round(ct.maxValue * 1.1)
 
             ct.timeline.graphs[0].label = componentCount
-
-            //console.log(componentId, 'count:', ct.instanceCount, 'mv:', ct.maxValue)
 
             // limit the number of samples in the graph
             if (ct.timeline.graphs[0].data.length > model.maxSampleCount) {
@@ -255,7 +260,7 @@ function renderComponentGraphs(components, update) {
     return Object.keys(components).map((componentId) => {
         const c = components[componentId]
         return html`<div class="component-graph-row">
-        <div>${componentId}</div>${renderEntityGraph(c.timeline, update)}
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-right: 6px;">${componentId}</div>${renderEntityGraph(c.timeline, update)}
         </div>`
     })
 }

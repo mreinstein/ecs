@@ -1,248 +1,93 @@
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-/**
- * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright jQuery Foundation and other contributors <https://jquery.org/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-
-/** Used as the `TypeError` message for "Functions" methods. */
-var FUNC_ERROR_TEXT = 'Expected a function';
-
-/** Used as references for various `Number` constants. */
+var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+var FUNC_ERROR_TEXT = "Expected a function";
 var NAN = 0 / 0;
-
-/** `Object#toString` result references. */
-var symbolTag = '[object Symbol]';
-
-/** Used to match leading and trailing whitespace. */
+var symbolTag = "[object Symbol]";
 var reTrim = /^\s+|\s+$/g;
-
-/** Used to detect bad signed hexadecimal string values. */
 var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-/** Used to detect binary string values. */
 var reIsBinary = /^0b[01]+$/i;
-
-/** Used to detect octal string values. */
 var reIsOctal = /^0o[0-7]+$/i;
-
-/** Built-in method references without a dependency on `root`. */
 var freeParseInt = parseInt;
-
-/** Detect free variable `global` from Node.js. */
-var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
-
-/** Detect free variable `self`. */
-var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-/** Used as a reference to the global object. */
-var root = freeGlobal || freeSelf || Function('return this')();
-
-/** Used for built-in method references. */
+var freeGlobal = typeof commonjsGlobal == "object" && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+var root = freeGlobal || freeSelf || Function("return this")();
 var objectProto = Object.prototype;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
 var objectToString = objectProto.toString;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMax = Math.max,
-    nativeMin = Math.min;
-
-/**
- * Gets the timestamp of the number of milliseconds that have elapsed since
- * the Unix epoch (1 January 1970 00:00:00 UTC).
- *
- * @static
- * @memberOf _
- * @since 2.4.0
- * @category Date
- * @returns {number} Returns the timestamp.
- * @example
- *
- * _.defer(function(stamp) {
- *   console.log(_.now() - stamp);
- * }, _.now());
- * // => Logs the number of milliseconds it took for the deferred invocation.
- */
-var now = function() {
+var nativeMax = Math.max,nativeMin = Math.min;
+var now = function () {
   return root.Date.now();
 };
-
-/**
- * Creates a debounced function that delays invoking `func` until after `wait`
- * milliseconds have elapsed since the last time the debounced function was
- * invoked. The debounced function comes with a `cancel` method to cancel
- * delayed `func` invocations and a `flush` method to immediately invoke them.
- * Provide `options` to indicate whether `func` should be invoked on the
- * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
- * with the last arguments provided to the debounced function. Subsequent
- * calls to the debounced function return the result of the last `func`
- * invocation.
- *
- * **Note:** If `leading` and `trailing` options are `true`, `func` is
- * invoked on the trailing edge of the timeout only if the debounced function
- * is invoked more than once during the `wait` timeout.
- *
- * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
- * until to the next tick, similar to `setTimeout` with a timeout of `0`.
- *
- * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
- * for details over the differences between `_.debounce` and `_.throttle`.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Function
- * @param {Function} func The function to debounce.
- * @param {number} [wait=0] The number of milliseconds to delay.
- * @param {Object} [options={}] The options object.
- * @param {boolean} [options.leading=false]
- *  Specify invoking on the leading edge of the timeout.
- * @param {number} [options.maxWait]
- *  The maximum time `func` is allowed to be delayed before it's invoked.
- * @param {boolean} [options.trailing=true]
- *  Specify invoking on the trailing edge of the timeout.
- * @returns {Function} Returns the new debounced function.
- * @example
- *
- * // Avoid costly calculations while the window size is in flux.
- * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
- *
- * // Invoke `sendMail` when clicked, debouncing subsequent calls.
- * jQuery(element).on('click', _.debounce(sendMail, 300, {
- *   'leading': true,
- *   'trailing': false
- * }));
- *
- * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
- * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
- * var source = new EventSource('/stream');
- * jQuery(source).on('message', debounced);
- *
- * // Cancel the trailing debounced invocation.
- * jQuery(window).on('popstate', debounced.cancel);
- */
 function debounce(func, wait, options) {
-  var lastArgs,
-      lastThis,
-      maxWait,
-      result,
-      timerId,
-      lastCallTime,
-      lastInvokeTime = 0,
-      leading = false,
-      maxing = false,
-      trailing = true;
-
-  if (typeof func != 'function') {
+  var lastArgs,lastThis,maxWait,result,timerId,lastCallTime,lastInvokeTime = 0,leading = false,maxing = false,trailing = true;
+  if (typeof func != "function") {
     throw new TypeError(FUNC_ERROR_TEXT);
   }
   wait = toNumber(wait) || 0;
   if (isObject(options)) {
     leading = !!options.leading;
-    maxing = 'maxWait' in options;
+    maxing = "maxWait" in options;
     maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-    trailing = 'trailing' in options ? !!options.trailing : trailing;
+    trailing = "trailing" in options ? !!options.trailing : trailing;
   }
-
   function invokeFunc(time) {
-    var args = lastArgs,
-        thisArg = lastThis;
-
-    lastArgs = lastThis = undefined;
+    var args = lastArgs,thisArg = lastThis;
+    lastArgs = lastThis = void 0;
     lastInvokeTime = time;
     result = func.apply(thisArg, args);
     return result;
   }
-
   function leadingEdge(time) {
-    // Reset any `maxWait` timer.
     lastInvokeTime = time;
-    // Start the timer for the trailing edge.
     timerId = setTimeout(timerExpired, wait);
-    // Invoke the leading edge.
     return leading ? invokeFunc(time) : result;
   }
-
   function remainingWait(time) {
-    var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime,
-        result = wait - timeSinceLastCall;
-
-    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+    var timeSinceLastCall = time - lastCallTime,timeSinceLastInvoke = time - lastInvokeTime,result2 = wait - timeSinceLastCall;
+    return maxing ? nativeMin(result2, maxWait - timeSinceLastInvoke) : result2;
   }
-
   function shouldInvoke(time) {
-    var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime;
-
-    // Either this is the first call, activity has stopped and we're at the
-    // trailing edge, the system time has gone backwards and we're treating
-    // it as the trailing edge, or we've hit the `maxWait` limit.
-    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
-      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+    var timeSinceLastCall = time - lastCallTime,timeSinceLastInvoke = time - lastInvokeTime;
+    return lastCallTime === void 0 || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
   }
-
   function timerExpired() {
     var time = now();
     if (shouldInvoke(time)) {
       return trailingEdge(time);
     }
-    // Restart the timer.
     timerId = setTimeout(timerExpired, remainingWait(time));
   }
-
   function trailingEdge(time) {
-    timerId = undefined;
-
-    // Only invoke if we have `lastArgs` which means `func` has been
-    // debounced at least once.
+    timerId = void 0;
     if (trailing && lastArgs) {
       return invokeFunc(time);
     }
-    lastArgs = lastThis = undefined;
+    lastArgs = lastThis = void 0;
     return result;
   }
-
   function cancel() {
-    if (timerId !== undefined) {
+    if (timerId !== void 0) {
       clearTimeout(timerId);
     }
     lastInvokeTime = 0;
-    lastArgs = lastCallTime = lastThis = timerId = undefined;
+    lastArgs = lastCallTime = lastThis = timerId = void 0;
   }
-
   function flush() {
-    return timerId === undefined ? result : trailingEdge(now());
+    return timerId === void 0 ? result : trailingEdge(now());
   }
-
   function debounced() {
-    var time = now(),
-        isInvoking = shouldInvoke(time);
-
+    var time = now(),isInvoking = shouldInvoke(time);
     lastArgs = arguments;
     lastThis = this;
     lastCallTime = time;
-
     if (isInvoking) {
-      if (timerId === undefined) {
+      if (timerId === void 0) {
         return leadingEdge(lastCallTime);
       }
       if (maxing) {
-        // Handle invocations in a tight loop.
         timerId = setTimeout(timerExpired, wait);
         return invokeFunc(lastCallTime);
       }
     }
-    if (timerId === undefined) {
+    if (timerId === void 0) {
       timerId = setTimeout(timerExpired, wait);
     }
     return result;
@@ -251,131 +96,34 @@ function debounce(func, wait, options) {
   debounced.flush = flush;
   return debounced;
 }
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
 function isObject(value) {
   var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
+  return !!value && (type == "object" || type == "function");
 }
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
 function isObjectLike(value) {
-  return !!value && typeof value == 'object';
+  return !!value && typeof value == "object";
 }
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
 function isSymbol(value) {
-  return typeof value == 'symbol' ||
-    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+  return typeof value == "symbol" || isObjectLike(value) && objectToString.call(value) == symbolTag;
 }
-
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */
 function toNumber(value) {
-  if (typeof value == 'number') {
+  if (typeof value == "number") {
     return value;
   }
   if (isSymbol(value)) {
     return NAN;
   }
   if (isObject(value)) {
-    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-    value = isObject(other) ? (other + '') : other;
+    var other = typeof value.valueOf == "function" ? value.valueOf() : value;
+    value = isObject(other) ? other + "" : other;
   }
-  if (typeof value != 'string') {
+  if (typeof value != "string") {
     return value === 0 ? value : +value;
   }
-  value = value.replace(reTrim, '');
+  value = value.replace(reTrim, "");
   var isBinary = reIsBinary.test(value);
-  return (isBinary || reIsOctal.test(value))
-    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-    : (reIsBadHex.test(value) ? NAN : +value);
+  return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
 }
-
 var lodash_debounce = debounce;
 
 function vnode(sel, data, children, text, elm) {
@@ -1589,6 +1337,153 @@ function lerp(a, b, t) {
   return a + (b - a) * t;
 }
 
+var commonjsGlobal$1 = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+var FUNC_ERROR_TEXT$1 = "Expected a function";
+var NAN$1 = 0 / 0;
+var symbolTag$1 = "[object Symbol]";
+var reTrim$1 = /^\s+|\s+$/g;
+var reIsBadHex$1 = /^[-+]0x[0-9a-f]+$/i;
+var reIsBinary$1 = /^0b[01]+$/i;
+var reIsOctal$1 = /^0o[0-7]+$/i;
+var freeParseInt$1 = parseInt;
+var freeGlobal$1 = typeof commonjsGlobal$1 == "object" && commonjsGlobal$1 && commonjsGlobal$1.Object === Object && commonjsGlobal$1;
+var freeSelf$1 = typeof self == "object" && self && self.Object === Object && self;
+var root$1 = freeGlobal$1 || freeSelf$1 || Function("return this")();
+var objectProto$1 = Object.prototype;
+var objectToString$1 = objectProto$1.toString;
+var nativeMax$1 = Math.max,nativeMin$1 = Math.min;
+var now$1 = function () {
+  return root$1.Date.now();
+};
+function debounce$1(func, wait, options) {
+  var lastArgs,lastThis,maxWait,result,timerId,lastCallTime,lastInvokeTime = 0,leading = false,maxing = false,trailing = true;
+  if (typeof func != "function") {
+    throw new TypeError(FUNC_ERROR_TEXT$1);
+  }
+  wait = toNumber$1(wait) || 0;
+  if (isObject$1(options)) {
+    leading = !!options.leading;
+    maxing = "maxWait" in options;
+    maxWait = maxing ? nativeMax$1(toNumber$1(options.maxWait) || 0, wait) : maxWait;
+    trailing = "trailing" in options ? !!options.trailing : trailing;
+  }
+  function invokeFunc(time) {
+    var args = lastArgs,thisArg = lastThis;
+    lastArgs = lastThis = void 0;
+    lastInvokeTime = time;
+    result = func.apply(thisArg, args);
+    return result;
+  }
+  function leadingEdge(time) {
+    lastInvokeTime = time;
+    timerId = setTimeout(timerExpired, wait);
+    return leading ? invokeFunc(time) : result;
+  }
+  function remainingWait(time) {
+    var timeSinceLastCall = time - lastCallTime,timeSinceLastInvoke = time - lastInvokeTime,result2 = wait - timeSinceLastCall;
+    return maxing ? nativeMin$1(result2, maxWait - timeSinceLastInvoke) : result2;
+  }
+  function shouldInvoke(time) {
+    var timeSinceLastCall = time - lastCallTime,timeSinceLastInvoke = time - lastInvokeTime;
+    return lastCallTime === void 0 || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
+  }
+  function timerExpired() {
+    var time = now$1();
+    if (shouldInvoke(time)) {
+      return trailingEdge(time);
+    }
+    timerId = setTimeout(timerExpired, remainingWait(time));
+  }
+  function trailingEdge(time) {
+    timerId = void 0;
+    if (trailing && lastArgs) {
+      return invokeFunc(time);
+    }
+    lastArgs = lastThis = void 0;
+    return result;
+  }
+  function cancel() {
+    if (timerId !== void 0) {
+      clearTimeout(timerId);
+    }
+    lastInvokeTime = 0;
+    lastArgs = lastCallTime = lastThis = timerId = void 0;
+  }
+  function flush() {
+    return timerId === void 0 ? result : trailingEdge(now$1());
+  }
+  function debounced() {
+    var time = now$1(),isInvoking = shouldInvoke(time);
+    lastArgs = arguments;
+    lastThis = this;
+    lastCallTime = time;
+    if (isInvoking) {
+      if (timerId === void 0) {
+        return leadingEdge(lastCallTime);
+      }
+      if (maxing) {
+        timerId = setTimeout(timerExpired, wait);
+        return invokeFunc(lastCallTime);
+      }
+    }
+    if (timerId === void 0) {
+      timerId = setTimeout(timerExpired, wait);
+    }
+    return result;
+  }
+  debounced.cancel = cancel;
+  debounced.flush = flush;
+  return debounced;
+}
+function throttle(func, wait, options) {
+  var leading = true,trailing = true;
+  if (typeof func != "function") {
+    throw new TypeError(FUNC_ERROR_TEXT$1);
+  }
+  if (isObject$1(options)) {
+    leading = "leading" in options ? !!options.leading : leading;
+    trailing = "trailing" in options ? !!options.trailing : trailing;
+  }
+  return debounce$1(func, wait, {
+    leading,
+    maxWait: wait,
+    trailing });
+
+}
+function isObject$1(value) {
+  var type = typeof value;
+  return !!value && (type == "object" || type == "function");
+}
+function isObjectLike$1(value) {
+  return !!value && typeof value == "object";
+}
+function isSymbol$1(value) {
+  return typeof value == "symbol" || isObjectLike$1(value) && objectToString$1.call(value) == symbolTag$1;
+}
+function toNumber$1(value) {
+  if (typeof value == "number") {
+    return value;
+  }
+  if (isSymbol$1(value)) {
+    return NAN$1;
+  }
+  if (isObject$1(value)) {
+    var other = typeof value.valueOf == "function" ? value.valueOf() : value;
+    value = isObject$1(other) ? other + "" : other;
+  }
+  if (typeof value != "string") {
+    return value === 0 ? value : +value;
+  }
+  value = value.replace(reTrim$1, "");
+  var isBinary = reIsBinary$1.test(value);
+  return isBinary || reIsOctal$1.test(value) ? freeParseInt$1(value.slice(2), isBinary ? 2 : 8) : reIsBadHex$1.test(value) ? NAN$1 : +value;
+}
+var lodash_throttle = throttle;
+
+const DOT_WIDTH = 4;
+const FPS = 60;
+
+
 function getTimePeriodData(graph) {
   return graph.data.filter(dataPoint => {
     // if data is outside of the time range skip it
@@ -1620,44 +1515,79 @@ function getGraphMetrics(model, graph) {
 }
 
 
-function gridLines(model, graph, update) {
-  if (!graph.gridLines)
-  return index``;
+function verticalGridLinesMinor(model, graph, update) {
+  if (!graph.gridLines || !graph.gridLines.vertical)
+  return;
+
+  const m = getGraphMetrics(model, graph);
+  const pixelsPerTick = 6;
+  const pixelsPerMinorLine = pixelsPerTick * graph.gridLines.vertical.ticksPerMinor;
+  const { ctx } = graph;
+
+  ctx.lineWidth = 1; //strokeWidth
+  ctx.strokeStyle = graph.gridLines.vertical.minorColor;
+
+  ctx.beginPath();
+
+  for (let i = 0; i < m.graphWidth; i += pixelsPerMinorLine) {
+    const x = m.leftMargin + i + 0.5;
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, m.graphHeight);
+  }
+
+  ctx.stroke();
+}
+
+
+function verticalGridLinesMajor(model, graph, update) {
+  if (!graph.gridLines || !graph.gridLines.vertical)
+  return;
 
   const m = getGraphMetrics(model, graph);
 
-  const gridLines = [];
+  const pixelsPerTick = 6;
+  const pixelsPerMajorLine = pixelsPerTick * graph.gridLines.vertical.ticksPerMajor;
 
-  if (graph.gridLines.vertical) {
-    const pixelsPerTick = 6;
-    const pixelsPerMinorLine = pixelsPerTick * graph.gridLines.vertical.ticksPerMinor;
-    for (let i = 0; i < m.graphWidth; i += pixelsPerMinorLine) {
-      const x = m.leftMargin + i;
-      gridLines.push({ x1: x, x2: x, y1: 0, y2: m.graphHeight, stroke: graph.gridLines.vertical.minorColor });
-    }
-
-    const pixelsPerMajorLine = pixelsPerTick * graph.gridLines.vertical.ticksPerMajor;
-    for (let i = 0; i < m.graphWidth; i += pixelsPerMajorLine) {
-      const x = m.leftMargin + i;
-      gridLines.push({ x1: x, x2: x, y1: 0, y2: m.graphHeight, stroke: graph.gridLines.vertical.majorColor });
-    }
-  }
-
-  if (graph.gridLines.horizontal) {
-    const distanceBetweenLines = m.graphHeight / (graph.gridLines.horizontal.lineCount + 1);
-    for (let i = distanceBetweenLines; i < m.graphHeight; i += distanceBetweenLines) {
-      const y = i;
-      gridLines.push({ x1: m.leftMargin, x2: m.leftMargin + m.graphWidth, y1: y, y2: y, stroke: graph.gridLines.horizontal.color, dashArray: '4 2' });
-    }
-  }
+  const { ctx } = graph;
 
   const strokeWidth = 1 / (window.devicePixelRatio || 1);
+  ctx.lineWidth = strokeWidth;
+  ctx.strokeStyle = graph.gridLines.vertical.majorColor;
 
-  return gridLines.map(tick => {
-    return index`<line x1="${tick.x1}" x2="${tick.x2}" y1="${tick.y1}" y2="${tick.y2}"
-                          style="stroke: ${tick.stroke}; stroke-width: ${strokeWidth}"
-                          @attrs:stroke-dasharray=${tick.dashArray}/>`;
-  });
+  ctx.beginPath();
+
+  for (let i = 0; i < m.graphWidth; i += pixelsPerMajorLine) {
+    const x = m.leftMargin + i + 0.5;
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, m.graphHeight);
+  }
+
+  ctx.stroke();
+}
+
+
+function gridLines(model, graph, update) {
+  if (!graph.gridLines || !graph.gridLines.horizontal)
+  return;
+
+  const m = getGraphMetrics(model, graph);
+
+  const { ctx } = graph;
+  ctx.lineWidth = 0.5; //strokeWidth
+  ctx.strokeStyle = graph.gridLines.horizontal.color;
+
+  ctx.beginPath();
+
+  ctx.setLineDash([4, 2]);
+
+  const distanceBetweenLines = m.graphHeight / (graph.gridLines.horizontal.lineCount + 1);
+  for (let y = distanceBetweenLines; y < m.graphHeight; y += distanceBetweenLines) {
+    ctx.moveTo(m.leftMargin + 0.5, y + 0.5);
+    ctx.lineTo(m.leftMargin + m.graphWidth + 0.5, y + 0.5);
+  }
+
+  ctx.stroke();
+  ctx.setLineDash([]);
 }
 
 
@@ -1665,8 +1595,565 @@ function renderLinePlotGraph(model, graph, dotWidth) {
   const tp = getTimePeriodData(graph);
   const m = getGraphMetrics(model, graph);
 
+  const { ctx } = graph;
+  let lastX, lastY;
+
+  if (graph.linePlotAreaColor) {
+    const region = new Path2D();
+
+    for (let i = 0; i < tp.length; i++) {
+      const point = tp[i];
+
+      const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, point.t);
+      const x = Math.round(startX * (m.graphWidth - dotWidth) + m.leftMargin) + 0.5;
+
+      const yLength = graph.yRange.end - graph.yRange.start;
+      const y = Math.round((1 - point.value / yLength) * (m.graphHeight - dotWidth)) + 0.5;
+
+      if (i === 0)
+      region.moveTo(x, m.graphHeight);
+
+      region.lineTo(x, y);
+      lastX = x;
+    }
+
+    region.lineTo(lastX, m.graphHeight);
+
+    region.closePath();
+    ctx.fillStyle = graph.linePlotAreaColor;
+    ctx.fill(region);
+  }
+
+  ctx.beginPath();
+  ctx.strokeStyle = graph.dataColor;
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i < tp.length; i++) {
+    const point = tp[i];
+
+    const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, point.t);
+    const x = Math.round(startX * (m.graphWidth - dotWidth) + m.leftMargin) + 0.5;
+
+    const yLength = graph.yRange.end - graph.yRange.start;
+    const y = Math.round((1 - point.value / yLength) * (m.graphHeight - dotWidth)) + 0.5;
+
+    if (i > 0) {
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+    }
+
+    lastX = x;
+    lastY = y;
+  }
+
+  ctx.stroke();
+}
+
+
+function renderScatterPlotGraph(model, graph, dotWidth) {
+  const tp = getTimePeriodData(graph);
+  const m = getGraphMetrics(model, graph);
+
+  const { ctx } = graph;
+
+  ctx.fillStyle = graph.dataColor;
+
+  return tp.map(point => {
+    const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, point.t);
+    const x = startX * (m.graphWidth - dotWidth) + m.leftMargin;
+
+    const yLength = graph.yRange.end - graph.yRange.start;
+    const y = (1 - point.value / yLength) * (m.graphHeight - dotWidth);
+
+    ctx.fillRect(Math.round(x), Math.round(y), dotWidth, dotWidth);
+  });
+}
+
+
+function graphComponent(model, graph, update) {
+
+  const dotWidth = 4;
+  const m = getGraphMetrics(model, graph);
+
+  // TODO: change mouse cursor to ew-resize when hovering over a drag handle
+
+  const _mouseMove = lodash_throttle(function (ev) {
+    const rect = model.elm.getBoundingClientRect();
+    const x = clamp(ev.clientX - rect.left, 0, model.elm.clientWidth); //x position within the element.
+
+    if (graph.selection.dragging === 'time') {
+      const pos = clamp((x - m.leftMargin) / m.graphWidth, 0, 1);
+      graph.selection.time = lerp(graph.timeRange.start, graph.timeRange.end, pos);
+
+    } else if (graph.selection.dragging === 'start') {
+      const pos = clamp((x - m.leftMargin) / m.graphWidth, 0, 1);
+
+      graph.selection.start = lerp(graph.timeRange.start, graph.timeRange.end, pos);
+
+      // prevent dragging the start control beyond end
+      if (graph.selection.start > graph.selection.end)
+      graph.selection.start = graph.selection.end;
+
+    } else if (graph.selection.dragging === 'end') {
+      const pos = clamp((x - m.leftMargin) / m.graphWidth, 0, 1);
+
+      graph.selection.end = pos === 1 ? Infinity : lerp(graph.timeRange.start, graph.timeRange.end, pos);
+
+      // prevent dragging the end control beyond start
+      if (graph.selection.end < graph.selection.start)
+      graph.selection.end = graph.selection.start;
+    }
+
+    update();
+  }, 1000 / FPS);
+
+  const _mouseUp = function (ev) {
+    graph.selection.dragging = undefined;
+    document.removeEventListener('mouseup', _mouseUp);
+    document.removeEventListener('mousemove', _mouseMove);
+    update();
+  };
+
+  const _mouseDown = function (ev) {
+
+    let draggingType; // start | end  | time | undefined
+
+    if (graph.selection?.type === 'range' && ev.offsetY <= 21) {
+      // check to see if the offsetX is within the bounds of the start or end drag controls
+      const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.start);
+      const endX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.end);
+
+      const x = startX * (m.graphWidth - dotWidth) + m.leftMargin;
+      const x2 = endX * (m.graphWidth - dotWidth) + m.leftMargin;
+
+      if (Math.abs(ev.offsetX - x) < 10) {
+        draggingType = 'start';
+      } else if (Math.abs(ev.offsetX - x2) < 10) {
+        draggingType = 'end';
+      }
+    } else if (graph.selection?.type === 'value') {
+      const m = getGraphMetrics(model, graph);
+      if (ev.offsetY >= m.graphHeight + 10)
+      draggingType = 'time';
+    }
+
+    graph.selection.dragging = draggingType;
+
+    if (draggingType) {
+      document.addEventListener('mousemove', _mouseMove, { passive: true });
+      document.addEventListener('mouseup', _mouseUp);
+      update();
+    }
+  };
+
+  const _insertHook = function (vnode) {
+    model.elm = vnode.elm;
+    graph.ctx = vnode.elm.getContext('2d');
+  };
+
+  if (graph.ctx) {
+    graph.ctx.clearRect(0, 0, model.elm.width, model.elm.height);
+    verticalGridLinesMinor(model, graph);
+    verticalGridLinesMajor(model, graph);
+    gridLines(model, graph);
+
+
+    // draw the bottom line of the graph
+    graph.ctx.beginPath();
+    graph.ctx.strokeStyle = '#888';
+    graph.ctx.lineWidth = 1;
+    graph.ctx.moveTo(m.leftMargin + 0.5, m.graphHeight - 0.5);
+    graph.ctx.lineTo(m.leftMargin + m.graphWidth + 0.5, m.graphHeight - 0.5);
+    graph.ctx.stroke();
+
+
+    if (graph.renderTicks) {
+      tickMarksComponent(model, graph);
+      tickLabelsComponent(model, graph);
+    }
+
+    graph.ctx.strokeStyle = graph.dataColor;
+    if (graph.type === 'scatterPlot')
+    renderScatterPlotGraph(model, graph, dotWidth);else
+
+    renderLinePlotGraph(model, graph, dotWidth);
+    timeSelectionComponent(model, graph);
+    renderLabelComponent(model, graph);
+  }
+
+  if (!graph.key)
+  graph.key = 'u' + Math.floor(Math.random() * 9999999);
+
+  return index`<canvas width="${model.width}"
+                        height="${graph.height}"
+                        @hook:insert=${_insertHook}
+                        @key=${graph.key}
+                        style="height: ${graph.height}px; width: 100%; padding-top: 10px; background-color: white; image-rendering: pixelated"
+                        @style:cursor=${graph.selection.dragging ? 'ew-resize' : 'inherit'}
+                        @on:mousedown=${_mouseDown}></canvas>`;
+}
+
+
+function renderLabelComponent(model, graph, update) {
+  const { ctx } = graph;
+  const m = getGraphMetrics(model, graph);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+
+  if (graph.renderValueLabel && graph.selection.type === 'value') {
+    ctx.textAlign = 'start';
+    ctx.fillText(`t: ${graph.selection.time.toFixed(1)}s`, 2, m.graphHeight + m.bottomMargin - 8);
+  }
+
+  ctx.textAlign = 'end';
+  ctx.fillText(graph.label, m.graphWidth + m.leftMargin - DOT_WIDTH, 12);
+}
+
+
+function tickMarksComponent(model, graph, update) {
+
+  const m = getGraphMetrics(model, graph);
+
+  const { ctx } = graph;
+
+  const constPixelsPerTick = 6;
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#888';
+
+  ctx.beginPath();
+
+  for (let i = 0; i < m.graphWidth; i += constPixelsPerTick) {
+    const tickHeight = i % 60 === 0 ? 8 : 4;
+    const x = m.leftMargin + i + 0.5;
+    ctx.moveTo(x, m.graphHeight);
+    ctx.lineTo(x, m.graphHeight + tickHeight);
+  }
+
+  ctx.stroke();
+}
+
+
+function tickLabelsComponent(model, graph, update) {
+  const m = getGraphMetrics(model, graph);
+
+  const timePeriod = graph.timeRange.end - graph.timeRange.start;
+
+  const { ctx } = graph;
+
+  const constPixelsPerTick = 6;
+
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'center';
+  //ctx.fillStyle = '#888'
+  ctx.strokeStyle = '#888';
+  //ctx.strokeWidth = 1
+
+  const tickCount = m.graphWidth / constPixelsPerTick;
+  const secondsPerTick = timePeriod / tickCount;
+  let lastSecond;
+
+  // every 10 ticks, draw the seconds
+  for (let i = 0; i < m.graphWidth; i += 60) {
+    const tickIdx = i / constPixelsPerTick;
+    const seconds = (graph.timeRange.start + tickIdx * secondsPerTick).toFixed(1);
+    if (lastSecond !== seconds) {
+      lastSecond = seconds;
+      ctx.strokeText(seconds, m.leftMargin + i, m.graphHeight + 19);
+    }
+  }
+}
+
+
+function timeSelectionComponent(model, graph, update) {
+  if (graph.selection.type === 'range')
+  timeRangeSelectionComponent(model, graph);
+
+  if (graph.selection.type === 'value')
+  timeValueSelectionComponent(model, graph);
+}
+
+
+function timeRangeSelectionComponent(model, graph, update) {
+  const m = getGraphMetrics(model, graph);
+  const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.start);
+  const endX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.end);
+
+  const { ctx } = graph;
+
+  // draw left and right greyed out graph areas (unselected regions)
+  ctx.fillStyle = 'rgba(205,205,205, 0.85)';
+  ctx.fillRect(m.leftMargin,
+  0,
+  startX * m.graphWidth,
+  m.graphHeight);
+
+
+  ctx.fillRect(m.leftMargin + endX * m.graphWidth,
+  0,
+  m.graphWidth - m.graphWidth * endX,
+  m.graphHeight);
+
+  const downHandlePath = [
+  [-5, -4],
+  [0, -8],
+  [10, 0],
+  [0, 8]];
+
+
+  // left drag handle
+  renderDragHandle(ctx, m.leftMargin + startX * m.graphWidth, 12, downHandlePath);
+
+  // right drag handle
+  renderDragHandle(ctx, m.leftMargin + endX * m.graphWidth, 12, downHandlePath);
+
+  ctx.strokeStyle = 'rgb(255,64,129)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  // left drag line
+  ctx.moveTo(m.leftMargin + startX * m.graphWidth - 0.5, 11);
+  ctx.lineTo(m.leftMargin + startX * m.graphWidth - 0.5, m.graphHeight + 1);
+
+  // right drag line
+  ctx.moveTo(m.leftMargin + endX * m.graphWidth - 0.5, 11);
+  ctx.lineTo(m.leftMargin + endX * m.graphWidth - 0.5, m.graphHeight + 1);
+
+  ctx.stroke();
+}
+
+
+function renderDragHandle(ctx, startX, startY, path) {
+  const region = new Path2D();
+
+  const currentPoint = [startX, startY];
+  region.moveTo(currentPoint[0], currentPoint[1]);
+
+  for (const p of path) {
+    currentPoint[0] += p[0];
+    currentPoint[1] += p[1];
+    region.lineTo(currentPoint[0], currentPoint[1]);
+  }
+
+  region.closePath();
+  ctx.fillStyle = 'rgba(255,64,129)';
+  ctx.fill(region);
+}
+
+
+function timeValueSelectionComponent(model, graph, update) {
+  const m = getGraphMetrics(model, graph);
+
+  const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.time);
+
+  const x = startX * m.graphWidth + m.leftMargin;
+  const y = m.graphHeight;
+
+  const { ctx } = graph;
+
+  const upHandlePath = [
+  [5, 4],
+  [0, 8],
+  [-10, 0],
+  [0, -8]];
+
+
+  renderDragHandle(ctx, x, y - 1, upHandlePath);
+
+  ctx.strokeStyle = 'rgb(255,64,129)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+
+  // drag line
+  ctx.moveTo(x - 0.5, 0);
+  ctx.lineTo(x - 0.5, m.graphHeight);
+  ctx.stroke();
+}
+
+
+function timelineComponent(model, update) {
+  const _insertHook = function (vnode) {
+    model.container = vnode;
+  };
+
+  if (model.container)
+  model.width = model.container.elm ? model.container.elm.offsetWidth : model.container.offsetWidth;
+
+  return index`
+        <div class="graph-stack"
+             @hook:insert=${_insertHook}
+             style="width: 100%; display: grid; grid-template-columns: 1fr; border: 1px solid #adafaf;">
+            ${model.graphs.map(g => graphComponent(model, g, update))}
+        </div>`;
+}
+
+function vnode$1(sel, data, children, text, elm) {
+  const key = data === undefined ? undefined : data.key;
+  return { sel, data, children, text, elm, key };
+}
+
+const array$1 = Array.isArray;
+function primitive$1(s) {
+  return typeof s === 'string' || typeof s === 'number';
+}
+
+function addNS$1(data, children, sel) {
+  data.ns = 'http://www.w3.org/2000/svg';
+  if (sel !== 'foreignObject' && children !== undefined) {
+    for (let i = 0; i < children.length; ++i) {
+      const childData = children[i].data;
+      if (childData !== undefined) {
+        addNS$1(childData, children[i].children, children[i].sel);
+      }
+    }
+  }
+}
+function h$1(sel, b, c) {
+  var data = {};
+  var children;
+  var text;
+  var i;
+  if (c !== undefined) {
+    if (b !== null) {
+      data = b;
+    }
+    if (array$1(c)) {
+      children = c;
+    } else
+    if (primitive$1(c)) {
+      text = c;
+    } else
+    if (c && c.sel) {
+      children = [c];
+    }
+  } else
+  if (b !== undefined && b !== null) {
+    if (array$1(b)) {
+      children = b;
+    } else
+    if (primitive$1(b)) {
+      text = b;
+    } else
+    if (b && b.sel) {
+      children = [b];
+    } else
+    {
+      data = b;
+    }
+  }
+  if (children !== undefined) {
+    for (i = 0; i < children.length; ++i) {
+      if (primitive$1(children[i]))
+      children[i] = vnode$1(undefined, undefined, undefined, children[i], undefined);
+    }
+  }
+  if (sel[0] === 's' && sel[1] === 'v' && sel[2] === 'g' && (
+  sel.length === 3 || sel[3] === '.' || sel[3] === '#')) {
+    addNS$1(data, children, sel);
+  }
+  return vnode$1(sel, data, children, text, undefined);
+}
+
+const FPS$1 = 60;
+
+
+function getTimePeriodData$1(graph) {
+  return graph.data.filter(dataPoint => {
+    // if data is outside of the time range skip it
+    if (dataPoint.t < graph.timeRange.start)
+    return false;
+
+    if (dataPoint.t > graph.timeRange.end)
+    return false;
+
+    return true;
+  });
+}
+
+
+function getGraphMetrics$1(model, graph) {
+  let leftMargin = 10;
+  const rightMargin = 10;
+  let bottomMargin = graph.renderTicks ? 20 : 0;
+
+  if (graph.renderValueLabel && graph.selection.type === 'value')
+  bottomMargin += 30;
+
+  const graphHeight = graph.height - bottomMargin;
+  const graphWidth = model.width - leftMargin - rightMargin;
+
+  return {
+    leftMargin, rightMargin, bottomMargin, graphHeight, graphWidth };
+
+}
+
+
+function verticalGridLinesMinor$1(model, graph, update) {
+  if (!graph.gridLines || !graph.gridLines.vertical)
+  return index``;
+
+  const m = getGraphMetrics$1(model, graph);
+
+  const gridLines = [];
+  const pixelsPerTick = 6;
+  const pixelsPerMinorLine = pixelsPerTick * graph.gridLines.vertical.ticksPerMinor;
+  for (let i = 0; i < m.graphWidth; i += pixelsPerMinorLine) {
+    const x = m.leftMargin + i;
+    //gridLines.push(html`<line x1="${x}" x2="${x}" y1="0" y2="${m.graphHeight}"/>`)
+    gridLines.push(h$1('line', { attrs: { x1: x, x2: x, y1: 0, y2: m.graphHeight } }));
+  }
+
+  const strokeWidth = 1 / (window.devicePixelRatio || 1);
+  return index`<g class="grid-minor" style="stroke: ${graph.gridLines.vertical.minorColor}; stroke-width: ${strokeWidth}">${gridLines}</g>`;
+}
+
+
+function verticalGridLinesMajor$1(model, graph, update) {
+  if (!graph.gridLines || !graph.gridLines.vertical)
+  return index``;
+
+  const m = getGraphMetrics$1(model, graph);
+
+  const gridLines = [];
+  const pixelsPerTick = 6;
+  const pixelsPerMajorLine = pixelsPerTick * graph.gridLines.vertical.ticksPerMajor;
+  for (let i = 0; i < m.graphWidth; i += pixelsPerMajorLine) {
+    const x = m.leftMargin + i;
+    //gridLines.push(html`<line x1="${x}" x2="${x}" y1="0" y2="${m.graphHeight}"/>`)
+    gridLines.push(h$1('line', { attrs: { x1: x, x2: x, y1: 0, y2: m.graphHeight } }));
+  }
+
+  const strokeWidth = 1 / (window.devicePixelRatio || 1);
+  return index`<g class="grid-major" style="stroke: ${graph.gridLines.vertical.majorColor}; stroke-width: ${strokeWidth}">${gridLines}</g>`;
+}
+
+
+function gridLines$1(model, graph, update) {
+  if (!graph.gridLines || !graph.gridLines.horizontal)
+  return index``;
+
+  const m = getGraphMetrics$1(model, graph);
+
+  const gridLines = [];
+  const distanceBetweenLines = m.graphHeight / (graph.gridLines.horizontal.lineCount + 1);
+  for (let y = distanceBetweenLines; y < m.graphHeight; y += distanceBetweenLines) {
+    gridLines.push(index`<line x1="${m.leftMargin}" x2="${m.leftMargin + m.graphWidth}" y1="${y}" y2="${y}"/>`);
+  }
+
+  const strokeWidth = 1 / (window.devicePixelRatio || 1);
+
+  return index`<g class="grid-horiz"
+                   style="stroke: ${graph.gridLines.horizontal.color}; stroke-width: ${strokeWidth}"
+                   stroke-dasharray="4 2">${gridLines}</g>`;
+}
+
+
+function renderLinePlotGraph$1(model, graph, dotWidth) {
+  const tp = getTimePeriodData$1(graph);
+  const m = getGraphMetrics$1(model, graph);
+
   const lines = [];
   let lastX, lastY;
+
+  let pathString = '';
 
   for (let i = 0; i < tp.length; i++) {
     const point = tp[i];
@@ -1677,20 +2164,29 @@ function renderLinePlotGraph(model, graph, dotWidth) {
     const yLength = graph.yRange.end - graph.yRange.start;
     const y = (1 - point.value / yLength) * (m.graphHeight - dotWidth);
 
-    if (i > 0)
-    lines.push(index`<line x1="${lastX}" y1="${lastY}" x2="${x}" y2="${y}" style="stroke: ${graph.dataColor}; stroke-width: 1;"/>`);
+    if (i > 0) {
+      lines.push(h$1('line', { attrs: { x1: lastX, y1: lastY, x2: x, y2: y } }));
+      pathString += `L ${x} ${y}`;
+    } else {
+      pathString = `M ${x} ${m.graphHeight}  L ${x} ${y}`;
+    }
 
     lastX = x;
     lastY = y;
+  }
+
+  if (graph.linePlotAreaColor && tp.length) {
+    pathString += ` L ${lastX} ${m.graphHeight} Z`;
+    lines.unshift(h$1('path', { attrs: { d: pathString, fill: graph.linePlotAreaColor, stroke: 'transparent' } }));
   }
 
   return lines;
 }
 
 
-function renderScatterPlotGraph(model, graph, dotWidth) {
-  const tp = getTimePeriodData(graph);
-  const m = getGraphMetrics(model, graph);
+function renderScatterPlotGraph$1(model, graph, dotWidth) {
+  const tp = getTimePeriodData$1(graph);
+  const m = getGraphMetrics$1(model, graph);
 
   return tp.map(point => {
     const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, point.t);
@@ -1699,40 +2195,31 @@ function renderScatterPlotGraph(model, graph, dotWidth) {
     const yLength = graph.yRange.end - graph.yRange.start;
     const y = (1 - point.value / yLength) * (m.graphHeight - dotWidth);
 
-    return index`<rect x="${x}" y="${y}" style="fill: ${graph.dataColor};" data-value="${point.value}" width="${dotWidth}" height="${dotWidth}" />`;
+    return h$1('rect', {
+      attrs: {
+        x,
+        y,
+        'data-value': point.value,
+        width: dotWidth,
+        height: dotWidth } });
+
+
   });
 }
 
 
-function graphComponent(model, graph, update) {
+function graphComponent$1(model, graph, update) {
 
   const dotWidth = 4;
-  const m = getGraphMetrics(model, graph);
-  //const timePeriod = (graph.timeRange.end - graph.timeRange.start)
-  //const pixelsPerSecond = m.graphWidth / timePeriod
-
-
-  const _mouseMove = function (ev) {
-    if (!graph.selection.dragging)
-    return;
-
-    if (graph.selection.dragging === 'start') {
-      const pos = clamp((ev.offsetX - m.leftMargin) / m.graphWidth, 0, 1);
-      graph.selection.start = lerp(graph.timeRange.start, graph.timeRange.end, pos);
-    } else if (graph.selection.dragging === 'end') {
-      const pos = clamp((ev.offsetX - m.leftMargin) / m.graphWidth, 0, 1);
-      graph.selection.end = pos === 1 ? Infinity : lerp(graph.timeRange.start, graph.timeRange.end, pos);
-    } else {
-      const pos = clamp((ev.offsetX - m.leftMargin) / m.graphWidth, 0, 1);
-      graph.selection.time = lerp(graph.timeRange.start, graph.timeRange.end, pos);
-    }
-
-    update();
-  };
+  const m = getGraphMetrics$1(model, graph);
 
   const _stopDragging = function () {
     graph.selection.dragging = undefined;
     update();
+  };
+
+  const _insertHook = function (vnode) {
+    model.elm = vnode.elm;
   };
 
   return index`
@@ -1740,65 +2227,68 @@ function graphComponent(model, graph, update) {
              class="graph"
              aria-labelledby="title"
              role="img"
-             viewBox="0 0 ${model.width} ${graph.height}" 
-             style="height: ${graph.height}px; width: 100%; background-color: white; font-size: 10px; text-anchor: middle; -moz-user-select: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; -khtml-user-drag: none; -moz-user-drag: none; -o-user-drag: none; user-drag: none;"
+             viewBox="0 0 ${model.width} ${graph.height}"
+             style="height: ${graph.height}px; width: 100%; padding-top: 10px; background-color: white; font-size: 10px; text-anchor: middle; -moz-user-select: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; -khtml-user-drag: none; -moz-user-drag: none; -o-user-drag: none; user-drag: none;"
              @on:mouseup=${_stopDragging}
-             @on:mouseleave=${_stopDragging}
-             @on:mousemove=${_mouseMove}>
+             @hook:insert=${_insertHook}>
             <title id="title">${graph.title}</title>
 
-            <g class="grid y-grid" id="yGrid"
-               style="stroke: #888; stroke-dasharray: 0; stroke-width: 1;">
-                ${gridLines(model, graph)}
+            ${verticalGridLinesMinor$1(model, graph)}
+            ${verticalGridLinesMajor$1(model, graph)}
+            ${gridLines$1(model, graph)}
+
+            <g style="stroke: #888; stroke-dasharray: 0; stroke-width: 1;">
                 <line x1="${m.leftMargin}" x2="${m.leftMargin + m.graphWidth}" y1="${m.graphHeight}" y2="${m.graphHeight}" />
-                ${tickMarksComponent(model, graph)}
-                ${tickLabelsComponent(model, graph)}
+                ${tickMarksComponent$1(model, graph)}
+                ${tickLabelsComponent$1(model, graph)}
             </g>
 
             <g class="data"
-               style="stroke-width: 1;">
-               ${graph.type === 'scatterPlot' ? renderScatterPlotGraph(model, graph, dotWidth) : renderLinePlotGraph(model, graph, dotWidth)}
+               style="fill: ${graph.dataColor}; stroke: ${graph.dataColor}; stroke-width: 1;">
+               ${graph.type === 'scatterPlot' ? renderScatterPlotGraph$1(model, graph, dotWidth) : renderLinePlotGraph$1(model, graph, dotWidth)}
             </g>
 
-            ${timeSelectionComponent(model, graph, update)}
+            ${timeSelectionComponent$1(model, graph, update)}
 
             <text x="${m.graphWidth + m.leftMargin - dotWidth}" y="12" style="fill: rgba(0, 0, 0, 0.7); text-anchor: end; pointer-events: none;">${graph.label}</text>
-            ${renderLabelComponent(model, graph)}
+            ${renderLabelComponent$1(model, graph)}
         </svg>`;
 }
 
 
-function renderLabelComponent(model, graph, update) {
+function renderLabelComponent$1(model, graph, update) {
   if (graph.renderValueLabel && graph.selection.type === 'value') {
-    const m = getGraphMetrics(model, graph);
-    return index`<text x="2" y="${m.graphHeight + m.bottomMargin - 8}" style="fill: rgba(0, 0, 0, 0.7); text-anchor: start; pointer-events: none;">t: ${graph.selection.time.toFixed(1)}s</text>
-            `;
+    const m = getGraphMetrics$1(model, graph);
+    return index`<text x="2" y="${m.graphHeight + m.bottomMargin - 8}" style="fill: rgba(0, 0, 0, 0.7); text-anchor: start; pointer-events: none;">t: ${graph.selection.time.toFixed(1)}s</text>`;
   }
 
   return index``;
 }
 
 
-function tickMarksComponent(model, graph, update) {
-  const m = getGraphMetrics(model, graph);
+function tickMarksComponent$1(model, graph, update) {
+  const m = getGraphMetrics$1(model, graph);
 
   const tickMarks = [];
 
   const constPixelsPerTick = 6;
-  const tickHeight = 4;
 
-  if (graph.renderTicks)
-  for (let i = 0; i < m.graphWidth; i += constPixelsPerTick)
-  tickMarks.push({ x: m.leftMargin + i, height: tickHeight });
+  if (graph.renderTicks) {
+    for (let i = 0; i < m.graphWidth; i += constPixelsPerTick) {
+      const tickHeight = i % 60 === 0 ? 8 : 4;
+      const x = m.leftMargin + i;
+      tickMarks.push(
+      h$1('line', { attrs: { x1: x, x2: x, y1: m.graphHeight, y2: m.graphHeight + tickHeight } }));
 
-  return tickMarks.map(tick => {
-    return index`<line x1="${tick.x}" x2="${tick.x}" y1="${m.graphHeight}" y2="${m.graphHeight + tick.height}" />`;
-  });
+    }
+  }
+
+  return tickMarks;
 }
 
 
-function tickLabelsComponent(model, graph, update) {
-  const m = getGraphMetrics(model, graph);
+function tickLabelsComponent$1(model, graph, update) {
+  const m = getGraphMetrics$1(model, graph);
 
   const timePeriod = graph.timeRange.end - graph.timeRange.start;
 
@@ -1827,24 +2317,58 @@ function tickLabelsComponent(model, graph, update) {
 }
 
 
-function timeSelectionComponent(model, graph, update) {
+function timeSelectionComponent$1(model, graph, update) {
   if (graph.selection.type === 'range')
-  return timeRangeSelectionComponent(model, graph, update);
+  return timeRangeSelectionComponent$1(model, graph, update);
 
   if (graph.selection.type === 'value')
-  return timeValueSelectionComponent(model, graph, update);
+  return timeValueSelectionComponent$1(model, graph, update);
 
   return index``;
 }
 
 
-function timeRangeSelectionComponent(model, graph, update) {
-  const m = getGraphMetrics(model, graph);
+function timeRangeSelectionComponent$1(model, graph, update) {
+  const m = getGraphMetrics$1(model, graph);
   const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.start);
   const endX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.end);
 
+  const _mouseMove = lodash_throttle(function (ev) {
+    const rect = model.elm.getBoundingClientRect();
+    const x = clamp(ev.clientX - rect.left, 0, model.elm.clientWidth); //x position within the element.
+
+    if (graph.selection.dragging === 'start') {
+      const pos = clamp((x - m.leftMargin) / m.graphWidth, 0, 1);
+      graph.selection.start = lerp(graph.timeRange.start, graph.timeRange.end, pos);
+
+      // prevent dragging the start control beyond end
+      if (graph.selection.start > graph.selection.end)
+      graph.selection.start = graph.selection.end;
+
+    } else if (graph.selection.dragging === 'end') {
+      const pos = clamp((x - m.leftMargin) / m.graphWidth, 0, 1);
+      graph.selection.end = pos === 1 ? Infinity : lerp(graph.timeRange.start, graph.timeRange.end, pos);
+
+      // prevent dragging the end control beyond start
+      if (graph.selection.end < graph.selection.start)
+      graph.selection.end = graph.selection.start;
+    }
+
+    update();
+  }, 1000 / FPS$1);
+
+  const _mouseUp = function () {
+    graph.selection.dragging = undefined;
+    document.removeEventListener('mouseup', _mouseUp);
+    document.removeEventListener('mousemove', _mouseMove);
+    update();
+  };
+
+  // @param String position  start | end
   const _mouseDown = function (position) {
     graph.selection.dragging = position;
+    document.addEventListener('mousemove', _mouseMove, { passive: true });
+    document.addEventListener('mouseup', _mouseUp);
     update();
   };
 
@@ -1871,23 +2395,42 @@ function timeRangeSelectionComponent(model, graph, update) {
 
             <path d="M ${m.leftMargin + endX * m.graphWidth} 12 l -5 -4 l 0 -8    l 10 0  l 0 8 Z"
                   style="fill: rgb(255,64,129); cursor: ew-resize;"
-                  @on:mousedown=${() => _mouseDown('end')}/> 
+                  @on:mousedown=${() => _mouseDown('end')}/>
 
             <line x1="${m.leftMargin + endX * m.graphWidth}"
                   x2="${m.leftMargin + endX * m.graphWidth}"
                   y1="11"
-                  y2="${m.graphHeight + 1}" stroke="rgb(255,64,129)"/>      
+                  y2="${m.graphHeight + 1}" stroke="rgb(255,64,129)"/>
         </g>`;
 }
 
 
-function timeValueSelectionComponent(model, graph, update) {
-  const _mouseDown = function (ev) {
-    graph.selection.dragging = true;
+function timeValueSelectionComponent$1(model, graph, update) {
+
+  const _mouseMove = lodash_throttle(function (ev) {
+    const rect = model.elm.getBoundingClientRect();
+    const x = clamp(ev.clientX - rect.left, 0, model.elm.clientWidth); //x position within the element.
+
+    const pos = clamp((x - m.leftMargin) / m.graphWidth, 0, 1);
+    graph.selection.time = lerp(graph.timeRange.start, graph.timeRange.end, pos);
+    update();
+  }, 1000 / 60);
+
+  const _mouseUp = function () {
+    graph.selection.dragging = undefined;
+    document.removeEventListener('mouseup', _mouseUp);
+    document.removeEventListener('mousemove', _mouseMove);
     update();
   };
 
-  const m = getGraphMetrics(model, graph);
+  const _mouseDown = function (position) {
+    graph.selection.dragging = true;
+    document.addEventListener('mousemove', _mouseMove, { passive: true });
+    document.addEventListener('mouseup', _mouseUp);
+    update();
+  };
+
+  const m = getGraphMetrics$1(model, graph);
 
   const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.time);
 
@@ -1908,7 +2451,7 @@ function timeValueSelectionComponent(model, graph, update) {
 }
 
 
-function timelineComponent(model, update) {
+function timelineComponent$1(model, update) {
   const _insertHook = function (vnode) {
     model.container = vnode;
   };
@@ -1920,15 +2463,19 @@ function timelineComponent(model, update) {
         <div class="graph-stack"
              @hook:insert=${_insertHook}
              style="width: 100%; display: grid; grid-template-columns: 1fr; border: 1px solid #adafaf;">
-            ${model.graphs.map(g => graphComponent(model, g, update))}
+            ${model.graphs.map(g => graphComponent$1(model, g, update))}
         </div>`;
+}
+
+function timelineComponent$2(model, update) {
+  return model.renderer === 'canvas' ? timelineComponent(model, update) : timelineComponent$1(model, update);
 }
 
 let currentVnode = document.querySelector('main');
 
 const model = {
     startTime: Date.now(),
-    maxSampleCount: 2000,
+    maxSampleCount: 1000,
 
     mainWidth: 0,
 
@@ -1938,11 +2485,13 @@ const model = {
         timeline: {
             container: undefined,
             width: 0,
+            renderer: 'canvas',
             graphs: [
                 {
                     title: 'Entity Count',
                     label: '',
                     type: 'linePlot',  // scatterPlot | linePlot
+                    linePlotAreaColor: 'rgba(41, 147, 251, 0.3)', // color to fill area if in linePlot mode
                     timeRange: {
                         start: 0,  // seconds
                         end: 0     // seconds
@@ -1981,11 +2530,13 @@ const model = {
         timeline: {
             container: undefined,
             width: 0,
+            renderer: 'canvas',
             graphs: [
                 {
                     title: 'Components Count',
                     label: '',
                     type: 'linePlot',  // scatterPlot | linePlot
+                    linePlotAreaColor: 'rgba(41, 147, 251, 0.3)', // color to fill area if in linePlot mode
                     timeRange: {
                         start: 0,  // seconds
                         end: 0     // seconds
@@ -2039,11 +2590,13 @@ function createComponentTimeline (componentId) {
         timeline: {
             container: undefined,
             width: 0,
+            renderer: 'canvas',
             graphs: [
                 {
                     title: 'Component Count',
                     label: '',
                     type: 'linePlot',  // scatterPlot | linePlot
+                    linePlotAreaColor: 'rgba(41, 147, 251, 0.3)', // color to fill area if in linePlot mode
                     timeRange: {
                         start: 0,  // seconds
                         end: 0     // seconds
@@ -2080,7 +2633,7 @@ function createComponentTimeline (componentId) {
 
 backgroundPageConnection.onMessage.addListener(function (message) {
     // worldCreated || refreshData || disabled
-    if (message.method === 'worldCreated') {
+    if (message.method === 'worldCreated' || message.method === 'tab-complete') {
         // reset the model
 
         model.entityCount.instanceCount = 0;
@@ -2090,6 +2643,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
         model.componentCount.totalUniqueComponentTypes = 0;
         model.componentCount.maxValue = 100;
         model.componentCount.timeline.graphs[0].data.length = 0;
+        model.componentCount.timeline.graphs[0].label = '';
 
         model.components = { };
 
@@ -2122,8 +2676,6 @@ backgroundPageConnection.onMessage.addListener(function (message) {
             ct.timeline.graphs[0].yRange.end = Math.round(ct.maxValue * 1.1);
 
             ct.timeline.graphs[0].label = componentCount;
-
-            //console.log(componentId, 'count:', ct.instanceCount, 'mv:', ct.maxValue)
 
             // limit the number of samples in the graph
             if (ct.timeline.graphs[0].data.length > model.maxSampleCount) {
@@ -2166,7 +2718,7 @@ function update () {
 
 
 function renderEntityGraph (timelineModel, update) {
-    const c = timelineComponent(timelineModel, update);
+    const c = timelineComponent$2(timelineModel, update);
     timelineModel.container = c;
     return c
 }
@@ -2176,7 +2728,7 @@ function renderComponentGraphs(components, update) {
     return Object.keys(components).map((componentId) => {
         const c = components[componentId];
         return index`<div class="component-graph-row">
-        <div>${componentId}</div>${renderEntityGraph(c.timeline, update)}
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-right: 6px;">${componentId}</div>${renderEntityGraph(c.timeline, update)}
         </div>`
     })
 }

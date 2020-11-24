@@ -40,7 +40,9 @@ function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
 
             // the array index of the currently processed system
             // used to determine which systems invoke queries
-            currentSystem: 0
+            currentSystem: 0,
+
+            lastSendTime: 0, // time stats were last sent (used to throttle send)
         }
     }
 
@@ -356,11 +358,15 @@ function cleanup (world) {
     world.removals.entities.length = 0
 
     if ((typeof window !== 'undefined') && window.__MREINSTEIN_ECS_DEVTOOLS) {
-        window.postMessage({
-            id: 'mreinstein/ecs-source',
-            method: 'refreshData',
-            data: world.stats,
-        }, '*');
+        // 4 fps
+        if (performance.now() - world.stats.lastSendTime > 250) {
+            world.stats.lastSendTime = performance.now();
+            window.postMessage({
+                id: 'mreinstein/ecs-source',
+                method: 'refreshData',
+                data: world.stats,
+            }, '*');
+        }
     }
 
     setTimeout(_resetStats, 0, world) // defer reset until next frame
