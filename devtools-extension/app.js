@@ -1,13 +1,13 @@
 import debounce from 'https://cdn.skypack.dev/lodash.debounce'
 import html     from 'https://cdn.jsdelivr.net/npm/snabby@2/snabby.js'
-import timeline from 'https://cdn.jsdelivr.net/gh/mreinstein/snabbdom-timeline/timeline.js'
+import timeline from 'https://cdn.jsdelivr.net/gh/mreinstein/snabbdom-timeline@master/timeline.js'
 
 
 let currentVnode = document.querySelector('main')
 
 const model = {
     startTime: Date.now(),
-    maxSampleCount: 1000,
+    maxSampleCount: 100,
 
     mainWidth: 0,
 
@@ -209,7 +209,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
 
             ct.timeline.graphs[0].label = componentCount
 
-            // limit the number of samples in the graph
+            // limit the n sd..fumber of samples in the graph
             if (ct.timeline.graphs[0].data.length > model.maxSampleCount) {
                 ct.timeline.graphs[0].data.shift()
                 ct.timeline.graphs[0].timeRange.start = ct.timeline.graphs[0].data[0].t

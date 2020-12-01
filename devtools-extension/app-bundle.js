@@ -1980,7 +1980,7 @@ function timelineComponent(model, update) {
   return index`
         <div class="graph-stack"
              @hook:insert=${_insertHook}
-             style="width: 100%; display: grid; grid-template-columns: 1fr; border: 1px solid #adafaf;">
+             style="width: 100%; display: grid; grid-template-columns: 1fr; border: ${model.border || 'none'};">
             ${model.graphs.map(g => graphComponent(model, g, update))}
         </div>`;
 }
@@ -2462,7 +2462,7 @@ function timelineComponent$1(model, update) {
   return index`
         <div class="graph-stack"
              @hook:insert=${_insertHook}
-             style="width: 100%; display: grid; grid-template-columns: 1fr; border: 1px solid #adafaf;">
+             style="width: 100%; display: grid; grid-template-columns: 1fr; border: ${model.border || 'none'};">
             ${model.graphs.map(g => graphComponent$1(model, g, update))}
         </div>`;
 }
@@ -2475,7 +2475,7 @@ let currentVnode = document.querySelector('main');
 
 const model = {
     startTime: Date.now(),
-    maxSampleCount: 1000,
+    maxSampleCount: 100,
 
     mainWidth: 0,
 
@@ -2677,7 +2677,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
 
             ct.timeline.graphs[0].label = componentCount;
 
-            // limit the number of samples in the graph
+            // limit the n sd..fumber of samples in the graph
             if (ct.timeline.graphs[0].data.length > model.maxSampleCount) {
                 ct.timeline.graphs[0].data.shift();
                 ct.timeline.graphs[0].timeRange.start = ct.timeline.graphs[0].data[0].t;

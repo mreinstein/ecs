@@ -68,7 +68,7 @@ function createEntity (world) {
 
 function addComponentToEntity (world, entity, componentName, componentData={}) {
 
-    if (!world.stats.componentCount[componentName])
+    if (!Number.isInteger(world.stats.componentCount[componentName]))
         world.stats.componentCount[componentName] = 0
 
     if (!entity[componentName])
@@ -313,9 +313,11 @@ function cleanup (world) {
         const componentName = world.removals.components[i+1]
 
         const entity = world.entities[entityIdx]
-        delete entity[componentName]
 
-        world.stats.componentCount[componentName] -= 1
+        if (entity[componentName])
+            world.stats.componentCount[componentName] -= 1
+
+        delete entity[componentName]
 
         // remove this entity from any filters that no longer match
         for (const filterId in world.filters) {
@@ -342,7 +344,8 @@ function cleanup (world) {
         const entity = world.entities[entityIdx]
 
         for (const componentName in entity)
-            world.stats.componentCount[componentName] -= 1
+            if (entity[componentName])
+                world.stats.componentCount[componentName] -= 1
 
         removeItems(world.entities, entityIdx, 1)
 
@@ -358,7 +361,10 @@ function cleanup (world) {
     world.removals.entities.length = 0
 
     if ((typeof window !== 'undefined') && window.__MREINSTEIN_ECS_DEVTOOLS) {
-        // 4 fps
+        // running at 60fps seems to queue up a lot of messages. I'm thinking it might just be more
+        // data than postMessage can send. capping it at some lower update rate seems to work better.
+        // for now capping this at 4fps. later we might investigate if sending deltas over postmessage
+        // solves the message piling up problem.
         if (performance.now() - world.stats.lastSendTime > 250) {
             world.stats.lastSendTime = performance.now();
             window.postMessage({
