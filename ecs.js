@@ -12,8 +12,8 @@ function createWorld () {
             removed: { } // key is the filter, value is the array of entities removed this frame
         },
         removals: {
-            entities: [ ], // indexes into entities array, sorted from highest to lowest
-            components: [ ] // [ entity index, component name ] pairs sorted from highest to lowest
+            entities: [ ],  // indexes into entities array, sorted from highest to lowest
+            components: [ ] // [ `entityIndex-componentName`` ]
         }
     }
 }
@@ -27,6 +27,10 @@ function createEntity (world) {
 
 
 function addComponentToEntity (world, entity, componentName, componentData={}) {
+    // ignore duplicate adds
+    if (entity[componentName])
+        return
+
     entity[componentName] = componentData
 
     // add this entity to any filters that match
@@ -58,6 +62,9 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
 
 
 function removeComponentFromEntity (world, entity, componentName) {
+    // ignore removals when the component isn't present
+    if (!entity[componentName])
+        return
 
     // get list of all remove listeners that we match
     const matchingRemoveListeners = [ ]
@@ -65,15 +72,21 @@ function removeComponentFromEntity (world, entity, componentName) {
         // if an entity matches a remove filter, but then no longer matches the filter after a component
         // is removed, it should be flagged as removed in listeners.removed
         if (_matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ]))
-            world.listeners.removed[filterId].push(entity)
+            // prevent adding the removal of an entity to the same list multiple times
+            if (world.listeners.removed[filterId].indexOf(entity) < 0)
+                world.listeners.removed[filterId].push(entity)
     }
 
     // add this component to the list of deferred removals
     const idx = world.entities.indexOf(entity)
-    world.removals.components.push(idx, componentName)
+    const removalKey = `${idx}-${componentName}`
+
+    if (world.removals.components.indexOf(removalKey) < 0)
+        world.removals.components.push(removalKey)
 }
 
 
+// TODO: check double removes! :o
 function removeEntity (world, entity) {
     const idx = world.entities.indexOf(entity)
     if (idx < 0)
@@ -85,9 +98,8 @@ function removeEntity (world, entity) {
 
         // if the entity matches the filter and isn't already in the removed list, add it
         const list = world.listeners.removed[filterId]
-        if (matches && list.indexOf(entity) < 0) {
+        if (matches && list.indexOf(entity) < 0)
             list.push(entity)
-        }
     }
 
     // add this entity to the list of deferred removals
@@ -204,9 +216,8 @@ function cleanup (world) {
     emptyListeners(world)
 
     // process all entity components marked for deferred removal
-    for (let i=0; i < world.removals.components.length; i+=2) {
-        const entityIdx = world.removals.components[i];
-        const componentName = world.removals.components[i+1]
+    for (let i=0; i < world.removals.components.length; i++) {
+        const [ entityIdx, componentName ] = world.removals.components[i].split('-')
 
         const entity = world.entities[entityIdx]
         delete entity[componentName]

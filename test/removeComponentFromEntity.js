@@ -60,3 +60,25 @@ for (const entity of ECS.getEntities(w2, [ 'position'])) {
 }
 
 tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred component removal')
+
+
+
+
+const w3 = ECS.createWorld()
+
+const entities6 = ECS.getEntities(w3, [ 'dupe' ], 'removed')
+
+const e8 = ECS.createEntity(w3)
+
+ECS.addComponentToEntity(w3, e8, 'dupe', { abc: true })
+
+ECS.cleanup(w3)
+
+
+ECS.removeComponentFromEntity(w3, e8, 'dupe')
+ECS.removeComponentFromEntity(w3, e8, 'dupe')
+ECS.removeComponentFromEntity(w3, e8, 'dupe')
+
+tap.deepEqual(ECS.getEntities(w3, [ 'dupe' ], 'removed'), [ e8 ], 'multiple removals only appear once in the removed list')
+tap.deepEqual(w3.removals.components, [ '0-dupe' ], 'multiple removals only appear once in the removed list')
+

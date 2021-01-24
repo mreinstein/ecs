@@ -21,7 +21,7 @@ tap.same(w.listeners.added, { "a,b,c": [ e ], "c": [ e ] }, 'clearing listeners 
 ECS.cleanup(w)
 
 
-tap.same(w.listeners.added, { "a,b,c": [], "c": [] }, 'emptying listeners should empty out the lists')
+tap.same(w.listeners.added, { 'a,b,c': [ ], 'c': [ ] }, 'emptying listeners should empty out the lists')
 
 
 tap.same(w.listeners.removed, { }, 'removed lists are empty when no queries are made')
