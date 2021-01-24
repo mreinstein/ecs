@@ -1,3 +1,7 @@
+# 0.10.1
+* use a more distinct separator string
+
+
 # 0.10.0
 * bugfix: handle duplicate entity removes
 * bugfix: handle duplicate component adds and removes
