@@ -1,7 +1,6 @@
 import ECS from '../ecs.js'
 import tap from 'tap'
 
-/*
 
 const w = ECS.createWorld()
 
@@ -71,7 +70,6 @@ for (const entity of ECS.getEntities(w2, [ 'position' ])) {
 }
 
 tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred removal')
-*/
 
 
 const w3 = ECS.createWorld()
