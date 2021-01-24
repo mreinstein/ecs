@@ -79,7 +79,7 @@ function removeComponentFromEntity (world, entity, componentName) {
 
     // add this component to the list of deferred removals
     const idx = world.entities.indexOf(entity)
-    const removalKey = `${idx}-${componentName}`
+    const removalKey = `${idx}__@@ECS@@__${componentName}`
 
     if (world.removals.components.indexOf(removalKey) < 0)
         world.removals.components.push(removalKey)
@@ -217,7 +217,7 @@ function cleanup (world) {
 
     // process all entity components marked for deferred removal
     for (let i=0; i < world.removals.components.length; i++) {
-        const [ entityIdx, componentName ] = world.removals.components[i].split('-')
+        const [ entityIdx, componentName ] = world.removals.components[i].split('__@@ECS@@__')
 
         const entity = world.entities[entityIdx]
         delete entity[componentName]
