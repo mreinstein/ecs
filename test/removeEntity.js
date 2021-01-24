@@ -1,6 +1,7 @@
 import ECS from '../ecs.js'
 import tap from 'tap'
 
+/*
 
 const w = ECS.createWorld()
 
@@ -70,3 +71,19 @@ for (const entity of ECS.getEntities(w2, [ 'position' ])) {
 }
 
 tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred removal')
+*/
+
+
+const w3 = ECS.createWorld()
+
+const e6 = ECS.createEntity(w3)
+ECS.addComponentToEntity(w3, e6, 'position')
+
+ECS.getEntities(w3, [ 'position' ], 'removed')
+
+ECS.removeEntity(w3, e6)
+ECS.removeEntity(w3, e6)
+ECS.removeEntity(w3, e6)
+
+tap.deepEqual(ECS.getEntities(w3, [ 'position' ], 'removed'), [ e6 ], 'multiple removals only appear once in the removed list')
+tap.deepEqual(w3.removals.entities, [ 0 ])

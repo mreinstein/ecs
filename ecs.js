@@ -86,7 +86,6 @@ function removeComponentFromEntity (world, entity, componentName) {
 }
 
 
-// TODO: check double removes! :o
 function removeEntity (world, entity) {
     const idx = world.entities.indexOf(entity)
     if (idx < 0)
@@ -103,7 +102,8 @@ function removeEntity (world, entity) {
     }
 
     // add this entity to the list of deferred removals
-    orderedInsert(world.removals.entities, idx)
+    if (world.removals.entities.indexOf(idx) < 0)
+        orderedInsert(world.removals.entities, idx)
 }
 
 
