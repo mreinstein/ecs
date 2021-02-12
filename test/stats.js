@@ -17,7 +17,8 @@ async function main () {
         componentCount: { },
         filterInvocationCount: { },
         systems: [ ],
-        currentSystem: 0
+        currentSystem: 0,
+        lastSendTime: 0
     }, 'initial stats data')
 
 
@@ -33,7 +34,8 @@ async function main () {
         },
         filterInvocationCount: { },
         systems: [ ],
-        currentSystem: 0
+        currentSystem: 0,
+        lastSendTime: 0
     }, 'adding entity and components updates counts')
 
 
@@ -50,7 +52,8 @@ async function main () {
         },
         filterInvocationCount: { },
         systems: [ ],
-        currentSystem: 0
+        currentSystem: 0,
+        lastSendTime: 0
     }, 'adding the same component name twice should not affect component count')
 
 
@@ -82,7 +85,8 @@ async function main () {
                 filters: { }
             }
         ],
-        currentSystem: 0
+        currentSystem: 0,
+        lastSendTime: 0
     }, 'adding system updates stats')
 
 
@@ -122,7 +126,8 @@ async function main () {
                 }
             }
         ],
-        currentSystem: 0
+        currentSystem: 0,
+        lastSendTime: 0
     }, 'calling cleanup resets stats for the next frame')
 
 
@@ -150,7 +155,8 @@ async function main () {
                 }
             }
         ],
-        currentSystem: 0
+        currentSystem: 0,
+        lastSendTime: 0
     }, 'removing an entity cleanups up component and entity counts')
 
 }

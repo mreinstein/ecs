@@ -21,6 +21,7 @@ tap.same(w, {
         componentCount: { },
         filterInvocationCount: { },
         systems: [ ],
-        currentSystem: 0
+        currentSystem: 0,
+        lastSendTime: 0
     }
 })
