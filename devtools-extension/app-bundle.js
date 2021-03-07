@@ -99,7 +99,7 @@ function createKeyToOldIdx$1(children, beginIdx, endIdx) {
   return map;
 }
 const hooks$1 = ["create", "update", "remove", "destroy", "pre", "post"];
-function init$2(modules, domApi) {
+function init$1$1(modules, domApi) {
   let i;
   let j;
   const cbs = {
@@ -424,7 +424,7 @@ function copyToThunk$1(vnode2, thunk3) {
   thunk3.text = vnode2.text;
   thunk3.elm = vnode2.elm;
 }
-function init$1$1(thunk3) {
+function init$2(thunk3) {
   const cur = thunk3.data;
   const vnode2 = cur.fn.apply(void 0, cur.args);
   copyToThunk$1(vnode2, thunk3);
@@ -455,7 +455,7 @@ const thunk$1 = function thunk2(sel, key, fn, args) {
   }
   return h$2(sel, {
     key,
-    hook: { init: init$1$1, prepatch: prepatch$1 },
+    hook: { init: init$2, prepatch: prepatch$1 },
     fn,
     args });
 
@@ -865,7 +865,7 @@ function create$1(modules, options = {}) {
     }
     return h$2(sel, data, content);
   }
-  const patch = init$2(modules || []);
+  const patch = init$1$1(modules || []);
   const snabby = hyperx$1(createElement2, { attrToProp: false });
   snabby.update = function update2(dest, src) {
     return patch(dest, src);
@@ -1610,20 +1610,25 @@ var index$1 = function () {
 const observer = new index$1(function (entries) {
   for (const entry of entries) {
     const breakpoints = JSON.parse(entry.target.dataset.breakpoints);
-    let prev;
     let highWaterMark = 0;
+    let selectedClass = "";
     for (const breakpoint of Object.keys(breakpoints)) {
       const minWidth = breakpoints[breakpoint];
       if (entry.contentRect.width >= minWidth && minWidth > highWaterMark) {
-        entry.target.classList.add(breakpoint);
+        selectedClass = breakpoint;
         highWaterMark = minWidth;
-        if (prev)
-        entry.target.classList.remove(prev);
-      } else {
+      }
+    }
+
+    for (const breakpoint of Object.keys(breakpoints)) {
+      if (breakpoint === selectedClass) {
+        if (!entry.target.classList.contains(breakpoint))
+        entry.target.classList.add(breakpoint);
+      } else if (entry.target.classList.contains(breakpoint)) {
         entry.target.classList.remove(breakpoint);
       }
-      prev = breakpoint;
     }
+
   }
 });
 function update$1(oldVnode, vnode2) {
@@ -1645,7 +1650,7 @@ var containerQueryModule = {
   update: update$1,
   destroy };
 
-var index$1$1 = create$1([
+var index$2 = create$1([
 attributesModule$1,
 eventListenersModule$1,
 classModule$1,
@@ -3948,7 +3953,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
 
 function update () {
     const newVnode = render(model, update);
-    currentVnode = index$1$1.update(currentVnode, newVnode);
+    currentVnode = index$2.update(currentVnode, newVnode);
 }
 
 
@@ -3962,7 +3967,7 @@ function renderEntityGraph (timelineModel, update) {
 function renderComponentGraphs(components, update) {
     return Object.keys(components).map((componentId) => {
         const c = components[componentId];
-        return index$1$1`<div class="component-graph-row">
+        return index$2`<div class="component-graph-row">
         <div style="display: flex; justify-content: flex-end; align-items: center; margin-right: 6px;">${componentId}</div>${renderEntityGraph(c.timeline, update)}
         </div>`
     })
@@ -3981,9 +3986,9 @@ function filtersView (systems, update) {
     const filterViews = Object.keys(filters)
         .filter((f) => filters[f] > 0)
         .map((f) => {
-            const components = f.split(',').map((c) => index$1$1`<div class="system-filter-component">${c}</div>`);
+            const components = f.split(',').map((c) => index$2`<div class="system-filter-component">${c}</div>`);
             const entityCount = filters[f];
-            return index$1$1`<div class="system-filter" style="padding: 4px; margin-bottom: 6px;">
+            return index$2`<div class="system-filter" style="padding: 4px; margin-bottom: 6px;">
                 <div style="padding-right: 4px; display: flex; align-items: center;">
                     ${components}
                 </div>
@@ -3991,7 +3996,7 @@ function filtersView (systems, update) {
             </div>`
         });
 
-    return index$1$1`<div class="filters">
+    return index$2`<div class="filters">
         <h3>Filters (${Object.keys(filters).length})</h3>
         ${filterViews}
     </div>`
@@ -4019,9 +4024,9 @@ function systemsView (systems, update) {
         const percent = Math.round(s.timeElapsed / totalTime * 100);
 
         const filterViews = Object.keys(s.filters).map((f) => {
-            const components = f.split(',').map((c) => index$1$1`<div class="system-filter-component">${c}</div>`);
+            const components = f.split(',').map((c) => index$2`<div class="system-filter-component">${c}</div>`);
             const entityCount = s.filters[f];
-            return index$1$1`<div class="system-filter">
+            return index$2`<div class="system-filter">
                 <div style="padding-right: 4px; display: flex; align-items: center;">
                     <div style="padding-right: 6px;">FILTER:</div>
                     ${components}
@@ -4030,7 +4035,7 @@ function systemsView (systems, update) {
             </div>`
         });
 
-        return index$1$1`<div class="system">
+        return index$2`<div class="system">
             <div style="grid-area: systemName; border-left: 4px solid dodgerblue; padding: 8px;">${s.name}</div>
             <div style="grid-area: systemTime; padding: 8px;">${s.timeElapsed.toFixed(2)}ms</div>
             <div style="grid-area: systemPercent; padding: 8px;">${percent}%</div>
@@ -4040,7 +4045,7 @@ function systemsView (systems, update) {
         </div>`
     });
 
-    return index$1$1`<div class="systems">
+    return index$2`<div class="systems">
         <h3>Systems (${systems.length})</h3>
         <p>Total Time: ${totalTime.toFixed(2)}ms</p>
         <div></div>
@@ -4051,7 +4056,7 @@ function systemsView (systems, update) {
 
 function render (model, update) {
 
-    return index$1$1`<main data-breakpoints='{ "col2": 640, "col3": 1024 }'>
+    return index$2`<main data-breakpoints='{ "col2": 640, "col3": 1024 }'>
         <div class="entities" key="entities">
             <h2>Entities (${model.entityCount.instanceCount})</h2>
             ${renderEntityGraph(model.entityCount.timeline, update)}
