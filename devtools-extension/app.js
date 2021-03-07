@@ -1,6 +1,9 @@
 import debounce from 'https://cdn.skypack.dev/lodash.debounce'
-import html     from 'https://cdn.jsdelivr.net/npm/snabby@2/snabby.js'
-import timeline from 'https://cdn.jsdelivr.net/gh/mreinstein/snabbdom-timeline@master/timeline.js'
+import html     from 'https://cdn.skypack.dev/snabby'
+import timeline from 'https://cdn.skypack.dev/snabbdom-timeline'
+
+
+// inspirted by ecsy https://blog.mozvr.com/ecsy-developer-tools/
 
 
 let currentVnode = document.querySelector('main')
@@ -8,8 +11,6 @@ let currentVnode = document.querySelector('main')
 const model = {
     startTime: Date.now(),
     maxSampleCount: 100,
-
-    mainWidth: 0,
 
     entityCount: {
         instanceCount: 0,
@@ -101,7 +102,20 @@ const model = {
         }
     },
 
-    components: { } // key is component id/name, value is the timeline for each component
+    components: { }, // key is component id/name, value is the timeline for each component
+
+    /*
+    example system:
+        {
+            filters: {
+                hero,rigidBody,facing: 1
+                transform,pointLight: 21
+            },
+            name: "lightSystem",
+            timeElapsed: 0.025000001187436283
+        }
+    */
+    systems: [ ]
 }
 
 
@@ -178,6 +192,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
         model.componentCount.timeline.graphs[0].label = ''
 
         model.components = { }
+        model.systems.length = 0
 
     } else if (message.method === 'refreshData') {
         const stats = message.data
@@ -237,6 +252,8 @@ backgroundPageConnection.onMessage.addListener(function (message) {
 
         model.entityCount.timeline.graphs[0].timeRange.end = t
         model.componentCount.timeline.graphs[0].timeRange.end = t
+
+        model.systems = message.data.systems
     }
 
     update()
@@ -266,29 +283,88 @@ function renderComponentGraphs(components, update) {
 }
 
 
+function filtersView (systems, update) {
+
+    // get all unique filters
+    const filters = { }
+
+    for (const s of systems)
+        for (const f of Object.keys(s.filters))
+            filters[f] = s.filters[f]
+
+    const filterViews = Object.keys(filters).map((f) => {
+        const components = f.split(',').map((c) => html`<div class="system-filter-component">${c}</div>`)
+        const entityCount = filters[f]
+        return html`<div class="system-filter" style="padding: 4px; margin-bottom: 6px;">
+            <div style="padding-right: 4px; display: flex; align-items: center;">
+                ${components}
+            </div>
+            <div>${entityCount}</div>
+        </div>`
+    })
+
+    return html`<div class="filters">
+        <h3>Filters (${Object.keys(filters).length})</h3>
+        ${filterViews}
+    </div>`
+}
+
+
+function systemsView (systems, update) {
+    /*
+    example system:
+        {
+            filters: {
+                hero,rigidBody,facing: 1
+                transform,pointLight: 21
+            },
+            name: "lightSystem",
+            timeElapsed: 0.025000001187436283
+        }
+    */
+
+    let totalTime = 0
+    for (const s of systems)
+        totalTime += s.timeElapsed
+
+    const systemViews = systems.map((s) => {
+        const percent = Math.round(s.timeElapsed / totalTime * 100)
+
+        const filterViews = Object.keys(s.filters).map((f) => {
+            const components = f.split(',').map((c) => html`<div class="system-filter-component">${c}</div>`)
+            const entityCount = s.filters[f]
+            return html`<div class="system-filter">
+                <div style="padding-right: 4px; display: flex; align-items: center;">
+                    <div style="padding-right: 6px;">FILTER:</div>
+                    ${components}
+                </div>
+                <div>${entityCount}</div>
+            </div>`
+        })
+
+        return html`<div class="system">
+            <div style="grid-area: systemName; border-left: 4px solid dodgerblue; padding: 8px;">${s.name}</div>
+            <div style="grid-area: systemTime; padding: 8px;">${s.timeElapsed.toFixed(2)}ms</div>
+            <div style="grid-area: systemPercent; padding: 8px;">${percent}%</div>
+            <div style="grid-area: systemQueries; padding-left: 20px; background-color: white;">
+                ${filterViews}
+            </div>
+        </div>`
+    })
+
+    return html`<div class="systems">
+        <h3>Systems (${systems.length})</h3>
+        <p>Total Time: ${totalTime.toFixed(2)}ms</p>
+        <div></div>
+        ${systemViews}
+    </div>`
+}
+
+
 function render (model, update) {
 
-    const _insertHook = function (vnode) {
-        const main = vnode.elm.parentNode
-
-        const waitMs = 200
-        const resizeHandler = debounce(function () {
-            model.mainWidth = main.offsetWidth
-            update()
-        }, waitMs)
-
-        const ro = new ResizeObserver(resizeHandler)
-        ro.observe(main);
-    }
-
-    let resp = ''
-    if (model.mainWidth > 1024)
-        resp = 'col3'
-    else if (model.mainWidth > 640)
-        resp = 'col2'
-
-    return html`<main class="${resp}">
-        <div class="entities" key="entities" @hook:insert=${_insertHook}>
+    return html`<main data-breakpoints='{ "col2": 640, "col3": 1024 }'>
+        <div class="entities" key="entities">
             <h2>Entities (${model.entityCount.instanceCount})</h2>
             ${renderEntityGraph(model.entityCount.timeline, update)}
         </div>
@@ -299,10 +375,9 @@ function render (model, update) {
             ${renderComponentGraphs(model.components, update)}
         </div>
 
-        <div class="queries"></div>
+        ${filtersView(model.systems, update)}
 
-        <div class="systems"></div>
-
+        ${systemsView(model.systems, update)}
     </main>`
 }
 

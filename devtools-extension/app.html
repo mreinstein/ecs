@@ -8,24 +8,24 @@
     <style>
         main {
             display: grid;
-            grid-gap: 10px;
+            grid-gap: 18px;
             grid-template-columns: 1fr;
             grid-template-areas: "entities"
                                  "components"
-                                 "queries"
+                                 "filters"
                                  "systems";
         }
 
         main.col2 {
             grid-template-columns: repeat(2, 1fr);
             grid-template-areas: "entities components"
-                                 "queries  systems";
+                                 "filters  systems";
         }
 
         main.col3 {
             grid-template-columns: repeat(3, 1fr);
-            grid-template-areas: "entities   queries systems"
-                                 "components queries systems";
+            grid-template-areas: "entities   filters systems"
+                                 "components filters systems";
         }
 
         .entities {
@@ -37,12 +37,38 @@
             display: grid;
         }
 
-        .queries {
-            grid-area: queries;
+        .filters {
+            grid-area: filters;
         }
 
         .systems {
             grid-area: systems;
+        }
+
+        .system {
+          background-color: rgba(0,0,0, 0.05);
+          margin-bottom: 16px;
+          display: grid;
+          grid-template-columns: 2fr 50px 50px 1fr;
+          grid-template-areas: "systemName    systemTime     systemPercent  noop"
+                               "systemQueries systemQueries  systemQueries  systemQueries"
+        }
+
+        .system-filter {
+          padding: 8px;
+          background-color: rgba(0,0,0, 0.15);
+          margin-bottom: 2px;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+
+        .system-filter-component {
+          background-color: rgba(0,0,0, 0.4);
+          border-radius: 6px;
+          padding: 4px;
+          color: white;
+          margin-right: 6px;
         }
 
         .component-graph-row {

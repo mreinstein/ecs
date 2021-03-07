@@ -47,7 +47,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener(
   function(request, sender) {
-    //console.log('bg message received:', request)
     //if (!sender.tab)
     //    return
     if (request.method === 'worldCreated')
