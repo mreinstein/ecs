@@ -3,7 +3,18 @@ import html     from 'https://cdn.skypack.dev/snabby'
 import timeline from 'https://cdn.skypack.dev/snabbdom-timeline'
 
 
-// inspirted by ecsy https://blog.mozvr.com/ecsy-developer-tools/
+// inspired by ecsy https://blog.mozvr.com/ecsy-developer-tools/
+
+/*
+<svg viewBox="0 0 100 100" width="100%" height="100%" style="display: block;">
+    <path d="M 96.25 50 A 46.25 46.25 0 0 1 90.88702513282273 71.61743915888101" stroke-width="7.5" stroke="hsl(54, 100%, 57%)" fill="none">
+        <title>MovableSystem</title>
+    </path>
+    <path d="M 87.48054937231139 77.09743380377057 A 46.25 46.25 0 1 1 95.79989817929763 43.563244080596995" stroke-width="7.5" stroke="hsl(34, 100%, 57%)" fill="none">
+        <title>RendererSystem</title>
+    </path>
+</svg>
+*/
 
 
 let currentVnode = document.querySelector('main')
@@ -292,16 +303,18 @@ function filtersView (systems, update) {
         for (const f of Object.keys(s.filters))
             filters[f] = s.filters[f]
 
-    const filterViews = Object.keys(filters).map((f) => {
-        const components = f.split(',').map((c) => html`<div class="system-filter-component">${c}</div>`)
-        const entityCount = filters[f]
-        return html`<div class="system-filter" style="padding: 4px; margin-bottom: 6px;">
-            <div style="padding-right: 4px; display: flex; align-items: center;">
-                ${components}
-            </div>
-            <div>${entityCount}</div>
-        </div>`
-    })
+    const filterViews = Object.keys(filters)
+        .filter((f) => filters[f] > 0)
+        .map((f) => {
+            const components = f.split(',').map((c) => html`<div class="system-filter-component">${c}</div>`)
+            const entityCount = filters[f]
+            return html`<div class="system-filter" style="padding: 4px; margin-bottom: 6px;">
+                <div style="padding-right: 4px; display: flex; align-items: center;">
+                    ${components}
+                </div>
+                <div>${entityCount}</div>
+            </div>`
+        })
 
     return html`<div class="filters">
         <h3>Filters (${Object.keys(filters).length})</h3>
