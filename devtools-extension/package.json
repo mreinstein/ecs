@@ -1,0 +1,18 @@
+{
+  "name": "devtools-extension",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "dev": "rollup -c rollup.config.js --watch.chokidar -o app-bundle.js app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^2.40.0",
+    "rollup-plugin-url-resolve": "^0.1.1"
+  },
+  "dependencies": {}
+}

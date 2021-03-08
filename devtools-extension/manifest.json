@@ -1,0 +1,59 @@
+{
+    "manifest_version": 2,
+    "name": "ecs-visualizer",
+    "description": "ECS developer tool panel",
+    "author": "Mike Reinstein",
+    "homepage_url": "https://github.com/mreinstein/ecs",
+    "version": "0.8.0",
+    "minimum_chrome_version": "80.0",
+
+    "icons": {
+        "32": "assets/icon_32_detected.png",
+        "48": "assets/icon_48_detected.png",
+        "64": "assets/icon_64_detected.png",
+        "128": "assets/icon_128_detected.png"
+    },
+
+    "browser_action" : {
+        "default_title": "ECS",
+        "default_icon": {
+          "32": "assets/icon_32_disabled.png",
+          "48": "assets/icon_48_disabled.png",
+          "64": "assets/icon_64_disabled.png",
+          "128": "assets/icon_128_disabled.png"
+        },
+        "default_popup": "popups/disabled.html"
+    },
+
+
+    "devtools_page": "devtools.html",
+
+    "background": {
+        "scripts": [ "background.js" ],
+        "persistent": false
+    },
+
+    "content_scripts": [{
+        "matches": ["http://*/*", "https://*/*"],
+        "js": ["contentScript.js"],
+        "run_at": "document_start"
+    }],
+
+    "web_accessible_resources": [
+        "app.html",
+        "app-bundle.js",
+        "popups/*.html",
+        "popups/*.js",
+        "assets/*.png"
+    ],
+
+     "content_security_policy": "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; connect-src *; frame-src *; object-src 'self'",
+
+    "permissions": [
+        "storage",
+        "tabs",
+        "file://*/*",
+        "http://*/*",
+        "https://*/*"
+    ]
+}

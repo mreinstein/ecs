@@ -4,7 +4,8 @@
   "description": "data oriented, functional entity component system",
   "main": "ecs.js",
   "scripts": {
-    "test": "tap test/"
+    "test": "tap test/",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "game",
