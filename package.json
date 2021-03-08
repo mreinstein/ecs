@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/mreinstein/ecs/issues"
   },
+  "engines": {
+    "node": ">=12.17"
+  },
   "homepage": "https://github.com/mreinstein/ecs#readme"
 }
