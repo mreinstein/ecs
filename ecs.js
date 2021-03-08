@@ -6,7 +6,6 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
 
 
 function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
-    console.log('yusss')
     const world = {
         entities: [ ],
         filters: { },
