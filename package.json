@@ -3,6 +3,7 @@
   "version": "0.10.1",
   "description": "data oriented, functional entity component system",
   "main": "ecs.js",
+  "type": "module",
   "scripts": {
     "test": "tap test/",
     "prepublishOnly": "npm test"
