@@ -130,3 +130,15 @@ Sometimes it's useful to query by components that are _not_ present:
 // get all entities that have a transform component but lack a hero component
 const entities = ECS.getEntities(world, [ 'transform', '!hero' ])
 ```
+
+
+### devtools chrome extension
+
+If you'd like to see a real time view of the data in your ECS powered program, there is a dev tools extension!
+
+![alt text](devtools.png "screenshot of the ECS devtools in action")
+
+Assuming you have the `devtools-extension/` unpacked in chrome, you should see this icon appear colored. clicking it will show this popup, indicating the page is using an ecs instance:
+
+![alt text](devtools2.png "screenshot of the ECS devtools in action")
+
