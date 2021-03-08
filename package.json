@@ -5,7 +5,7 @@
   "main": "ecs.js",
   "type": "module",
   "scripts": {
-    "test": "tap test/",
+    "test": "tap --no-esm test/",
     "prepublishOnly": "npm test"
   },
   "keywords": [
