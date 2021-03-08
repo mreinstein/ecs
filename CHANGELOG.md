@@ -1,3 +1,8 @@
+# 0.11.0
+* BREAKING: publish as a pure ES module
+* add a chrome devtools extension to show realtime ECS stats
+
+
 # 0.10.1
 * use a more distinct separator string
 
