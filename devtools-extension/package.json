@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "watch": "rollup -c rollup.config.js --watch.chokidar -o app-bundle.js app.js",
+    "dev": "rollup -c rollup.config.js --watch.chokidar -o app-bundle.js app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

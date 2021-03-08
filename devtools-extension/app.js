@@ -323,6 +323,66 @@ function filtersView (systems, update) {
 }
 
 
+function systemsOverviewGraphView (systems, update) {
+
+    const segments = [ ]
+
+    let totalTime = 0
+    for (const s of systems)
+        totalTime += s.timeElapsed
+
+    const significant = [ ]
+
+    if (systems.length) {
+        const colorDivisor = 360 / systems.length
+
+        // Total of all preceding segments length
+        // For use in stroke-dashoffset calculation
+        let totalPercent = 0
+
+        for (let i = 0; i < systems.length; i++) {
+            const system = systems[i]
+            // percentage occupied by current segment
+            const percent = Math.floor(system.timeElapsed / totalTime * 100)
+
+            if (percent === 0)
+                continue
+            
+            // current segments stroke-dasharray calculation
+            const strokeDasharray = `${percent} ${100 - percent}`
+
+            const color = Math.round(i * colorDivisor)
+            const strokeColor = `hsl(${color}, 100%, 50%)`
+
+            if (percent > 3)
+                significant.push({ name: system.name, percent, strokeColor })
+
+            const strokeDashOffset = -totalPercent
+
+            segments.push(html`<circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="${strokeColor}" stroke-width="3" stroke-dasharray="${strokeDasharray}" stroke-dashoffset="${strokeDashOffset}" title="${system.name}"/>`)
+            
+            totalPercent += percent
+        }
+    }
+
+    return html`<div style="display:flex; grid-template-columns: 1fr 110px">
+        <svg width="110px" height="110px" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+            <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="#fff"/>
+            <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e2e3e4" stroke-width="3"/>
+            ${segments}
+        </svg>
+        <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-left: 10px;">
+            ${significant.map((s) => {
+                return html`<div style="display: flex;flex-direction: row; align-items: center;">
+                    <div style="background-color: ${s.strokeColor}; width: 10px; height: 10px; margin-right: 5px;"></div>
+                    <div> ${s.percent}%  ${s.name}</div>
+                </div>`
+            })}
+        </div>
+    </div>`
+}
+
+
 function systemsView (systems, update) {
     /*
     example system:
@@ -340,7 +400,7 @@ function systemsView (systems, update) {
     for (const s of systems)
         totalTime += s.timeElapsed
 
-    const systemViews = systems.map((s) => {
+    const systemViews = systems.map((s, i) => {
         const percent = Math.round(s.timeElapsed / totalTime * 100)
 
         const filterViews = Object.keys(s.filters).map((f) => {
@@ -355,8 +415,12 @@ function systemsView (systems, update) {
             </div>`
         })
 
+        const colorDivisor = 360 / systems.length
+        const color = Math.round(i * colorDivisor)
+        const strokeColor = `hsl(${color}, 100%, 50%)`
+
         return html`<div class="system">
-            <div style="grid-area: systemName; border-left: 4px solid dodgerblue; padding: 8px;">${s.name}</div>
+            <div style="grid-area: systemName; border-left: 4px solid ${strokeColor}; padding: 8px;">${s.name}</div>
             <div style="grid-area: systemTime; padding: 8px;">${s.timeElapsed.toFixed(2)}ms</div>
             <div style="grid-area: systemPercent; padding: 8px;">${percent}%</div>
             <div style="grid-area: systemQueries; padding-left: 20px; background-color: white;">
@@ -368,6 +432,7 @@ function systemsView (systems, update) {
     return html`<div class="systems">
         <h3>Systems (${systems.length})</h3>
         <p>Total Time: ${totalTime.toFixed(2)}ms</p>
+        ${systemsOverviewGraphView(systems, update)}
         <div></div>
         ${systemViews}
     </div>`
