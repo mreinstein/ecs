@@ -6,7 +6,7 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
 
 
 function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
-
+    console.log('yusss')
     const world = {
         entities: [ ],
         filters: { },
@@ -69,6 +69,10 @@ function createEntity (world) {
 
 function addComponentToEntity (world, entity, componentName, componentData={}) {
 
+    // ignore duplicate adds
+    if (entity[componentName])
+        return
+
     if (!Number.isInteger(world.stats.componentCount[componentName]))
         world.stats.componentCount[componentName] = 0
 
@@ -106,6 +110,9 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
 
 
 function removeComponentFromEntity (world, entity, componentName) {
+    // ignore removals when the component isn't present
+    if (!entity[componentName])
+        return
 
     // get list of all remove listeners that we match
     const matchingRemoveListeners = [ ]
@@ -113,12 +120,17 @@ function removeComponentFromEntity (world, entity, componentName) {
         // if an entity matches a remove filter, but then no longer matches the filter after a component
         // is removed, it should be flagged as removed in listeners.removed
         if (_matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ]))
-            world.listeners.removed[filterId].push(entity)
+            // prevent adding the removal of an entity to the same list multiple times
+            if (world.listeners.removed[filterId].indexOf(entity) < 0)
+                world.listeners.removed[filterId].push(entity)
     }
 
     // add this component to the list of deferred removals
     const idx = world.entities.indexOf(entity)
-    world.removals.components.push(idx, componentName)
+    const removalKey = `${idx}__@@ECS@@__${componentName}`
+
+    if (world.removals.components.indexOf(removalKey) < 0)
+        world.removals.components.push(removalKey)
 }
 
 
@@ -138,9 +150,10 @@ function removeEntity (world, entity) {
     }
 
     // add this entity to the list of deferred removals
-    orderedInsert(world.removals.entities, idx)
-
-    world.stats.entityCount--
+    if (world.removals.entities.indexOf(idx) < 0) {
+        orderedInsert(world.removals.entities, idx)
+        world.stats.entityCount--
+    }
 }
 
 
@@ -309,9 +322,8 @@ function cleanup (world) {
     emptyListeners(world)
 
     // process all entity components marked for deferred removal
-    for (let i=0; i < world.removals.components.length; i+=2) {
-        const entityIdx = world.removals.components[i];
-        const componentName = world.removals.components[i+1]
+    for (let i=0; i < world.removals.components.length; i++) {
+        const [ entityIdx, componentName ] = world.removals.components[i].split('__@@ECS@@__')
 
         const entity = world.entities[entityIdx]
 
