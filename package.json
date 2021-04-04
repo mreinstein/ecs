@@ -5,7 +5,7 @@
   "main": "ecs.js",
   "type": "module",
   "scripts": {
-    "test": "tap --no-esm test/",
+    "test": "tap test/",
     "prepublishOnly": "npm test"
   },
   "keywords": [
@@ -15,10 +15,10 @@
     "entity component system"
   ],
   "dependencies": {
-    "remove-array-items": "^2.0.1"
+    "remove-array-items": "^3.0.0"
   },
   "devDependencies": {
-    "tap": "^14.11.0"
+    "tap": "^15.0.1"
   },
   "repository": {
     "type": "git",
