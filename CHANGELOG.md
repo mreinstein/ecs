@@ -1,3 +1,7 @@
+# 0.12.0
+* add option to remove entity's component immediately rather than being deferred to the next frame
+
+
 # 0.11.0
 * BREAKING: publish as a pure ES module
 * add a chrome devtools extension to show realtime ECS stats
