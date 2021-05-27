@@ -19,6 +19,6 @@ for (let i=0; i < 10; i++) {
 
 let last = a[0]
 for (let i=1; i < a.length; i++) {
-    tap.assert(last >= a[i], 'sorts highest to lowest')
+    tap.ok(last >= a[i], 'sorts highest to lowest')
     last = a[i]
 }

@@ -83,5 +83,5 @@ ECS.removeEntity(w3, e6)
 ECS.removeEntity(w3, e6)
 ECS.removeEntity(w3, e6)
 
-tap.deepEqual(ECS.getEntities(w3, [ 'position' ], 'removed'), [ e6 ], 'multiple removals only appear once in the removed list')
-tap.deepEqual(w3.removals.entities, [ 0 ])
+tap.same(ECS.getEntities(w3, [ 'position' ], 'removed'), [ e6 ], 'multiple removals only appear once in the removed list')
+tap.same(w3.removals.entities, [ 0 ])

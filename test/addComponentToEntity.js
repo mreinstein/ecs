@@ -24,4 +24,4 @@ ECS.addComponentToEntity(w3, e8, 'dupe')
 ECS.addComponentToEntity(w3, e8, 'dupe')
 ECS.addComponentToEntity(w3, e8, 'dupe')
 
-tap.deepEqual(ECS.getEntities(w3, [ 'dupe' ], 'added'), [ e8 ], 'multiple additions only appear once in the added list')
+tap.same(ECS.getEntities(w3, [ 'dupe' ], 'added'), [ e8 ], 'multiple additions only appear once in the added list')

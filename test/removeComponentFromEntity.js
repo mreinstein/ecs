@@ -79,6 +79,5 @@ ECS.removeComponentFromEntity(w3, e8, 'dupe')
 ECS.removeComponentFromEntity(w3, e8, 'dupe')
 ECS.removeComponentFromEntity(w3, e8, 'dupe')
 
-tap.deepEqual(ECS.getEntities(w3, [ 'dupe' ], 'removed'), [ e8 ], 'multiple removals only appear once in the removed list')
-tap.deepEqual(w3.removals.components, [ '0__@@ECS@@__dupe' ], 'multiple removals only appear once in the removed list')
-
+tap.same(ECS.getEntities(w3, [ 'dupe' ], 'removed'), [ e8 ], 'multiple removals only appear once in the removed list')
+tap.same(w3.removals.components, [ '0__@@ECS@@__dupe' ], 'multiple removals only appear once in the removed list')
