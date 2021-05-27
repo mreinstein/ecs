@@ -52,3 +52,31 @@ function testRemoveEntity () {
     const r2 = ECS.getEntities(w, [ 'a' ], 'removed')
     tap.same(r2, [ e ], 'removing entity should add it to removed listeners')
 }
+
+
+
+function testRemoveComponentWithoutDeferred () {
+    const w = ECS.createWorld()
+
+    // setup the remove listener
+    let r = ECS.getEntities(w, [ 'a' ], 'removed')
+
+    const e = ECS.createEntity(w) 
+
+    ECS.addComponentToEntity(w, e, 'a')
+    ECS.addComponentToEntity(w, e, 'b')
+
+
+    const deferredRemoval = false
+    ECS.removeComponentFromEntity(w, e, 'a', deferredRemoval)
+  
+    r = ECS.getEntities(w, [ 'a' ], 'removed')
+
+    tap.same(r, [ e ], 'immediately removing a component still includes it in the removed list')
+
+    console.error('W:', w)
+    console.error('R:', r)
+}
+
+
+testRemoveComponentWithoutDeferred()

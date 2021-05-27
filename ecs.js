@@ -108,7 +108,7 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
 }
 
 
-function removeComponentFromEntity (world, entity, componentName) {
+function removeComponentFromEntity (world, entity, componentName, deferredRemoval=true) {
     // ignore removals when the component isn't present
     if (!entity[componentName])
         return
@@ -124,12 +124,16 @@ function removeComponentFromEntity (world, entity, componentName) {
                 world.listeners.removed[filterId].push(entity)
     }
 
-    // add this component to the list of deferred removals
-    const idx = world.entities.indexOf(entity)
-    const removalKey = `${idx}__@@ECS@@__${componentName}`
+    if (deferredRemoval) {
+        // add this component to the list of deferred removals
+        const idx = world.entities.indexOf(entity)
+        const removalKey = `${idx}__@@ECS@@__${componentName}`
 
-    if (!world.removals.components.includes(removalKey))
-        world.removals.components.push(removalKey)
+        if (!world.removals.components.includes(removalKey))
+            world.removals.components.push(removalKey)
+    } else {
+        _removeComponent(world, entity, componentName)
+    }
 }
 
 

@@ -63,7 +63,6 @@ tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed be
 
 
 
-
 const w3 = ECS.createWorld()
 
 const entities6 = ECS.getEntities(w3, [ 'dupe' ], 'removed')
@@ -81,3 +80,22 @@ ECS.removeComponentFromEntity(w3, e8, 'dupe')
 
 tap.same(ECS.getEntities(w3, [ 'dupe' ], 'removed'), [ e8 ], 'multiple removals only appear once in the removed list')
 tap.same(w3.removals.components, [ '0__@@ECS@@__dupe' ], 'multiple removals only appear once in the removed list')
+
+
+
+const w4 = ECS.createWorld()
+
+const e9 = ECS.createEntity(w4)
+
+ECS.addComponentToEntity(w4, e9, 'aabb', { abc: true })
+ECS.addComponentToEntity(w4, e9, 'transform')
+
+tap.equal(ECS.getEntities(w4, [ 'aabb' ]).length, 1)
+
+const deferredRemoval = false
+ECS.removeComponentFromEntity(w4, e9, 'aabb', deferredRemoval)
+
+tap.equal(ECS.getEntities(w4, [ 'aabb' ]).length, 0)
+tap.same(w4.entities, [ { transform: {} } ], 'immediately remove component from entity')
+tap.same(w4.removals, { entities: [ ], components: [ ] }, 'does not include the component in the deferred removal list')
+tap.same(w4.stats.componentCount, { aabb: 0, transform: 1 }, 'immediately adjusts component stats')
