@@ -102,7 +102,7 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
 
         // if the entity matches the filter and isn't already in the added list, add it
         const list = world.listeners.added[filterId]
-        if (matches && list.indexOf(entity) < 0)
+        if (matches && !list.includes(entity))
             list.push(entity)
     }
 }
@@ -120,7 +120,7 @@ function removeComponentFromEntity (world, entity, componentName) {
         // is removed, it should be flagged as removed in listeners.removed
         if (_matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ]))
             // prevent adding the removal of an entity to the same list multiple times
-            if (world.listeners.removed[filterId].indexOf(entity) < 0)
+            if (!world.listeners.removed[filterId].includes(entity))
                 world.listeners.removed[filterId].push(entity)
     }
 
@@ -128,7 +128,7 @@ function removeComponentFromEntity (world, entity, componentName) {
     const idx = world.entities.indexOf(entity)
     const removalKey = `${idx}__@@ECS@@__${componentName}`
 
-    if (world.removals.components.indexOf(removalKey) < 0)
+    if (!world.removals.components.includes(removalKey))
         world.removals.components.push(removalKey)
 }
 
@@ -144,12 +144,12 @@ function removeEntity (world, entity) {
 
         // if the entity matches the filter and isn't already in the removed list, add it
         const list = world.listeners.removed[filterId]
-        if (matches && list.indexOf(entity) < 0)
+        if (matches && !list.includes(entity))
             list.push(entity)
     }
 
     // add this entity to the list of deferred removals
-    if (world.removals.entities.indexOf(idx) < 0) {
+    if (!world.removals.entities.includes(idx)) {
         orderedInsert(world.removals.entities, idx)
         world.stats.entityCount--
     }
@@ -207,7 +207,7 @@ function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
 
     // if the entity lacks any components in the filter, it's not in the filter
     for (const componentId of componentIds) {
-        const isIgnored = componentIgnoreList.indexOf(componentId) >= 0
+        const isIgnored = componentIgnoreList.includes(componentId)
         if (isIgnored)
             return false
 
@@ -317,35 +317,38 @@ function _resetStats (world) {
 }
 
 
+function _removeComponent (world, entity, componentName) {
+    if (entity[componentName])
+        world.stats.componentCount[componentName] -= 1
+
+    delete entity[componentName]
+
+    // remove this entity from any filters that no longer match
+    for (const filterId in world.filters) {
+        const filter = world.filters[filterId]
+
+        if (_matchesFilter(filterId, entity) && !filter.includes(entity)) {
+            // entity matches filter and it's not in the filter add it
+            filter.push(entity)
+        } else if (filterId.includes(componentName)) {
+            // entity doesn't match filter and it's in the filter remove it
+            // this filter contains the removed component
+            const filterIdx = filter.indexOf(entity)
+            if (filterIdx >= 0)
+                removeItems(filter, filterIdx, 1)
+        }
+    }
+}
+
+
 function cleanup (world) {
     emptyListeners(world)
 
     // process all entity components marked for deferred removal
     for (let i=0; i < world.removals.components.length; i++) {
         const [ entityIdx, componentName ] = world.removals.components[i].split('__@@ECS@@__')
-
         const entity = world.entities[entityIdx]
-
-        if (entity[componentName])
-            world.stats.componentCount[componentName] -= 1
-
-        delete entity[componentName]
-
-        // remove this entity from any filters that no longer match
-        for (const filterId in world.filters) {
-            const filter = world.filters[filterId]
-
-            if (_matchesFilter(filterId, entity) && (filter.indexOf(entity) < 0)) {
-                // entity matches filter and it's not in the filter add it
-                filter.push(entity)
-            } else if (filterId.indexOf(componentName) >= 0) {
-                // entity doesn't match filter and it's in the filter remove it
-                // this filter contains the removed component
-                const filterIdx = filter.indexOf(entity)
-                if (filterIdx >= 0)
-                    removeItems(filter, filterIdx, 1)
-            }
-        }
+        _removeComponent(world, entity, componentName)
     }
 
     world.removals.components.length = 0
