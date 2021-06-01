@@ -54,7 +54,6 @@ function testRemoveEntity () {
 }
 
 
-
 function testRemoveComponentWithoutDeferred () {
     const w = ECS.createWorld()
 
@@ -73,9 +72,6 @@ function testRemoveComponentWithoutDeferred () {
     r = ECS.getEntities(w, [ 'a' ], 'removed')
 
     tap.same(r, [ e ], 'immediately removing a component still includes it in the removed list')
-
-    console.error('W:', w)
-    console.error('R:', r)
 }
 
 
