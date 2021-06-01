@@ -1,12 +1,13 @@
-sudo: false
-
+dist: xenial
+os: linux
 language: node_js
 
 node_js:
 - '12.17'
 - '14'
+- '16'
 
-matrix:
+jobs:
   include:
   - node_js: '14'
     env: BROWSER_NAME=chrome BROWSER_VERSION=latest
