@@ -2579,7 +2579,7 @@ var lodash_throttle = throttle;
 const DOT_WIDTH = 4;
 const FPS$1 = 60;
 function getTimePeriodData$1(graph) {
-  return graph.data.filter(dataPoint => {
+  return graph.data.filter((dataPoint) => {
     if (dataPoint.t < graph.timeRange.start)
     return false;
     if (dataPoint.t > graph.timeRange.end)
@@ -2701,7 +2701,7 @@ function renderScatterPlotGraph$1(model, graph, dotWidth) {
   const m = getGraphMetrics$1(model, graph);
   const { ctx } = graph;
   ctx.fillStyle = graph.dataColor;
-  return tp.map(point => {
+  return tp.map((point) => {
     const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, point.t);
     const x2 = startX * (m.graphWidth - dotWidth) + m.leftMargin;
     const yLength = graph.yRange.end - graph.yRange.start;
@@ -2919,7 +2919,7 @@ function timelineComponent$2(model, update) {
         <div class="graph-stack"
              @hook:insert=${_insertHook}
              style="width: 100%; display: grid; grid-template-columns: 1fr; border: ${model.border || "none"};">
-            ${model.graphs.map(g => graphComponent$1(model, g, update))}
+            ${model.graphs.map((g) => graphComponent$1(model, g, update))}
         </div>`;
 }
 function vnode(sel, data, children, text, elm) {
@@ -2981,7 +2981,7 @@ function h(sel, b, c) {
 }
 const FPS = 60;
 function getTimePeriodData(graph) {
-  return graph.data.filter(dataPoint => {
+  return graph.data.filter((dataPoint) => {
     if (dataPoint.t < graph.timeRange.start)
     return false;
     if (dataPoint.t > graph.timeRange.end)
@@ -3077,7 +3077,7 @@ function renderLinePlotGraph(model, graph, dotWidth) {
 function renderScatterPlotGraph(model, graph, dotWidth) {
   const tp = getTimePeriodData(graph);
   const m = getGraphMetrics(model, graph);
-  return tp.map(point => {
+  return tp.map((point) => {
     const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, point.t);
     const x2 = startX * (m.graphWidth - dotWidth) + m.leftMargin;
     const yLength = graph.yRange.end - graph.yRange.start;
@@ -3174,7 +3174,7 @@ function tickLabelsComponent(model, graph, update) {
       }
     }
   }
-  return tickLabels.map(tick => {
+  return tickLabels.map((tick) => {
     return jt`<text x="${tick.x}" y="${m.graphHeight + 19}">${tick.seconds}</text>`;
   });
 }
@@ -3294,7 +3294,7 @@ function timelineComponent$1(model, update) {
         <div class="graph-stack"
              @hook:insert=${_insertHook}
              style="width: 100%; display: grid; grid-template-columns: 1fr; border: ${model.border || "none"};">
-            ${model.graphs.map(g => graphComponent(model, g, update))}
+            ${model.graphs.map((g) => graphComponent(model, g, update))}
         </div>`;
 }
 function timelineComponent(model, update) {
