@@ -12,6 +12,6 @@
   "license": "ISC",
   "devDependencies": {
     "rollup": "^2.50.5",
-    "rollup-plugin-url-resolve": "^0.1.2"
+    "rollup-plugin-url-resolve": "^0.2.0"
   }
 }
