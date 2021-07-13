@@ -334,7 +334,7 @@ function _removeComponent (world, entity, componentName) {
         if (_matchesFilter(filterId, entity) && !filter.includes(entity)) {
             // entity matches filter and it's not in the filter add it
             filter.push(entity)
-        } else if (filterId.includes(componentName)) {
+        } else if (_hasComponent(filterId,componentName)) {
             // entity doesn't match filter and it's in the filter remove it
             // this filter contains the removed component
             const filterIdx = filter.indexOf(entity)
@@ -343,6 +343,25 @@ function _removeComponent (world, entity, componentName) {
         }
     }
 }
+
+// purpose: by given filterId and component determine if component is referred in that filter.
+// arguments: filterId is a string in the form "component1,component2,...,componentN", component is a string
+function _hasComponent (filterId, component) {
+  return (filterId === component) ||
+         filterId.startsWith(`${component},`) ||
+         filterId.endsWith(`,${component}`) ||
+         filterId.includes(`,${component},`)
+}
+
+/* Seems provided algorithm for _hasComponent is pretty good. Alternatives:
+   1. Use regexp. Then component name should be qouted before using in regexp,
+      for example as in https://stackoverflow.com/a/494122.
+      Seems qouting + regexp will be less perfomant as simple string search.
+   2. Use filterId.split(",").includes(component) - this includes string 
+      search (e.g. ",") + array creation.
+   3. Another option will be to store filters in form "[component1][component2]"
+      but this is a hure refactoring with possible caveats.
+*/
 
 
 function cleanup (world) {
