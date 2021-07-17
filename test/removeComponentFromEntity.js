@@ -99,3 +99,18 @@ tap.equal(ECS.getEntities(w4, [ 'aabb' ]).length, 0)
 tap.same(w4.entities, [ { transform: {} } ], 'immediately remove component from entity')
 tap.same(w4.removals, { entities: [ ], components: [ ] }, 'does not include the component in the deferred removal list')
 tap.same(w4.stats.componentCount, { aabb: 0, transform: 1 }, 'immediately adjusts component stats')
+
+//////////////////////////////////////////////////////////////////////////
+// removing component named 'A' should not break filter for component 'AB'
+{
+const w = ECS.createWorld()
+const e = ECS.createEntity(w)
+
+ECS.addComponentToEntity(w, e, 'tilda')
+ECS.addComponentToEntity(w, e, 'matilda')
+tap.equal(ECS.getEntities(w, [ 'matilda' ]).length, 1)
+
+ECS.removeComponentFromEntity(w, e, 'tilda',false)
+
+tap.equal(ECS.getEntities(w, [ 'matilda' ]).length, 1)
+}

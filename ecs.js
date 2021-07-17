@@ -334,7 +334,7 @@ function _removeComponent (world, entity, componentName) {
         if (_matchesFilter(filterId, entity) && !filter.includes(entity)) {
             // entity matches filter and it's not in the filter add it
             filter.push(entity)
-        } else if (filterId.includes(componentName)) {
+        } else if (_hasComponent(filterId,componentName)) {
             // entity doesn't match filter and it's in the filter remove it
             // this filter contains the removed component
             const filterIdx = filter.indexOf(entity)
@@ -342,6 +342,15 @@ function _removeComponent (world, entity, componentName) {
                 removeItems(filter, filterIdx, 1)
         }
     }
+}
+
+// purpose: by given filterId and component determine if component is referred in that filter.
+// arguments: filterId is a string in the form "component1,component2,...,componentN", component is a string
+function _hasComponent (filterId, component) {
+  return (filterId === component) ||
+         filterId.startsWith(`${component},`) ||
+         filterId.endsWith(`,${component}`) ||
+         filterId.includes(`,${component},`)
 }
 
 
