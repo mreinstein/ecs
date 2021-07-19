@@ -1,3 +1,10 @@
+# 0.13.0
+Thanks to @pavelvasev for both of these bug fixes!
+
+* fix add component bug #22 
+* fix add component listener bug #19
+
+
 # 0.12.0
 * add option to remove entity's component immediately rather than being deferred to the next frame
 
