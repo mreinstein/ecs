@@ -98,7 +98,7 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
     }
 
     for (const filterId in world.listeners.added) {
-        const matches = _matchesFilter(filterId, entity)
+        const matches = _matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ])
 
         // if the entity matches the filter and isn't already in the added list, add it
         const list = world.listeners.added[filterId]
