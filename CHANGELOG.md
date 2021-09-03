@@ -1,3 +1,7 @@
+# 0.13.1
+* update deps
+
+
 # 0.13.0
 Thanks to @pavelvasev for both of these bug fixes!
 
