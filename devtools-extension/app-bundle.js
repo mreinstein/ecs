@@ -2738,8 +2738,9 @@ function graphComponent$1(model, graph, update) {
     update();
   };
   const _mouseDown = function (ev) {
+    var _a, _b;
     let draggingType;
-    if (graph.selection?.type === "range" && ev.offsetY <= 21) {
+    if (((_a = graph.selection) == null ? void 0 : _a.type) === "range" && ev.offsetY <= 21) {
       const startX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.start);
       const endX = findPosOnScale(graph.timeRange.start, graph.timeRange.end, graph.selection.end);
       const x2 = startX * (m.graphWidth - dotWidth) + m.leftMargin;
@@ -2749,7 +2750,7 @@ function graphComponent$1(model, graph, update) {
       } else if (Math.abs(ev.offsetX - x22) < 10) {
         draggingType = "end";
       }
-    } else if (graph.selection?.type === "value") {
+    } else if (((_b = graph.selection) == null ? void 0 : _b.type) === "value") {
       const m2 = getGraphMetrics$1(model, graph);
       if (ev.offsetY >= m2.graphHeight + 10)
       draggingType = "time";
