@@ -166,6 +166,9 @@ Assuming you have the `devtools-extension/` unpacked in chrome, you should see t
 ![alt text](devtools2.png "screenshot of the ECS devtools in action")
 
 
+If you're not sure how to load unpacked extensions in Chrome, follow the instructions here: https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest
+
+
 ### references, honorable mentions, etc.
 
 If you'd like to explore other data oriented, highly performant ECS implementations, check out https://github.com/NateTheGreatt/bitECS I haven't personally used it yet, but browsing over the project, looks legit!
