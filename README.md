@@ -2,7 +2,7 @@
 
 data oriented, functional entity component system.
 
-[![Build Status](https://travis-ci.org/mreinstein/ecs.svg?branch=master)](https://travis-ci.org/mreinstein/ecs)
+![tests](https://github.com/mreinstein/ecs/actions/workflows/main.yml/badge.svg)
 
 
 ## what?
