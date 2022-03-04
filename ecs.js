@@ -236,8 +236,14 @@ function addSystem (world, fn) {
         filters: { }
     })
 
+    if (!system.onPreFixedUpdate)
+        system.onPreFixedUpdate = function () { }
+
     if (!system.onFixedUpdate)
         system.onFixedUpdate = function () { }
+
+    if (!system.onPostFixedUpdate)
+        system.onPostFixedUpdate = function () { }
 
     if (!system.onPreUpdate)
         system.onPreUpdate = function () { }
@@ -252,12 +258,34 @@ function addSystem (world, fn) {
 }
 
 
+function preFixedUpdate (world, dt) {
+    for (let i=0; i < world.systems.length; i++) {
+        world.stats.currentSystem = i
+        const system = world.systems[i]
+        const start = now()
+        system.onPreFixedUpdate(dt)
+        world.stats.systems[i].timeElapsed += (now() - start)
+    }
+}
+
+
 function fixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
         const start = now()
         system.onFixedUpdate(dt)
+        world.stats.systems[i].timeElapsed += (now() - start)
+    }
+}
+
+
+function postFixedUpdate (world, dt) {
+    for (let i=0; i < world.systems.length; i++) {
+        world.stats.currentSystem = i
+        const system = world.systems[i]
+        const start = now()
+        system.onPostFixedUpdate(dt)
         world.stats.systems[i].timeElapsed += (now() - start)
     }
 }
@@ -408,4 +436,4 @@ function cleanup (world) {
 
 
 export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities,
-                 removeEntity, addSystem, fixedUpdate, update, preUpdate, postUpdate, cleanup }
+                 removeEntity, addSystem, preFixedUpdate, fixedUpdate, postFixedUpdate, update, preUpdate, postUpdate, cleanup }

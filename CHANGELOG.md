@@ -1,3 +1,8 @@
+# 0.14.0
+* add preFixedUpdate
+* add postFixedUpdate
+
+
 # 0.13.1
 * update deps
 
