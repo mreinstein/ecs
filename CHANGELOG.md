@@ -1,3 +1,7 @@
+# 0.15.0
+* add option to remove entity's immediately rather than being deferred to the next frame
+
+
 # 0.14.0
 * add preFixedUpdate
 * add postFixedUpdate
