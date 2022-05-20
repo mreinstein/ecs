@@ -137,7 +137,7 @@ function removeComponentFromEntity (world, entity, componentName, deferredRemova
 }
 
 
-function removeEntity (world, entity) {
+function removeEntity (world, entity, deferredRemoval=true) {
     const idx = world.entities.indexOf(entity)
     if (idx < 0)
         return
@@ -152,11 +152,16 @@ function removeEntity (world, entity) {
             list.push(entity)
     }
 
-    // add this entity to the list of deferred removals
-    if (!world.removals.entities.includes(idx)) {
-        orderedInsert(world.removals.entities, idx)
-        world.stats.entityCount--
+    if (deferredRemoval) {
+        // add this entity to the list of deferred removals
+        if (!world.removals.entities.includes(idx)) {
+            orderedInsert(world.removals.entities, idx)
+            world.stats.entityCount--
+        }
+    } else {
+        _removeEntity(world, entity)
     }
+
 }
 
 
@@ -372,6 +377,25 @@ function _removeComponent (world, entity, componentName) {
     }
 }
 
+
+function _removeEntity (world, entity) {
+    for (const componentName in entity)
+        if (entity[componentName])
+            world.stats.componentCount[componentName] -= 1
+
+    const entityIdx = world.entities.indexOf(entity)
+    removeItems(world.entities, entityIdx, 1)
+
+    // update all filters that match this
+    for (const filterId in world.filters) {
+        const filter = world.filters[filterId]
+        const idx = filter.indexOf(entity)
+        if (idx >= 0)
+            removeItems(filter, idx, 1)
+    }
+}
+
+
 // purpose: by given filterId and component determine if component is referred in that filter.
 // arguments: filterId is a string in the form "component1,component2,...,componentN", component is a string
 function _hasComponent (filterId, component) {
@@ -394,24 +418,10 @@ function cleanup (world) {
 
     world.removals.components.length = 0
 
-
     // process all entities marked for deferred removal
     for (const entityIdx of world.removals.entities) {
         const entity = world.entities[entityIdx]
-
-        for (const componentName in entity)
-            if (entity[componentName])
-                world.stats.componentCount[componentName] -= 1
-
-        removeItems(world.entities, entityIdx, 1)
-
-        // update all filters that match this
-        for (const filterId in world.filters) {
-            const filter = world.filters[filterId]
-            const idx = filter.indexOf(entity)
-            if (idx >= 0)
-                removeItems(filter, idx, 1)
-        }
+        _removeEntity(world, entity)
     }
 
     world.removals.entities.length = 0

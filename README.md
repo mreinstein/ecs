@@ -155,6 +155,28 @@ ECS.getEntities(world, [ componentName ]).length  // because we are not deferrin
 ```
 
 
+### deferred entity removal
+
+By default, when an entity is removed it is deferred until the next frame.
+
+This is typically what you want, but if you want to immediately remove an entity, you can do this:
+
+```javascript
+
+const world = ECS.createWorld()
+const entity = ECS.createEntity(world)
+ECS.addComponentToEntity(world, entity, 'test_component')
+
+
+const deferredRemoval = false  // by default this is true. setting it to false immediately removes the component
+ECS.removeEntity(world, entity, deferredRemoval)
+
+ECS.getEntities(world, [ 'test_component' ]).length  // because we are not deferring the removal, length === 0 
+```
+
+
+
+
 ### devtools chrome extension
 
 If you'd like to see a real time view of the data in your ECS powered program, there is a dev tools extension!

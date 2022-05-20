@@ -103,14 +103,14 @@ tap.same(w4.stats.componentCount, { aabb: 0, transform: 1 }, 'immediately adjust
 //////////////////////////////////////////////////////////////////////////
 // removing component named 'A' should not break filter for component 'AB'
 {
-const w = ECS.createWorld()
-const e = ECS.createEntity(w)
+	const w = ECS.createWorld()
+	const e = ECS.createEntity(w)
 
-ECS.addComponentToEntity(w, e, 'tilda')
-ECS.addComponentToEntity(w, e, 'matilda')
-tap.equal(ECS.getEntities(w, [ 'matilda' ]).length, 1)
+	ECS.addComponentToEntity(w, e, 'tilda')
+	ECS.addComponentToEntity(w, e, 'matilda')
+	tap.equal(ECS.getEntities(w, [ 'matilda' ]).length, 1)
 
-ECS.removeComponentFromEntity(w, e, 'tilda',false)
+	ECS.removeComponentFromEntity(w, e, 'tilda', deferredRemoval)
 
-tap.equal(ECS.getEntities(w, [ 'matilda' ]).length, 1)
+	tap.equal(ECS.getEntities(w, [ 'matilda' ]).length, 1)
 }

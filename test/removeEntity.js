@@ -85,3 +85,19 @@ ECS.removeEntity(w3, e6)
 
 tap.same(ECS.getEntities(w3, [ 'position' ], 'removed'), [ e6 ], 'multiple removals only appear once in the removed list')
 tap.same(w3.removals.entities, [ 0 ])
+
+
+
+// deferred removal should immediately remove the entity
+const w4 = ECS.createWorld()
+
+const e7 = ECS.createEntity(w4)
+ECS.addComponentToEntity(w4, e7, 'testc')
+
+tap.equals(ECS.getEntities(w4, [ 'testc' ]).length, 1, '1 entity should be present')
+
+const deferredRemoval = false
+ECS.removeEntity(w4, e7, deferredRemoval)
+
+tap.equals(ECS.getEntities(w4, [ 'testc' ]).length, 0, 'no entities present because of immediate removal')
+
