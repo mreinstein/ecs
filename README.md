@@ -26,7 +26,7 @@ The entire ecs module here is about 100 lines of code, and offers an O(1) iterat
 This is a minimal example of what you can do with `ecs`, illustrating how to declare
 your entities, components, and systems.
 
-Requires node version `12.17.1` or higher.
+Requires a modern web browser, or node version `12.17.1` or higher.
 
 ```javascript
 import ECS      from 'ecs'
