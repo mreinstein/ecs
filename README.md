@@ -2,8 +2,7 @@
 
 data oriented, functional entity component system.
 
-![tests](https://github.com/mreinstein/ecs/actions/workflows/main.yml/badge.svg)
-
+[![CI](https://github.com/mreinstein/ecs/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/mreinstein/ecs/actions/workflows/main.yml)
 
 ## what?
 
