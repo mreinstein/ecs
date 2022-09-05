@@ -14,6 +14,8 @@ function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
             added: { },  // key is the filter, value is the array of entities added this frame
             removed: { } // key is the filter, value is the array of entities removed this frame
         },
+        
+        // deferred removals
         removals: {
             entities: [ ], // indexes into entities array, sorted from highest to lowest
             components: [ ] // [ entity index, component name ] pairs sorted from highest to lowest
@@ -211,6 +213,7 @@ function getEntities (world, componentNames, listenerType) {
 
 
 // returns true if an entity contains all the components that match the filter
+// all entities having at least one component in the ignore list are excluded.
 function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
     const componentIds = filterId.split(',')
 
