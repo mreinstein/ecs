@@ -5,7 +5,99 @@ import removeItems   from 'remove-array-items'
 const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => performance.now())
 
 
+/**
+ * @typedef { 'added' | 'removed' } ListenerType
+ */
+
+/**
+ * @typedef { Object } Component
+ */
+
+/**
+ * @typedef { Object } Entity
+ */
+
+/**
+ * @typedef { Object } Filter
+ */
+
+
+/**
+ * @typedef { Object } System
+ * @prop {(dt: number) => void} [onPreFixedUpdate]
+ * @prop {(dt: number) => void} [onFixedUpdate]
+ * @prop {(dt: number) => void} [onPostFixedUpdate]
+ * @prop {(dt: number) => void} [onPreUpdate]
+ * @prop {(dt: number) => void} [onUpdate]
+ * @prop {(dt: number) => void} [onPostUpdate]
+ */
+
+/**
+ * @typedef {{
+ *   (world: World) => System
+ * }} SystemFunction
+ * @prop {string} [name] Name of the function. Defaults to "anonymousSystem"
+ */
+
+/**
+ * @typedef { Object } Listener
+ */
+
+/**
+ * @typedef {{ [ key: string ]: Listener }} ListenerMap
+ */
+
+/**
+ * @typedef { Object } ListenerChangeMap
+ * @prop {ListenerMap} added 
+ * @prop {ListenerMap} removed 
+ */
+
+/**
+ * @typedef { Object } DeferredRemovalMap
+ * @prop {number[]} entities indexes into entities array, sorted from highest to lowest
+ * @prop {string[]} components [ entity index, component name ] pairs sorted from highest to lowest
+ * Stored as a string but seperated with `__@@ECS@@__`
+ */
+
+/**
+ * @typedef { Object } WorldStats
+ * @prop {number} entityCount
+ * @prop {{ [ key: number ]: number }} componentCount key is component id, value is instance count
+ * @prop {{ [ key: number ]: number }} filterInvocationCount key is filter id, value is number of times this filter was run this frame
+ * @prop {{
+ *   name: string;
+ *   timeElapsed: number;
+ *   filters: {
+ *     [ key: string ]: number;
+ *   };
+ * }[]} systems
+ * @prop {number} currentSystem the array index of the currently processed system
+ *   used to determine which systems invoke queries
+ * @prop {number} lastSendTime time stats were last sent (used to throttle send)
+ */
+
+/**
+ * @typedef { Object } World
+ * @prop {Entity[]} entities 
+ * @prop {Filter[]} filters 
+ * @prop {System[]} systems 
+ * @prop {ListenerChangeMap[]} listeners 
+ * @prop {DeferredRemovalMap} removals 
+ * @prop {WorldStats[]} stats 
+ */
+
+/**
+ * Creates a world and sends window post message with id `mreinstein/ecs-source`
+ * and method `worldCreated`
+ *
+ * @param {number} worldId ID of the world to create
+ * @returns {World} created world
+ */
 function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
+    /**
+     * @type {World}
+     */
     const world = {
         entities: [ ],
         filters: { },
@@ -59,7 +151,11 @@ function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
     return world
 }
 
-
+/**
+ * Creates an entity and adds it to the world, incrementing the entity count
+ * @param {World} world world where entity will be added
+ * @returns {Entity} the created entity
+ */
 function createEntity (world) {
     const entity = { }
     world.entities.push(entity)
@@ -67,7 +163,14 @@ function createEntity (world) {
     return entity
 }
 
-
+/**
+ * Adds a component to the entity
+ * @param {World} world world where listener will be invoked
+ * @param {Entity} entity 
+ * @param {string} componentName 
+ * @param {Component} componentData 
+ * @returns {void} returns early if this is a duplicate componentName
+ */
 function addComponentToEntity (world, entity, componentName, componentData={}) {
 
     // ignore duplicate adds
@@ -109,7 +212,14 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
     }
 }
 
-
+/**
+ * Removes a component from the entity, optionally deferring removal
+ * @param {World} world world where listener will be invoked
+ * @param {Entity} entity entity to remove component from
+ * @param {string} componentName name of the component to remove
+ * @param {boolean} [deferredRemoval] Default is true, optionally defer removal 
+ * @returns {void} returns early if componentName does not exist on entity
+ */
 function removeComponentFromEntity (world, entity, componentName, deferredRemoval=true) {
     // ignore removals when the component isn't present
     if (!entity[componentName])
@@ -138,7 +248,13 @@ function removeComponentFromEntity (world, entity, componentName, deferredRemova
     }
 }
 
-
+/**
+ * Remove an entity from the world
+ * @param {World} world world to remove entity from and emit listeners
+ * @param {Entity} entity entity to remove
+ * @param {boolean} [deferredRemoval] Default is true, optionally defer removal 
+ * @returns {void} returns early if entity does not exist in world
+ */
 function removeEntity (world, entity, deferredRemoval=true) {
     const idx = world.entities.indexOf(entity)
     if (idx < 0)
@@ -166,7 +282,18 @@ function removeEntity (world, entity, deferredRemoval=true) {
 
 }
 
-
+/**
+ * Get entities from the world with all provided components. Optionally,
+ * @param {World} world 
+ * @param {string[]} componentNames A component filter used to match entities. 
+ * Must match all of the components in the filter.
+ * Can add an exclamation mark at the beginning to query by components that are not present. For example:
+ * `const entities = ECS.getEntities(world, [ 'transform', '!hero' ])`
+ * 
+ * @param {ListenerType} [listenerType] Optional. Can be "added" or "removed". Provides a list of entities
+ * that match were "added" or "removed" since the last system call which matched the filter.
+ * @returns {Entity[]} an array of entities that match the given filters
+ */
 function getEntities (world, componentNames, listenerType) {
     const filterId = componentNames.join(',')
 
@@ -212,8 +339,14 @@ function getEntities (world, componentNames, listenerType) {
 }
 
 
-// returns true if an entity contains all the components that match the filter
-// all entities having at least one component in the ignore list are excluded.
+/**
+ * returns true if an entity contains all the components that match the filter
+ * all entities having at least one component in the ignore list are excluded.
+ * @param {string} filterId 
+ * @param {Entity} entity 
+ * @param {string[]} componentIgnoreList 
+ * @returns 
+ */
 function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
     const componentIds = filterId.split(',')
 
@@ -233,7 +366,11 @@ function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
     return true
 }
 
-
+/**
+ * Adds a system to the world.
+ * @param {World} world 
+ * @param {System} fn 
+ */
 function addSystem (world, fn) {
     const system = fn(world)
 
@@ -265,7 +402,11 @@ function addSystem (world, fn) {
     world.systems.push(system)
 }
 
-
+/**
+ * 
+ * @param {World} world 
+ * @param {number} dt Change in time since last update, in milliseconds
+ */
 function preFixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
@@ -277,6 +418,11 @@ function preFixedUpdate (world, dt) {
 }
 
 
+/**
+ * 
+ * @param {World} world 
+ * @param {number} dt Change in time since last update, in milliseconds
+ */
 function fixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
@@ -287,7 +433,11 @@ function fixedUpdate (world, dt) {
     }
 }
 
-
+/**
+ * 
+ * @param {World} world 
+ * @param {number} dt Change in time since last update, in milliseconds
+ */
 function postFixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
@@ -299,6 +449,11 @@ function postFixedUpdate (world, dt) {
 }
 
 
+/**
+ * 
+ * @param {World} world 
+ * @param {number} dt Change in time since last update, in milliseconds
+ */
 function preUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
@@ -309,7 +464,11 @@ function preUpdate (world, dt) {
     }
 }
 
-
+/**
+ * 
+ * @param {World} world 
+ * @param {number} dt Change in time since last update, in milliseconds
+ */
 function update (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
@@ -320,7 +479,11 @@ function update (world, dt) {
     }
 }
 
-
+/**
+ * 
+ * @param {World} world 
+ * @param {number} dt Change in time since last update, in milliseconds
+ */
 function postUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
@@ -331,9 +494,12 @@ function postUpdate (world, dt) {
     }
 }
 
-
-// remove all entities that were added/removed this frame from the listener set
-// should be called after postUpdate
+/**
+ * remove all entities that were added/removed this frame from the listener set
+ * should be called after postUpdate
+ *
+ * @param {World} world 
+ */
 function emptyListeners (world) {
     for (const filterId in world.listeners.added)
         world.listeners.added[filterId].length = 0
@@ -342,7 +508,10 @@ function emptyListeners (world) {
         world.listeners.removed[filterId].length = 0
 }
 
-
+/**
+ * 
+ * @param {World} world 
+ */
 function _resetStats (world) {
     for (const filterId in world.stats.filterInvocationCount)
         world.stats.filterInvocationCount[filterId] = 0
@@ -356,7 +525,12 @@ function _resetStats (world) {
     world.stats.currentSystem = 0
 }
 
-
+/**
+ * 
+ * @param {World} world 
+ * @param {Entity} entity 
+ * @param {string} componentName 
+ */
 function _removeComponent (world, entity, componentName) {
     if (entity[componentName])
         world.stats.componentCount[componentName] -= 1
@@ -380,7 +554,11 @@ function _removeComponent (world, entity, componentName) {
     }
 }
 
-
+/**
+ * 
+ * @param {World} world 
+ * @param {Entity} entity 
+ */
 function _removeEntity (world, entity) {
     for (const componentName in entity)
         if (entity[componentName])
@@ -398,9 +576,12 @@ function _removeEntity (world, entity) {
     }
 }
 
-
-// purpose: by given filterId and component determine if component is referred in that filter.
-// arguments: filterId is a string in the form "component1,component2,...,componentN", component is a string
+/**
+ * purpose: by given filterId and component determine if component is referred in that filter.
+ * @param {string} filterId a string in the form "component1,component2,...,componentN", component is a string
+ * @param {string} component 
+ * @returns {boolean}
+ */
 function _hasComponent (filterId, component) {
   return (filterId === component) ||
          filterId.startsWith(`${component},`) ||
@@ -408,7 +589,10 @@ function _hasComponent (filterId, component) {
          filterId.includes(`,${component},`)
 }
 
-
+/**
+ * necessary cleanup step at the end of each frame loop
+ * @param {World} world 
+ */
 function cleanup (world) {
     emptyListeners(world)
 
@@ -448,5 +632,19 @@ function cleanup (world) {
 }
 
 
-export default { createWorld, createEntity, addComponentToEntity, removeComponentFromEntity, getEntities,
-                 removeEntity, addSystem, preFixedUpdate, fixedUpdate, postFixedUpdate, update, preUpdate, postUpdate, cleanup }
+export default {
+    createWorld,
+    createEntity,
+    addComponentToEntity,
+    removeComponentFromEntity,
+    getEntities,
+    removeEntity,
+    addSystem,
+    preFixedUpdate,
+    fixedUpdate,
+    postFixedUpdate,
+    update,
+    preUpdate,
+    postUpdate,
+    cleanup,
+}

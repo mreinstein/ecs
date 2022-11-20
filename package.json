@@ -3,10 +3,12 @@
   "version": "0.15.0",
   "description": "data oriented, functional entity component system",
   "main": "ecs.js",
+  "types": "types/ecs.d.ts",
   "type": "module",
   "scripts": {
     "test": "tap test/",
-    "prepublishOnly": "npm test"
+    "build": "tsc",
+    "prepublishOnly": "npm build && npm test"
   },
   "keywords": [
     "game",
@@ -18,7 +20,8 @@
     "remove-array-items": "^3.0.0"
   },
   "devDependencies": {
-    "tap": "^16.0.0"
+    "tap": "^16.0.0",
+    "typescript": "^4.9.3"
   },
   "repository": {
     "type": "git",
