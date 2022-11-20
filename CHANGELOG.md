@@ -1,4 +1,4 @@
-# 0.15.1
+# 0.16.0
 * add Typescript types, jsdoc, and named exports
 
 # 0.15.0

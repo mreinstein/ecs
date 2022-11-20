@@ -189,6 +189,61 @@ Assuming you have the `devtools-extension/` unpacked in chrome, you should see t
 
 If you're not sure how to load unpacked extensions in Chrome, follow the instructions here: https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest
 
+### Typescript Support
+
+Typescript and named exports are also supported:
+
+```typescript
+import {
+    default as ECS,
+    createWorld,
+    createEntity,
+    addComponentToEntity,
+    getEntities,
+    addSystem,
+    SystemFunction,
+    SystemUpdateFunction
+} from 'ecs';
+const world = createWorld();
+
+const PLAYER = createEntity(world);
+addComponentToEntity(world, PLAYER, 'position', { x: 15, y: 23 })
+addComponentToEntity(world, PLAYER, 'moveable', { dx: 0, dy: 0 });
+
+const movementSystem: SystemFunction = function (world) {
+    const onUpdate: SystemUpdateFunction = function (dt) {
+        for (const entity of getEntities(world, ['position', 'moveable'])) {
+            entity.position.x += entity.moveable.dx
+            entity.position.y += entity.moveable.dy
+        }
+    }
+
+
+    return { onUpdate }
+}
+
+addSystem(world, movementSystem);
+
+let currentTime = performance.now();
+
+function gameLoop() {
+    const newTime = performance.now()
+    const frameTime = newTime - currentTime  // in milliseconds, e.g. 16.64356
+    currentTime = newTime
+
+    // run onUpdate for all added systems
+    ECS.update(world, frameTime)
+
+    // necessary cleanup step at the end of each frame loop
+    ECS.cleanup(world)
+
+    requestAnimationFrame(gameLoop);
+}
+
+
+// finally start the game loop
+gameLoop();
+```
 
 ### references, honorable mentions, etc.
 
