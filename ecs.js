@@ -20,7 +20,7 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
  */
 
 /**
- * @typedef { Object } Filter
+ * @typedef { Entity[] } FilteredEntityList
  */
 
 /**
@@ -59,6 +59,10 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
  */
 
 /**
+ * @typedef {{ [ filterId: string ]: FilteredEntityList }} FilterMap
+ */
+
+/**
  * @typedef { Object } DeferredRemovalMap
  * @prop {number[]} entities indexes into entities array, sorted from highest to lowest
  * @prop {string[]} components [ entity index, component name ] pairs sorted from highest to lowest
@@ -85,11 +89,11 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
 /**
  * @typedef { Object } World
  * @prop {Entity[]} entities 
- * @prop {Filter[]} filters 
+ * @prop {FilterMap} filters 
  * @prop {System[]} systems 
- * @prop {ListenerChangeMap[]} listeners 
+ * @prop {ListenerChangeMap} listeners 
  * @prop {DeferredRemovalMap} removals 
- * @prop {WorldStats[]} stats 
+ * @prop {WorldStats} stats 
  */
 
 /**

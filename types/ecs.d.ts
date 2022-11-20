@@ -10,7 +10,7 @@
  * }} Entity
  */
 /**
- * @typedef { Object } Filter
+ * @typedef { Entity[] } FilteredEntityList
  */
 /**
  * @typedef { (dt: number) => void } SystemUpdateFunction
@@ -42,6 +42,9 @@
  * @prop {ListenerMap} removed
  */
 /**
+ * @typedef {{ [ filterId: string ]: FilteredEntityList }} FilterMap
+ */
+/**
  * @typedef { Object } DeferredRemovalMap
  * @prop {number[]} entities indexes into entities array, sorted from highest to lowest
  * @prop {string[]} components [ entity index, component name ] pairs sorted from highest to lowest
@@ -66,11 +69,11 @@
 /**
  * @typedef { Object } World
  * @prop {Entity[]} entities
- * @prop {Filter[]} filters
+ * @prop {FilterMap} filters
  * @prop {System[]} systems
- * @prop {ListenerChangeMap[]} listeners
+ * @prop {ListenerChangeMap} listeners
  * @prop {DeferredRemovalMap} removals
- * @prop {WorldStats[]} stats
+ * @prop {WorldStats} stats
  */
 /**
  * Creates a world and sends window post message with id `mreinstein/ecs-source`
@@ -194,7 +197,7 @@ export type Component = any;
 export type Entity = {
     [key: string]: any;
 };
-export type Filter = any;
+export type FilteredEntityList = Entity[];
 export type SystemUpdateFunction = (dt: number) => void;
 export type System = {
     onPreFixedUpdate?: SystemUpdateFunction;
@@ -212,6 +215,9 @@ export type ListenerMap = {
 export type ListenerChangeMap = {
     added: ListenerMap;
     removed: ListenerMap;
+};
+export type FilterMap = {
+    [filterId: string]: FilteredEntityList;
 };
 export type DeferredRemovalMap = {
     /**
@@ -257,10 +263,10 @@ export type WorldStats = {
 };
 export type World = {
     entities: Entity[];
-    filters: Filter[];
+    filters: FilterMap;
     systems: System[];
-    listeners: ListenerChangeMap[];
+    listeners: ListenerChangeMap;
     removals: DeferredRemovalMap;
-    stats: WorldStats[];
+    stats: WorldStats;
 };
 //# sourceMappingURL=ecs.d.ts.map
