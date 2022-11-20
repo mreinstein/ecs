@@ -23,15 +23,18 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
  * @typedef { Object } Filter
  */
 
+/**
+ * @typedef { (dt: number) => void } SystemUpdateFunction
+ */
 
 /**
  * @typedef { Object } System
- * @prop {(dt: number) => void} [onPreFixedUpdate]
- * @prop {(dt: number) => void} [onFixedUpdate]
- * @prop {(dt: number) => void} [onPostFixedUpdate]
- * @prop {(dt: number) => void} [onPreUpdate]
- * @prop {(dt: number) => void} [onUpdate]
- * @prop {(dt: number) => void} [onPostUpdate]
+ * @prop {SystemUpdateFunction} [onPreFixedUpdate]
+ * @prop {SystemUpdateFunction} [onFixedUpdate]
+ * @prop {SystemUpdateFunction} [onPostFixedUpdate]
+ * @prop {SystemUpdateFunction} [onPreUpdate]
+ * @prop {SystemUpdateFunction} [onUpdate]
+ * @prop {SystemUpdateFunction} [onPostUpdate]
  */
 
 /**
@@ -96,7 +99,7 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
  * @param {number} worldId ID of the world to create
  * @returns {World} created world
  */
-function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
+export function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
     /**
      * @type {World}
      */
@@ -158,7 +161,7 @@ function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
  * @param {World} world world where entity will be added
  * @returns {Entity} the created entity
  */
-function createEntity (world) {
+export function createEntity (world) {
     const entity = { }
     world.entities.push(entity)
     world.stats.entityCount++
@@ -173,7 +176,7 @@ function createEntity (world) {
  * @param {Component} [componentData] 
  * @returns {void} returns early if this is a duplicate componentName
  */
-function addComponentToEntity (world, entity, componentName, componentData={}) {
+export function addComponentToEntity (world, entity, componentName, componentData={}) {
 
     // ignore duplicate adds
     if (entity[componentName])
@@ -222,7 +225,7 @@ function addComponentToEntity (world, entity, componentName, componentData={}) {
  * @param {boolean} [deferredRemoval] Default is true, optionally defer removal 
  * @returns {void} returns early if componentName does not exist on entity
  */
-function removeComponentFromEntity (world, entity, componentName, deferredRemoval=true) {
+ export function removeComponentFromEntity (world, entity, componentName, deferredRemoval=true) {
     // ignore removals when the component isn't present
     if (!entity[componentName])
         return
@@ -257,7 +260,7 @@ function removeComponentFromEntity (world, entity, componentName, deferredRemova
  * @param {boolean} [deferredRemoval] Default is true, optionally defer removal 
  * @returns {void} returns early if entity does not exist in world
  */
-function removeEntity (world, entity, deferredRemoval=true) {
+ export function removeEntity (world, entity, deferredRemoval=true) {
     const idx = world.entities.indexOf(entity)
     if (idx < 0)
         return
@@ -296,7 +299,7 @@ function removeEntity (world, entity, deferredRemoval=true) {
  * that match were "added" or "removed" since the last system call which matched the filter.
  * @returns {Entity[]} an array of entities that match the given filters
  */
-function getEntities (world, componentNames, listenerType) {
+export function getEntities (world, componentNames, listenerType) {
     const filterId = componentNames.join(',')
 
     if (!world.filters[filterId])
@@ -373,7 +376,7 @@ function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
  * @param {World} world 
  * @param {SystemFunction} fn 
  */
-function addSystem (world, fn) {
+export function addSystem (world, fn) {
     const system = fn(world)
 
     world.stats.systems.push({
@@ -409,7 +412,7 @@ function addSystem (world, fn) {
  * @param {World} world 
  * @param {number} dt Change in time since last update, in milliseconds
  */
-function preFixedUpdate (world, dt) {
+export function preFixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
@@ -425,7 +428,7 @@ function preFixedUpdate (world, dt) {
  * @param {World} world 
  * @param {number} dt Change in time since last update, in milliseconds
  */
-function fixedUpdate (world, dt) {
+export function fixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
@@ -440,7 +443,7 @@ function fixedUpdate (world, dt) {
  * @param {World} world 
  * @param {number} dt Change in time since last update, in milliseconds
  */
-function postFixedUpdate (world, dt) {
+export function postFixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
@@ -456,7 +459,7 @@ function postFixedUpdate (world, dt) {
  * @param {World} world 
  * @param {number} dt Change in time since last update, in milliseconds
  */
-function preUpdate (world, dt) {
+export function preUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
@@ -471,7 +474,7 @@ function preUpdate (world, dt) {
  * @param {World} world 
  * @param {number} dt Change in time since last update, in milliseconds
  */
-function update (world, dt) {
+export function update (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
@@ -486,7 +489,7 @@ function update (world, dt) {
  * @param {World} world 
  * @param {number} dt Change in time since last update, in milliseconds
  */
-function postUpdate (world, dt) {
+export function postUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
@@ -595,7 +598,7 @@ function _hasComponent (filterId, component) {
  * necessary cleanup step at the end of each frame loop
  * @param {World} world 
  */
-function cleanup (world) {
+export function cleanup (world) {
     emptyListeners(world)
 
     // process all entity components marked for deferred removal
@@ -649,4 +652,5 @@ export default {
     preUpdate,
     postUpdate,
     cleanup,
+
 }

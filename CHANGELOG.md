@@ -1,3 +1,6 @@
+# 0.15.1
+* add Typescript types, jsdoc, and named exports
+
 # 0.15.0
 * add option to remove entity's immediately rather than being deferred to the next frame
 

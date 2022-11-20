@@ -1,6 +1,6 @@
 {
   "name": "ecs",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "data oriented, functional entity component system",
   "main": "ecs.js",
   "types": "types/ecs.d.ts",
@@ -8,7 +8,7 @@
   "scripts": {
     "test": "tap test/",
     "build": "tsc",
-    "prepublishOnly": "npm build && npm test"
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "game",
