@@ -10,11 +10,13 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
  */
 
 /**
- * @typedef { Object } Component
+ * @typedef { any } Component
  */
 
 /**
- * @typedef { Object } Entity
+ * @typedef {{
+ *  [ key: string ]: Component
+ * }} Entity
  */
 
 /**
@@ -168,7 +170,7 @@ function createEntity (world) {
  * @param {World} world world where listener will be invoked
  * @param {Entity} entity 
  * @param {string} componentName 
- * @param {Component} componentData 
+ * @param {Component} [componentData] 
  * @returns {void} returns early if this is a duplicate componentName
  */
 function addComponentToEntity (world, entity, componentName, componentData={}) {
@@ -369,7 +371,7 @@ function _matchesFilter (filterId, entity, componentIgnoreList=[]) {
 /**
  * Adds a system to the world.
  * @param {World} world 
- * @param {System} fn 
+ * @param {SystemFunction} fn 
  */
 function addSystem (world, fn) {
     const system = fn(world)
