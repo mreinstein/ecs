@@ -2,16 +2,17 @@
   "name": "devtools-extension",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "private": true,
   "scripts": {
-    "dev": "rollup -c rollup.config.js --watch.chokidar -o app-bundle.js app.js",
+    "build": "node esbuild.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "rollup": "^2.50.5",
-    "rollup-plugin-url-resolve": "^0.2.0"
+    "@hyrious/esbuild-plugin-http": "^0.1.1",
+    "esbuild": "^0.15.18"
   }
 }

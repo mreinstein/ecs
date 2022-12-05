@@ -1,5 +1,5 @@
 import debounce from 'https://cdn.skypack.dev/lodash.debounce'
-import html     from 'https://cdn.skypack.dev/snabby@3.1.0'
+import html     from 'https://cdn.skypack.dev/snabby'
 import timeline from 'https://cdn.skypack.dev/snabbdom-timeline'
 
 
