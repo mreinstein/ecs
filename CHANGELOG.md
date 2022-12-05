@@ -1,3 +1,10 @@
+# 0.17.0
+* BREAKING: `added` and `removed` entities are now delayed until after `ECS.cleanup()` runs to avoid missing entities based on system order. Fixes #35
+* BREAKING: passing an invalid `listenerType` (e.g., `ECS.getEntities(w, [], 'blahblah')`) now throws an error
+* avoid `Array.splice()` because it generates memory garbage
+* replace rollup with esbuild in the chrome extension bundling step
+
+
 # 0.16.0
 * add Typescript types, jsdoc, and named exports
 
