@@ -8,7 +8,13 @@
 export default function orderedInsert (arr, val) {
     for (let i=0; i < arr.length; i++) {
         if (arr[i] <= val) {
-            arr.splice(i, 0, val)
+
+            // shift down all of the entries after the insert location by 1
+            for (let idx=arr.length-1; idx >= i; idx--)
+                arr[idx+1] = arr[idx]
+
+            arr[i] = val
+
             return
         }
     }
