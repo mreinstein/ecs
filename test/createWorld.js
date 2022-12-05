@@ -10,7 +10,9 @@ tap.same(w, {
     systems: [ ],
     listeners: {
         added: { },
-        removed: { }
+        removed: { },
+        _added: { },
+        _removed: { }
     },
     removals: {
         entities: [ ],

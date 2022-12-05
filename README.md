@@ -85,7 +85,7 @@ function rendererSystem (world) {
     const onUpdate = function (dt) {
 
         // optional 3rd parameter, can be 'added' or 'removed'. provides the list of entities that were
-        // added/removed since the last system call which match the filter
+        // added/removed since the last ECS.cleanup(...) call
         for (const entity of ECS.getEntities(world, [ 'renderable' ], 'added')) {
             // do whatever setup you need for newly created renderable here
         }

@@ -112,14 +112,20 @@ export function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
         filters: { },
         systems: [ ],
         listeners: {
-            added: { },  // key is the filter, value is the array of entities added this frame
-            removed: { } // key is the filter, value is the array of entities removed this frame
+            added: { },   // key is the filter, value is the array of entities added last frame
+            removed: { }, // key is the filter, value is the array of entities removed last frame
+
+            // Buffer all entities added/removed this frame and report them as added/removed in the
+            // next frame.  Fixes https://github.com/mreinstein/ecs/issues/35 where some events can
+            // be missed depending on system order.
+            _added: { },
+            _removed: { }
         },
         
         // deferred removals
         removals: {
-            entities: [ ], // indexes into entities array, sorted from highest to lowest
-            components: [ ] // [ entity index, component name ] pairs sorted from highest to lowest
+            entities: [ ],  // indexes into entities array, sorted from highest to lowest
+            components: [ ] // [ entity index, component name ] pairs (unsorted)
         },
 
         stats: {
@@ -130,14 +136,15 @@ export function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
             filterInvocationCount: { }, // key is filter id, value is number of times this filter was run this frame
             systems: [
                 /*
-                {
-                    name: 'systemname',
-                    timeElapsed: 0, // milliseconds spent in this system this frame
-                    filters: {
-                        filterId1: 0,  // number of entities that matched the filter
-                        filterId2: 0,
+                example format:
+                    {
+                        name: 'systemname',
+                        timeElapsed: 0, // milliseconds spent in this system this frame
+                        filters: {
+                            filterId1: 0,  // number of entities that matched the filter
+                            filterId2: 0,
+                        }
                     }
-                }
                 */
             ],
 
@@ -211,11 +218,11 @@ export function addComponentToEntity (world, entity, componentName, componentDat
         }
     }
 
-    for (const filterId in world.listeners.added) {
+    for (const filterId in world.listeners._added) {
         const matches = _matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ])
 
         // if the entity matches the filter and isn't already in the added list, add it
-        const list = world.listeners.added[filterId]
+        const list = world.listeners._added[filterId]
         if (matches && !list.includes(entity))
             list.push(entity)
     }
@@ -236,17 +243,17 @@ export function addComponentToEntity (world, entity, componentName, componentDat
 
     // get list of all remove listeners that we match
     const matchingRemoveListeners = [ ]
-    for (const filterId in world.listeners.removed) {
+    for (const filterId in world.listeners._removed) {
         // if an entity matches a remove filter, but then no longer matches the filter after a component
-        // is removed, it should be flagged as removed in listeners.removed
+        // is removed, it should be flagged as removed in listeners._removed
         if (_matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ]))
             // prevent adding the removal of an entity to the same list multiple times
-            if (!world.listeners.removed[filterId].includes(entity))
-                world.listeners.removed[filterId].push(entity)
+            if (!world.listeners._removed[filterId].includes(entity))
+                world.listeners._removed[filterId].push(entity)
     }
 
     if (deferredRemoval) {
-        // add this component to the list of deferred removals
+        // add the component to the list of components to remove when the cleanup function is invoked
         const idx = world.entities.indexOf(entity)
         const removalKey = `${idx}__@@ECS@@__${componentName}`
 
@@ -270,17 +277,17 @@ export function addComponentToEntity (world, entity, componentName, componentDat
         return
 
     // add the entity to all matching remove listener lists
-    for (const filterId in world.listeners.removed) {
+    for (const filterId in world.listeners._removed) {
         const matches = _matchesFilter(filterId, entity)
 
         // if the entity matches the filter and isn't already in the removed list, add it
-        const list = world.listeners.removed[filterId]
+        const list = world.listeners._removed[filterId]
         if (matches && !list.includes(entity))
             list.push(entity)
     }
 
     if (deferredRemoval) {
-        // add this entity to the list of deferred removals
+        // add the entity to the list of entities to remove when the cleanup function is invoked
         if (!world.removals.entities.includes(idx)) {
             orderedInsert(world.removals.entities, idx)
             world.stats.entityCount--
@@ -288,7 +295,6 @@ export function addComponentToEntity (world, entity, componentName, componentDat
     } else {
         _removeEntity(world, entity)
     }
-
 }
 
 /**
@@ -325,6 +331,7 @@ export function getEntities (world, componentNames, listenerType) {
     if (listenerType === 'added') {
         // if the filter doesn't exist yet, add it
         if (!world.listeners.added[filterId]) {
+            world.listeners._added[filterId] = [ ]
             world.listeners.added[filterId] = [ ]
             // add all existing entities that are already matching to the added event
             for (const entity of world.entities) {
@@ -334,14 +341,38 @@ export function getEntities (world, componentNames, listenerType) {
         }
 
         return world.listeners.added[filterId]
-    }
 
-    if (listenerType === 'removed') {
-        // if the filter doesn't exist yet, remove it
-        if (!world.listeners.removed[filterId])
+    } else if (listenerType === 'removed') {
+        // if the filter doesn't exist yet, add it
+        if (!world.listeners.removed[filterId]) {
+            world.listeners._removed[filterId] = [ ]
             world.listeners.removed[filterId] = [ ]
 
+            // add all of the entities that are in the deferred removal list that match the removed event
+            for (const entityIdx of world.removals.entities) {
+                if (_matchesFilter(filterId, world.entities[entityIdx]))
+                    world.listeners.removed[filterId].push(entity)
+            }
+
+            for (const pair of world.removals.components) {
+                const [ idx, componentName ] = pair.split('__@@ECS@@__')
+
+                const entityIdx = parseInt(idx, 10)
+                const entity = world.entities[entityIdx]
+
+                // if an entity matches a remove filter, but then no longer matches the filter after a component
+                // is removed, it should be flagged as removed
+                if (_matchesFilter(filterId, entity) && !_matchesFilter(filterId, entity, [ componentName ]))
+                    // prevent adding the removal of an entity to the same list multiple times
+                    if (!world.listeners.removed[filterId].includes(entity))
+                        world.listeners.removed[filterId].push(entity)
+            }
+        }
+
         return world.listeners.removed[filterId]
+
+    } else if (listenerType) {
+        throw new Error(`Invalid listenerType '${listenerType}'. Should be 'removed' or 'added'.`)
     }
 
     return world.filters[filterId]
@@ -504,20 +535,6 @@ export function postUpdate (world, dt) {
 }
 
 /**
- * remove all entities that were added/removed this frame from the listener set
- * should be called after postUpdate
- *
- * @param {World} world 
- */
-function emptyListeners (world) {
-    for (const filterId in world.listeners.added)
-        world.listeners.added[filterId].length = 0
-
-    for (const filterId in world.listeners.removed)
-        world.listeners.removed[filterId].length = 0
-}
-
-/**
  * 
  * @param {World} world 
  */
@@ -603,9 +620,32 @@ function _hasComponent (filterId, component) {
  * @param {World} world 
  */
 export function cleanup (world) {
-    emptyListeners(world)
+
+    // move all of the entities that were added/removed this frame into the list to report
+    // next frame. This ensures that events aren't missed when systems add entities after another
+    // system listening for those entities has already run this frame.
+    for (const id in world.listeners.added)
+        world.listeners.added[id].length = 0
+
+    for (const id in world.listeners.removed)
+        world.listeners.removed[id].length = 0
+
+    for (const id in world.listeners._added) {
+        world.listeners.added[id] = world.listeners._added[id]
+        world.listeners._added[id] = [ ]
+    }
+
+    for (const id in world.listeners._removed) {
+        world.listeners.removed[id] = world.listeners._removed[id]
+        world.listeners._removed[id] = [ ]
+    }
+
 
     // process all entity components marked for deferred removal
+    //
+    // component removals MUST be processed before entity removals because
+    // the component removal items include an index into the entity array, and
+    // this will become invalid when entities are removed and the remaining items shift positions
     for (let i=0; i < world.removals.components.length; i++) {
         const [ entityIdx, componentName ] = world.removals.components[i].split('__@@ECS@@__')
         const entity = world.entities[entityIdx]
@@ -655,6 +695,6 @@ export default {
     update,
     preUpdate,
     postUpdate,
-    cleanup,
-
+    cleanup
 }
+

@@ -15,7 +15,7 @@ let r2 = ECS.getEntities(w, [ 'c' ], 'added')
 
 tap.same(r, [ e ], 'setting up an added listener includes entities already matching the filter')
 tap.same(r2, [ e ], 'setting up an added listener includes entities already matching the filter')
-tap.same(w.listeners.added, { "a,b,c": [ e ], "c": [ e ] }, 'clearing listeners should empty out the lists')
+tap.same(w.listeners.added, { 'a,b,c': [ e ], 'c': [ e ] }, 'clearing listeners should empty out the lists')
 
 
 ECS.cleanup(w)
@@ -32,8 +32,14 @@ r2 = ECS.getEntities(w, [ 'c' ], 'removed')
 
 ECS.removeComponentFromEntity(w, e, 'c')
 
-tap.same(w.listeners.removed, { "a,b,c": [ e ], "c": [ e ] }, 'removing component should add to removed lists')
+tap.same(w.listeners._removed, { 'a,b,c': [ e ], 'c': [ e ] }, 'removing component should add to removed lists')
 
+tap.same(w.listeners.removed, { 'a,b,c': [], c: [] }, 'removing component should not yet be in removed list until next cleanup()')
+
+ECS.cleanup(w)
+
+tap.same(w.listeners.removed, { 'a,b,c': [ e ], 'c': [ e ] }, 'removed has the contents of _removed after cleanup()')
+tap.same(w.listeners._removed, { 'a,b,c': [], c: [] }, '_removed is emptied after cleanup()')
 
 testRemoveEntity()
 
@@ -49,8 +55,9 @@ function testRemoveEntity () {
     tap.same(r, [ ])
 
     ECS.removeEntity(w, e)
-    const r2 = ECS.getEntities(w, [ 'a' ], 'removed')
-    tap.same(r2, [ e ], 'removing entity should add it to removed listeners')
+
+    ECS.cleanup(w)
+    tap.same(ECS.getEntities(w, [ 'a' ], 'removed'), [ e ], 'removing entity should add it to removed listeners')
 }
 
 
@@ -68,10 +75,9 @@ function testRemoveComponentWithoutDeferred () {
 
     const deferredRemoval = false
     ECS.removeComponentFromEntity(w, e, 'a', deferredRemoval)
+    ECS.cleanup(w)
   
-    r = ECS.getEntities(w, [ 'a' ], 'removed')
-
-    tap.same(r, [ e ], 'immediately removing a component still includes it in the removed list')
+    tap.same(ECS.getEntities(w, [ 'a' ], 'removed'), [ e ], 'immediately removing a component still includes it in the removed list')
 }
 
 
