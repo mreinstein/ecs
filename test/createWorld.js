@@ -9,12 +9,12 @@ tap.same(w, {
     filters: { },
     systems: [ ],
     listeners: {
-        added: { },
-        removed: { },
-        _added: { },
-        _removed: { }
+        added: new Set(),
+        removed: new Set(),
+        _added: new Set(),
+        _removed: new Set()
     },
-    removals: {
+    deferredRemovals: {
         entities: [ ],
         components: [ ]
     },

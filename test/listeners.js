@@ -2,83 +2,65 @@ import ECS from '../ecs.js'
 import tap from 'tap'
 
 
-const w = ECS.createWorld()
-
-const e = ECS.createEntity(w)
-
-ECS.addComponentToEntity(w, e, 'a')
-ECS.addComponentToEntity(w, e, 'b')
-ECS.addComponentToEntity(w, e, 'c')
-
-let r = ECS.getEntities(w, [ 'a', 'b', 'c' ], 'added')
-let r2 = ECS.getEntities(w, [ 'c' ], 'added')
-
-tap.same(r, [ e ], 'setting up an added listener includes entities already matching the filter')
-tap.same(r2, [ e ], 'setting up an added listener includes entities already matching the filter')
-tap.same(w.listeners.added, { 'a,b,c': [ e ], 'c': [ e ] }, 'clearing listeners should empty out the lists')
-
-
-ECS.cleanup(w)
-
-
-tap.same(w.listeners.added, { 'a,b,c': [ ], 'c': [ ] }, 'emptying listeners should empty out the lists')
-
-
-tap.same(w.listeners.removed, { }, 'removed lists are empty when no queries are made')
-
-
-r = ECS.getEntities(w, [ 'a', 'b', 'c' ], 'removed')
-r2 = ECS.getEntities(w, [ 'c' ], 'removed')
-
-ECS.removeComponentFromEntity(w, e, 'c')
-
-tap.same(w.listeners._removed, { 'a,b,c': [ e ], 'c': [ e ] }, 'removing component should add to removed lists')
-
-tap.same(w.listeners.removed, { 'a,b,c': [], c: [] }, 'removing component should not yet be in removed list until next cleanup()')
-
-ECS.cleanup(w)
-
-tap.same(w.listeners.removed, { 'a,b,c': [ e ], 'c': [ e ] }, 'removed has the contents of _removed after cleanup()')
-tap.same(w.listeners._removed, { 'a,b,c': [], c: [] }, '_removed is emptied after cleanup()')
-
-testRemoveEntity()
-
-
-function testRemoveEntity () {
+{
     const w = ECS.createWorld()
 
-    const e = ECS.createEntity(w) 
-
-    ECS.addComponentToEntity(w, e, 'a')
-
-    const r = ECS.getEntities(w, [ 'a' ], 'removed')
-    tap.same(r, [ ])
-
-    ECS.removeEntity(w, e)
-
-    ECS.cleanup(w)
-    tap.same(ECS.getEntities(w, [ 'a' ], 'removed'), [ e ], 'removing entity should add it to removed listeners')
-}
-
-
-function testRemoveComponentWithoutDeferred () {
-    const w = ECS.createWorld()
-
-    // setup the remove listener
-    let r = ECS.getEntities(w, [ 'a' ], 'removed')
-
-    const e = ECS.createEntity(w) 
+    const e = ECS.createEntity(w)
 
     ECS.addComponentToEntity(w, e, 'a')
     ECS.addComponentToEntity(w, e, 'b')
+    ECS.addComponentToEntity(w, e, 'c')
 
+    const s = new Set()
+    s.add(e)
+    tap.same(w.listeners._added, s, 'the new entity is in the "added this frame" set')
+    tap.same(w.listeners.added, new Set(), 'the new entity is NOT in the "added last frame" set')
 
-    const deferredRemoval = false
-    ECS.removeComponentFromEntity(w, e, 'a', deferredRemoval)
     ECS.cleanup(w)
-  
-    tap.same(ECS.getEntities(w, [ 'a' ], 'removed'), [ e ], 'immediately removing a component still includes it in the removed list')
+
+    tap.same(w.listeners.added, s, 'the entity is now in the "added last frame" set')
+    tap.same(w.listeners._added, new Set(), 'the "added this frame" set is now empty')
 }
 
 
-testRemoveComponentWithoutDeferred()
+{
+    const w = ECS.createWorld()
+
+    const e = ECS.createEntity(w) 
+
+    ECS.cleanup(w)
+
+    ECS.removeEntity(w, e)
+
+    const s = new Set()
+    s.add(e)
+    tap.same(w.listeners._removed, s, 'the new entity is in the "removed this frame" set')
+    tap.same(w.listeners.removed, new Set(), 'the new entity is NOT in the "removed last frame" set')
+
+    ECS.cleanup(w)
+    
+    tap.same(w.listeners.removed, s, 'the entity is now in the "removed last frame" set')
+    tap.same(w.listeners._removed, new Set(), 'the "removed this frame" set is now empty')
+}
+
+
+{
+    const w = ECS.createWorld()
+
+    const e = ECS.createEntity(w)
+
+    ECS.cleanup(w)
+
+    const deferredRemoval = false
+    ECS.removeEntity(w, e, deferredRemoval)
+
+    const s = new Set()
+    s.add(e)
+    tap.same(w.listeners._removed, s, 'the non-deferred, removed entity is in the "removed this frame" set')
+    tap.same(w.listeners.removed, new Set(), 'the non-deferred, removed entity is NOT in the "removed this last frame" set')
+
+    ECS.cleanup(w)
+
+    tap.same(w.listeners.removed, s, 'the entity is now in the "removed last frame" set')
+    tap.same(w.listeners._removed, new Set(), 'the "removed this frame" set is now empty')
+}

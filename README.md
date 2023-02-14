@@ -43,7 +43,6 @@ ECS.addComponentToEntity(world, PLAYER, 'position', { x: 15, y: 23 })
 ECS.addComponentToEntity(world, PLAYER, 'moveable', { dx: 0, dy: 0 })
 
 
-
 // update entity velocity based on key pressed
 function keyboardControlSystem (world) {
     // called each game loop
@@ -82,12 +81,25 @@ function movementSystem (world) {
 
 
 function rendererSystem (world) {
+
+    const RENDERABLE_FILTER = [ 'renderable' ]
+
+    // data structure to store all entities that were added or removed last frame
+    const resultEntries = {
+        count: 0,
+        entries: new Array(100)
+    }
+
     const onUpdate = function (dt) {
 
         // optional 3rd parameter, can be 'added' or 'removed'. provides the list of entities that were
-        // added/removed since the last ECS.cleanup(...) call
-        for (const entity of ECS.getEntities(world, [ 'renderable' ], 'added')) {
-            // do whatever setup you need for newly created renderable here
+        // added since the last ECS.cleanup(...) call
+        for (ECS.getEntities(world, RENDERABLE_FILTER, 'added', resultEntries)) {
+            // resultEntries will now be filled in with a reference to all entries added last frame
+        }
+
+        for (ECS.getEntities(world, RENDERABLE_FILTER, 'removed', resultEntries)) {
+            // resultEntries will now be filled in with a reference to all entries removed last frame
         }
 
     }
@@ -203,12 +215,13 @@ import {
     addSystem,
     SystemFunction,
     SystemUpdateFunction
-} from 'ecs';
-const world = createWorld();
+} from 'ecs'
+
+const world = createWorld()
 
 const PLAYER = createEntity(world);
 addComponentToEntity(world, PLAYER, 'position', { x: 15, y: 23 })
-addComponentToEntity(world, PLAYER, 'moveable', { dx: 0, dy: 0 });
+addComponentToEntity(world, PLAYER, 'moveable', { dx: 0, dy: 0 })
 
 const movementSystem: SystemFunction = function (world) {
     const onUpdate: SystemUpdateFunction = function (dt) {
@@ -237,12 +250,12 @@ function gameLoop() {
     // necessary cleanup step at the end of each frame loop
     ECS.cleanup(world)
 
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(gameLoop)
 }
 
 
 // finally start the game loop
-gameLoop();
+gameLoop()
 ```
 
 ### references, honorable mentions, etc.

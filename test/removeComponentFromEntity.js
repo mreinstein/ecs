@@ -79,11 +79,11 @@ import tap from 'tap'
 	ECS.removeComponentFromEntity(w, e8, 'dupe')
 
 	tap.same(ECS.getEntities(w, [ 'dupe' ], 'removed'), [ e8 ], 'multiple removals only appear once in the removed list')
-	tap.same(w.removals.components, [ '0__@@ECS@@__dupe' ], 'multiple removals only appear once in the removed list')
+	tap.same(w.deferredRemovals.components, [ '0__@@ECS@@__dupe' ], 'multiple removals only appear once in the removed list')
 
 	ECS.cleanup(w)
 	
-	tap.same(w.removals.components, [ ])
+	tap.same(w.deferredRemovals.components, [ ])
 }
 
 
@@ -102,7 +102,7 @@ import tap from 'tap'
 
 	tap.equal(ECS.getEntities(w, [ 'aabb' ]).length, 0)
 	tap.same(w.entities, [ { transform: {} } ], 'immediately remove component from entity')
-	tap.same(w.removals, { entities: [ ], components: [ ] }, 'does not include the component in the deferred removal list')
+	tap.same(w.deferredRemovals, { entities: [ ], components: [ ] }, 'does not include the component in the deferred removal list')
 	tap.same(w.stats.componentCount, { aabb: 0, transform: 1 }, 'immediately adjusts component stats')
 }
 

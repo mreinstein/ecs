@@ -1,3 +1,8 @@
+# 0.18.0
+* BREAKING: `added` and `removed` entities have a new API structure, where an additional argument is required
+* internally the `listeners` property uses Set instead of Object
+
+
 # 0.17.0
 * BREAKING: `added` and `removed` entities are now delayed until after `ECS.cleanup()` runs to avoid missing entities based on system order. Fixes #35
 * BREAKING: passing an invalid `listenerType` (e.g., `ECS.getEntities(w, [], 'blahblah')`) now throws an error
