@@ -103,17 +103,43 @@ import tap from 'tap'
 }
 
 
+{
+	// deferred removal should immediately remove the entity
+	const w = ECS.createWorld()
 
-// deferred removal should immediately remove the entity
-const w4 = ECS.createWorld()
+	const e = ECS.createEntity(w)
+	ECS.addComponentToEntity(w, e, 'testc')
 
-const e7 = ECS.createEntity(w4)
-ECS.addComponentToEntity(w4, e7, 'testc')
+	tap.equal(ECS.getEntities(w, [ 'testc' ]).length, 1, '1 entity should be present')
 
-tap.equal(ECS.getEntities(w4, [ 'testc' ]).length, 1, '1 entity should be present')
+	const deferredRemoval = false
+	ECS.removeEntity(w, e, deferredRemoval)
 
-const deferredRemoval = false
-ECS.removeEntity(w4, e7, deferredRemoval)
+	tap.equal(ECS.getEntities(w, [ 'testc' ]).length, 0, 'no entities present because of immediate removal')
+}
 
-tap.equal(ECS.getEntities(w4, [ 'testc' ]).length, 0, 'no entities present because of immediate removal')
 
+{
+	// removing an entity immediately doesn't screw up removing other entities via deferred removal
+	const w = ECS.createWorld()
+
+	const e = ECS.createEntity(w)
+	ECS.addComponentToEntity(w, e, 'e1')
+
+	const e2 = ECS.createEntity(w)
+	ECS.addComponentToEntity(w, e2, 'e2')
+
+	const e3 = ECS.createEntity(w)
+	ECS.addComponentToEntity(w, e3, 'e3')
+
+	ECS.cleanup(w)
+
+	ECS.removeEntity(w, e3)
+
+	const deferredRemoval = false
+	ECS.removeEntity(w, e2, deferredRemoval)
+
+	ECS.cleanup(w)
+	
+	tap.same(w.entities, [ e ], 'none deferred entity removal does not interfere with regular deferred entity removal')
+}

@@ -72,7 +72,7 @@
  * @prop {FilterMap} filters
  * @prop {System[]} systems
  * @prop {ListenerChangeMap} listeners
- * @prop {DeferredRemovalMap} removals
+ * @prop {DeferredRemovalMap} deferredRemovals
  * @prop {WorldStats} stats
  */
 /**
@@ -125,9 +125,11 @@ export function removeEntity(world: World, entity: Entity, deferredRemoval?: boo
  *
  * @param {ListenerType} [listenerType] Optional. Can be "added" or "removed". Provides a list of entities
  * that match were "added" or "removed" since the last system call which matched the filter.
+ * * @param {ListenerResult} [listenerEntities] Optional. Provides the resulting entities that match the added/removed event.
+ * must be present whenever ListenerType is present.
  * @returns {Entity[]} an array of entities that match the given filters
  */
-export function getEntities(world: World, componentNames: string[], listenerType?: ListenerType): Entity[];
+export function getEntities(world: World, componentNames: string[], listenerType?: ListenerType, listenerEntities?: ListenerResult): Entity[];
 /**
  * Adds a system to the world.
  * @param {World} world
@@ -266,7 +268,7 @@ export type World = {
     filters: FilterMap;
     systems: System[];
     listeners: ListenerChangeMap;
-    removals: DeferredRemovalMap;
+    deferredRemovals: DeferredRemovalMap;
     stats: WorldStats;
 };
 //# sourceMappingURL=ecs.d.ts.map

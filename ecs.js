@@ -214,10 +214,9 @@ export function addComponentToEntity (world, entity, componentName, componentDat
             // filter already contains entity and the filter doesn't match the entity, remove it
             if (!matches)
                 removeItems(filter, idx, 1)
-        } else {
+        } else if (matches) {
             // filter doesn't contain the entity yet, and it's not included yet, add it
-            if (matches)
-                filter.push(entity)
+            filter.push(entity)
         }
     }
 }
@@ -270,7 +269,8 @@ export function addComponentToEntity (world, entity, componentName, componentDat
             world.stats.entityCount--
         }
     } else {
-        _removeEntity(world, entity)
+        const shiftUpEntities = true
+        _removeEntity(world, entity, shiftUpEntities)
     }
 }
 
@@ -521,7 +521,7 @@ function _removeComponent (world, entity, componentName) {
         if (_matchesFilter(filterId, entity) && !filter.includes(entity)) {
             // entity matches filter and it's not in the filter add it
             filter.push(entity)
-        } else if (_hasComponent(filterId,componentName)) {
+        } else if (_hasComponent(filterId, componentName)) {
             // entity doesn't match filter and it's in the filter remove it
             // this filter contains the removed component
             const filterIdx = filter.indexOf(entity)
@@ -536,13 +536,22 @@ function _removeComponent (world, entity, componentName) {
  * @param {World} world 
  * @param {Entity} entity 
  */
-function _removeEntity (world, entity) {
+function _removeEntity (world, entity, shiftUpEntities=false) {
     for (const componentName in entity)
         if (entity[componentName])
             world.stats.componentCount[componentName] -= 1
 
     const entityIdx = world.entities.indexOf(entity)
+
     removeItems(world.entities, entityIdx, 1)
+
+    if (shiftUpEntities) {
+        for (let i=0; i <  world.deferredRemovals.entities.length; i++) {
+            const idx = world.deferredRemovals.entities[i]
+            if (idx >= entityIdx)
+                world.deferredRemovals.entities[i] -= 1
+        }
+    }
 
     // update all filters that match this
     for (const filterId in world.filters) {
@@ -596,6 +605,7 @@ export function cleanup (world) {
     for (let i=0; i < world.deferredRemovals.components.length; i++) {
         const [ entityIdx, componentName ] = world.deferredRemovals.components[i].split('__@@ECS@@__')
         const entity = world.entities[entityIdx]
+
         _removeComponent(world, entity, componentName)
     }
 
@@ -644,4 +654,3 @@ export default {
     postUpdate,
     cleanup
 }
-
