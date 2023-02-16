@@ -1,3 +1,7 @@
+# 0.18.1
+* fix bug where doing an immediate removal after a deferred removal breaks cleanup
+
+
 # 0.18.0
 * BREAKING: `added` and `removed` entities have a new API structure, where an additional argument is required
 * internally the `listeners` property uses Set instead of Object
