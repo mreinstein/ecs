@@ -1,5 +1,10 @@
+# 0.18.3
+* oof, revert serious breakage from 0.18.2 :'(
+
+
 # 0.18.2
 * remove one function wrapper in the hot path
+
 
 # 0.18.1
 * fix bug where doing an immediate removal after a deferred removal breaks cleanup
@@ -19,6 +24,7 @@
 
 # 0.16.0
 * add Typescript types, jsdoc, and named exports
+
 
 # 0.15.0
 * add option to remove entity's immediately rather than being deferred to the next frame

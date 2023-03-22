@@ -2,7 +2,7 @@ import orderedInsert from './ordered-insert.js'
 import removeItems   from 'remove-array-items'
 
 
-const now = (typeof performance === 'undefined') ? Date.now : performance.now
+const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => performance.now())
 
 
 /**
