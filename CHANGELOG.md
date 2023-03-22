@@ -1,3 +1,6 @@
+# 0.18.2
+* remove one function wrapper in the hot path
+
 # 0.18.1
 * fix bug where doing an immediate removal after a deferred removal breaks cleanup
 
