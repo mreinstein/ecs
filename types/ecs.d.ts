@@ -131,6 +131,17 @@ export function removeEntity(world: World, entity: Entity, deferredRemoval?: boo
  */
 export function getEntities(world: World, componentNames: string[], listenerType?: ListenerType, listenerEntities?: ListenerResult): Entity[];
 /**
+ * Get one entity from the world with all provided components. Optionally,
+ * @param {World} world
+ * @param {string[]} componentNames A component filter used to match entities.
+ * Must match all of the components in the filter.
+ * Can add an exclamation mark at the beginning to query by components that are not present. For example:
+ * `const e = ECS.getEntity(world, [ 'transform', '!hero' ])`
+ *
+ * @returns {Entity|void} one entity that matches the given filters or undefined if none match
+ */
+export function getEntity(world: World, componentNames: string[]): Entity | void;
+/**
  * Adds a system to the world.
  * @param {World} world
  * @param {SystemFunction} fn
@@ -183,6 +194,7 @@ declare namespace _default {
     export { addComponentToEntity };
     export { removeComponentFromEntity };
     export { getEntities };
+    export { getEntity };
     export { removeEntity };
     export { addSystem };
     export { preFixedUpdate };
