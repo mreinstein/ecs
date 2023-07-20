@@ -1,3 +1,8 @@
+# 0.18.4
+* [`180ff077d7e`]](https://github.com/mreinstein/ecs/commit/180ff077d7e1c966ede47204ef69113c2102dbf3) fix some really terrible crashing bugs 
+* add unit tests to cover all of those discovered cases
+
+
 # 0.18.3
 * oof, revert serious breakage from 0.18.2 :'(
 
