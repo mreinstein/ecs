@@ -331,6 +331,21 @@ export function getEntities (world, componentNames, listenerType, listenerEntiti
 
 
 /**
+ * Get one entity from the world with all provided components. Optionally,
+ * @param {World} world 
+ * @param {string[]} componentNames A component filter used to match entities. 
+ * Must match all of the components in the filter.
+ * Can add an exclamation mark at the beginning to query by components that are not present. For example:
+ * `const e = ECS.getEntity(world, [ 'transform', '!hero' ])`
+ * 
+ * @returns {Entity|void} one entity that matches the given filters or undefined if none match
+ */
+export function getEntity (world, componentNames) {
+    return getEntities(world, componentNames)[0]
+}
+
+
+/**
  * returns true if an entity contains all the components that match the filter
  * all entities having at least one component in the ignore list are excluded.
  * @param {string} filterId 
@@ -667,6 +682,7 @@ export default {
     addComponentToEntity,
     removeComponentFromEntity,
     getEntities,
+    getEntity,
     removeEntity,
     addSystem,
     preFixedUpdate,

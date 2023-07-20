@@ -135,6 +135,17 @@ gameLoop()
 ```
 
 
+### get a single entity
+
+Sometimes you just want a single entity, like for singleton objects (player's character for example).
+
+```javascript
+const h = ECS.getEntities(world, [ 'hero' ])[0]  // kinda kludgy
+
+const h = ECS.getEntity(world, [ 'hero' ])       // same result, less typing
+```
+
+
 ### not filter
 
 Sometimes it's useful to query by components that are _not_ present:
@@ -184,8 +195,6 @@ ECS.removeEntity(world, entity, deferredRemoval)
 
 ECS.getEntities(world, [ 'test_component' ]).length  // because we are not deferring the removal, length === 0 
 ```
-
-
 
 
 ### devtools chrome extension
