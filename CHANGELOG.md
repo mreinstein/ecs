@@ -1,3 +1,7 @@
+# 0.19.0
+* add an `getEntity(world, components)` function for a bit of syntax sugar.
+
+
 # 0.18.4
 * [`180ff077d7e`]](https://github.com/mreinstein/ecs/commit/180ff077d7e1c966ede47204ef69113c2102dbf3) fix some really terrible crashing bugs 
 * add unit tests to cover all of those discovered cases
