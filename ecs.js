@@ -541,15 +541,39 @@ function _removeEntity (world, entity, shiftUpEntities=false) {
         if (entity[componentName])
             world.stats.componentCount[componentName] -= 1
 
-    const entityIdx = world.entities.indexOf(entity)
+    const entityToRemoveIdx = world.entities.indexOf(entity)
 
-    removeItems(world.entities, entityIdx, 1)
+    removeItems(world.entities, entityToRemoveIdx, 1)
 
     if (shiftUpEntities) {
-        for (let i=0; i <  world.deferredRemovals.entities.length; i++) {
+        for (let i=world.deferredRemovals.entities.length-1; i >= 0; i--) {
             const idx = world.deferredRemovals.entities[i]
-            if (idx >= entityIdx)
+            if (idx > entityToRemoveIdx) {
                 world.deferredRemovals.entities[i] -= 1
+            } else if (idx === entityToRemoveIdx) {
+                // if this entity was defer removed, but then insta-removed, we can remove
+                // this entity from the deferred removal list. e.g.,
+                //
+                // ECS.removeEntity(w, e, true)  // deferred removal
+                // ECS.removeEntity(w, e, false) // instant removal
+                //   <-- at this point, there shouldnt be anything in the deferred removal list for the cleanup step to run
+                // ECS.cleanup()
+                removeItems(world.deferredRemovals.entities, i, 1)
+            } 
+        }
+
+        for (let i=world.deferredRemovals.components.length-1; i >= 0; i--) {
+            const str = world.deferredRemovals.components[i]
+            let [ entityIdx, componentName ] = str.split('__@@ECS@@__')
+            entityIdx = parseInt(entityIdx, 10)
+        
+            if (entityIdx > entityToRemoveIdx) {
+                world.deferredRemovals.components[i] = `${entityIdx-1}__@@ECS@@__${componentName}`
+            }
+            else if (entityIdx === entityToRemoveIdx) {
+                // remove this component from the deferred list since the entity it belongs to has already been removed
+                removeItems(world.deferredRemovals.components, i, 1)
+            }
         }
     }
 
@@ -605,7 +629,6 @@ export function cleanup (world) {
     for (let i=0; i < world.deferredRemovals.components.length; i++) {
         const [ entityIdx, componentName ] = world.deferredRemovals.components[i].split('__@@ECS@@__')
         const entity = world.entities[entityIdx]
-
         _removeComponent(world, entity, componentName)
     }
 

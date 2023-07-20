@@ -143,3 +143,80 @@ import tap from 'tap'
 	
 	tap.same(w.entities, [ e ], 'none deferred entity removal does not interfere with regular deferred entity removal')
 }
+
+
+{
+	// defer remove an entity, then remove it immediately. Prior to cleanup should empty the deferredRemovals set.
+
+	const w = ECS.createWorld()
+
+	const e = ECS.createEntity(w)
+	ECS.addComponentToEntity(w, e, 'derp')
+
+	ECS.cleanup(w)
+
+	ECS.removeEntity(w, e, true)
+
+	tap.equal(w.deferredRemovals.entities.length, 1)
+
+	ECS.removeEntity(w, e, false)
+
+	tap.equal(w.deferredRemovals.entities.length, 0)
+	tap.equal(w.deferredRemovals.components.length, 0)
+	tap.equal(w.listeners.removed.size, 0)
+	tap.equal(w.listeners._removed.size, 1)
+
+	ECS.cleanup(w)
+
+	tap.equal(w.deferredRemovals.entities.length, 0)
+	tap.equal(w.deferredRemovals.components.length, 0)
+	tap.equal(w.listeners.removed.size, 1)
+	tap.equal(w.listeners._removed.size, 0)
+}
+
+
+{
+	// remove an entity immediately, then deferred remove it. Should still provide listners
+
+	const w = ECS.createWorld()
+
+	const e = ECS.createEntity(w)
+
+	ECS.cleanup(w)
+
+	ECS.removeEntity(w, e, false) // non-deferred removal (instant)
+
+	ECS.removeEntity(w, e, true)  // deferred removal
+
+	tap.equal(w.deferredRemovals.entities.length, 0)
+	tap.equal(w.deferredRemovals.components.length, 0)
+
+	tap.equal(w.listeners.added.size, 1)
+	tap.equal(w.listeners._removed.size, 1)
+
+	ECS.cleanup(w)
+}
+
+
+{
+	// remove all values from the deferredRemovals.components list for an entity we just insta-removed
+
+	const w = ECS.createWorld()
+
+	const e = ECS.createEntity(w)
+
+	ECS.addComponentToEntity(w, e, 'a')
+	ECS.addComponentToEntity(w, e, 'b')
+
+	ECS.cleanup(w)
+
+	ECS.removeComponentFromEntity(w, e, 'a')
+	ECS.removeComponentFromEntity(w, e, 'b')
+	const deferredRemoval = false
+	ECS.removeEntity(w, e, deferredRemoval)
+
+	tap.equal(w.deferredRemovals.components.length, 0)
+	tap.equal(w.deferredRemovals.entities.length, 0)
+
+	ECS.cleanup(w)
+}

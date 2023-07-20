@@ -121,3 +121,25 @@ import tap from 'tap'
 
 	tap.equal(ECS.getEntities(w, [ 'matilda' ]).length, 1)
 }
+
+
+{
+	// if we immediately remove an entity (non-deferred removal) then we re-process the 
+	// world.deferredRemovals.components strings and shift up all the idx values > the idx of the removed entity
+
+	const w = ECS.createWorld()
+
+	const e = ECS.createEntity(w)
+
+	const e2 = ECS.createEntity(w)
+	
+	ECS.addComponentToEntity(w, e2, 'hitHero')
+
+	ECS.removeComponentFromEntity(w, e2, 'hitHero')
+
+	ECS.removeEntity(w, e, false)
+
+	//console.error(w.deferredRemovals.components)
+
+	ECS.cleanup(w)
+}
