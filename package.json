@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "tap": "^16.0.0",
-    "typescript": "^4.9.3"
+    "typescript": "^5.1.6"
   },
   "repository": {
     "type": "git",
