@@ -5,6 +5,8 @@ import tap from 'tap'
 const w = ECS.createWorld()
 
 tap.same(w, {
+    entityIds: new Map(),
+    nextId: 1,
     entities: [ ],
     filters: { },
     systems: [ ],

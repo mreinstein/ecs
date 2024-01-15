@@ -108,6 +108,10 @@ export function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
      * @type {World}
      */
     const world = {
+
+        entityIds: new Map(), // maps both entityId -> entity, and entity -> entityId
+        nextId: 1,  // id of the next entity to be created
+
         entities: [ ],
         filters: { },
         systems: [ ],
@@ -177,8 +181,23 @@ export function createEntity (world) {
     world.entities.push(entity)
     world.stats.entityCount++
 
+    world.entityIds.set(world.nextId, entity)
+    world.entityIds.set(entity, world.nextId)
+
+    world.nextId++
+
     world.listeners._added.add(entity)
     return entity
+}
+
+
+export function getEntityId (world, entity) {
+    return world.entityIds.get(entity)
+}
+
+
+export function getEntityById (world, entityId) {
+    return world.entityIds.get(entityId)
 }
 
 
@@ -558,6 +577,12 @@ function _removeEntity (world, entity, shiftUpEntities=false) {
 
     const entityToRemoveIdx = world.entities.indexOf(entity)
 
+    const entityId = world.entityIds.get(entity)
+    if (entityId !== undefined) {
+        world.entityIds.delete(entity)
+        world.entityIds.delete(entityId)
+    }
+
     removeItems(world.entities, entityToRemoveIdx, 1)
 
     if (shiftUpEntities) {
@@ -679,6 +704,10 @@ export function cleanup (world) {
 export default {
     createWorld,
     createEntity,
+
+    getEntityId,
+    getEntityById,
+
     addComponentToEntity,
     removeComponentFromEntity,
     getEntities,

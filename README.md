@@ -197,6 +197,32 @@ ECS.getEntities(world, [ 'test_component' ]).length  // because we are not defer
 ```
 
 
+### get entity by unique id
+
+ECS will generate a unique integer id for every entity created in a world:
+
+```javascript
+const world = ECS.createWorld()
+const e = ECS.createEntity(world)
+const e2 = ECS.createEntity(world)
+
+const id1 = ECS.getEntityId(world, e)
+const id2 = ECS.getEntityId(world, e2)
+
+console.log(id1)  // 1
+console.log(id2)  // 2
+```
+
+You can then lookup  this entity directly:
+```javascript
+const e = ECS.getEntityById(world, id1)  // e is the entity
+```
+
+This can be useful in cases where you need to reference an entity from another context. for example,
+if you're running a networked simulation and need to refer to a specific entity across peers.
+
+
+
 ### devtools chrome extension
 
 If you'd like to see a real time view of the data in your ECS powered program, there is a dev tools extension!
