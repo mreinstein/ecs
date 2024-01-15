@@ -1,5 +1,9 @@
+# 0.20.0
+* add `getEntityById(world, id)` and `getEntityId(world, entity)` functions
+
+
 # 0.19.0
-* add an `getEntity(world, components)` function for a bit of syntax sugar.
+* add an `getEntity(world, components)` function for a bit of syntax sugar
 
 
 # 0.18.4
