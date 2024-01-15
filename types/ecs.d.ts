@@ -89,6 +89,8 @@ export function createWorld(worldId?: number): World;
  * @returns {Entity} the created entity
  */
 export function createEntity(world: World): Entity;
+export function getEntityId(world: any, entity: any): any;
+export function getEntityById(world: any, entityId: any): any;
 /**
  * Adds a component to the entity
  * @param {World} world world where listener will be invoked
@@ -191,6 +193,8 @@ export function cleanup(world: World): void;
 declare namespace _default {
     export { createWorld };
     export { createEntity };
+    export { getEntityId };
+    export { getEntityById };
     export { addComponentToEntity };
     export { removeComponentFromEntity };
     export { getEntities };
