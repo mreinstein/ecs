@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title class="titleText"> ECS example - event handling </title>
+        <meta name="description" content="ECS example - event handling" />
+        <meta name="author" content="Michael Reinstein" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1" />
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+
+        <style>
+            * {
+                font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light',
+                    'Helvetica Neue', Helvetica, Arial, 'Lucida Grande',
+                    sans-serif;
+                font-weight: 300;
+            }
+
+            body {
+                background-color: #666;
+                padding: 0;
+                margin: 0;
+                transition: opacity 0.27s;
+            }
+
+            body, canvas, img {
+                image-rendering: pixelated;
+            }
+
+            canvas {
+                background-color: #333;
+                border: none;
+                -ms-interpolation-mode: nearest-neighbor;
+                image-rendering: -moz-crisp-edges;
+                image-rendering: pixelated;
+            }
+
+            canvas::-webkit-scrollbar {
+                display: none;
+            }
+
+        </style>
+    </head>
+    <body>
+
+        <canvas> </canvas>
+        
+<script type="importmap">
+  {
+    "imports": {
+      "ecs": "../../ecs.js",
+      "remove-array-items": "https://cdn.skypack.dev/pin/remove-array-items@v3.0.0-6htcasDN4O2uJ56RUqlh/mode=imports,min/optimized/remove-array-items.js"
+    }
+  }
+</script>
+
+<script type="module" src="./app.js"> </script>
+    </body>
+</html>
