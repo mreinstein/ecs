@@ -85,23 +85,23 @@ function rendererSystem (world) {
     const RENDERABLE_FILTER = [ 'renderable' ]
 
     // data structure to store all entities that were added or removed last frame
-    const resultEntries = {
+    const result = {
         count: 0,
         entries: new Array(100)
     }
 
     const onUpdate = function (dt) {
 
-        // optional 3rd parameter, can be 'added' or 'removed'. provides the list of entities that were
+        // optional 3rd parameter, can be 'added' or 'removed'. populates the list of entities that were
         // added since the last ECS.cleanup(...) call
-        for (ECS.getEntities(world, RENDERABLE_FILTER, 'added', resultEntries)) {
-            // resultEntries will now be filled in with a reference to all entries added last frame
-        }
-
-        for (ECS.getEntities(world, RENDERABLE_FILTER, 'removed', resultEntries)) {
-            // resultEntries will now be filled in with a reference to all entries removed last frame
-        }
-
+        ECS.getEntities(world, RENDERABLE_FILTER, 'added', result)
+        for (let i=0; i < result.count; i++)
+            console.log('added new entity:', result.entries[i])
+        
+        // result will be filled in with a reference to all entries removed last frame
+        ECS.getEntities(world, RENDERABLE_FILTER, 'removed', result)
+        for (let i=0; i < result.count; i++)
+            console.log('removed entity:', result.entries[i])
     }
 
     return { onUpdate }
