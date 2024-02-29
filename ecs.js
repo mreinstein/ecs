@@ -10,6 +10,10 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
  */
 
 /**
+ * @typedef { Entity[] } ListenerResult
+ */
+
+/**
  * @typedef { any } Component
  */
 

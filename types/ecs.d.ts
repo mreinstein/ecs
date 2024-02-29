@@ -2,6 +2,9 @@
  * @typedef { 'added' | 'removed' } ListenerType
  */
 /**
+ * @typedef { Entity[] } ListenerResult
+ */
+/**
  * @typedef { any } Component
  */
 /**
@@ -211,6 +214,7 @@ declare namespace _default {
 }
 export default _default;
 export type ListenerType = 'added' | 'removed';
+export type ListenerResult = Entity[];
 export type Component = any;
 export type Entity = {
     [key: string]: any;
