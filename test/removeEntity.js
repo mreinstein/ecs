@@ -17,7 +17,7 @@ import tap from 'tap'
 	ECS.removeEntity(w, e)
 
 
-	tap.same(w.deferredRemovals.entities, [ 0 ], 'entity is added to deferred entity remove list')
+	tap.same(w.deferredRemovals.entities.values().next().value, e, 'entity is added to deferred entity remove list')
 
 	ECS.cleanup(w) // process deferred removals
 	tap.equal(w.entities.length, 0, 'entity gets removed from the world')
@@ -87,7 +87,7 @@ import tap from 'tap'
 	ECS.removeEntity(w3, e6)
 	ECS.removeEntity(w3, e6)
 
-	tap.same(w3.deferredRemovals.entities, [ 0 ])
+	tap.same(w3.deferredRemovals.entities.values().next().value, e6)
 
 	ECS.cleanup(w3)
 
@@ -157,18 +157,18 @@ import tap from 'tap'
 
 	ECS.removeEntity(w, e, true)
 
-	tap.equal(w.deferredRemovals.entities.length, 1)
+	tap.equal(w.deferredRemovals.entities.size, 1)
 
 	ECS.removeEntity(w, e, false)
 
-	tap.equal(w.deferredRemovals.entities.length, 0)
+	tap.equal(w.deferredRemovals.entities.size, 0)
 	tap.equal(w.deferredRemovals.components.length, 0)
 	tap.equal(w.listeners.removed.size, 0)
 	tap.equal(w.listeners._removed.size, 1)
 
 	ECS.cleanup(w)
 
-	tap.equal(w.deferredRemovals.entities.length, 0)
+	tap.equal(w.deferredRemovals.entities.size, 0)
 	tap.equal(w.deferredRemovals.components.length, 0)
 	tap.equal(w.listeners.removed.size, 1)
 	tap.equal(w.listeners._removed.size, 0)
@@ -188,7 +188,7 @@ import tap from 'tap'
 
 	ECS.removeEntity(w, e, true)  // deferred removal
 
-	tap.equal(w.deferredRemovals.entities.length, 0)
+	tap.equal(w.deferredRemovals.entities.size, 0)
 	tap.equal(w.deferredRemovals.components.length, 0)
 
 	tap.equal(w.listeners.added.size, 1)
@@ -216,7 +216,7 @@ import tap from 'tap'
 	ECS.removeEntity(w, e, deferredRemoval)
 
 	tap.equal(w.deferredRemovals.components.length, 0)
-	tap.equal(w.deferredRemovals.entities.length, 0)
+	tap.equal(w.deferredRemovals.entities.size, 0)
 
 	ECS.cleanup(w)
 }

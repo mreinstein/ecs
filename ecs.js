@@ -1,5 +1,5 @@
-import orderedInsert from './ordered-insert.js'
-import removeItems   from 'remove-array-items'
+import * as ComponentSet from './component-set.js'
+import removeItems       from 'remove-array-items'
 
 
 const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => performance.now())
@@ -68,9 +68,8 @@ const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => p
 
 /**
  * @typedef { Object } DeferredRemovalMap
- * @prop {number[]} entities indexes into entities array, sorted from highest to lowest
- * @prop {string[]} components [ entity index, component name ] pairs sorted from highest to lowest
- * Stored as a string but seperated with `__@@ECS@@__`
+ * @prop {number[]} entities
+ * @prop {string[]} components [ entity, component name ]
  */
 
 /**
@@ -131,8 +130,8 @@ export function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
         },
         
         deferredRemovals: {
-            entities: [ ],  // indexes into entities array, sorted from highest to lowest
-            components: [ ] // [ entity index, component name ] pairs (unsorted)
+            entities: new Set(),
+            components: ComponentSet.create() // [ entity, componentName ] pairs
         },
 
         stats: {
@@ -260,11 +259,8 @@ export function addComponentToEntity (world, entity, componentName, componentDat
 
     if (deferredRemoval) {
         // add the component to the list of components to remove when the cleanup function is invoked
-        const idx = world.entities.indexOf(entity)
-        const removalKey = `${idx}__@@ECS@@__${componentName}`
-
-        if (!world.deferredRemovals.components.includes(removalKey))
-            world.deferredRemovals.components.push(removalKey)
+        if (!ComponentSet.includes(world.deferredRemovals.components, entity, componentName))
+            ComponentSet.add(world.deferredRemovals.components, entity, componentName)
     } else {
         _removeComponent(world, entity, componentName)
     }
@@ -287,13 +283,12 @@ export function addComponentToEntity (world, entity, componentName, componentDat
 
     if (deferredRemoval) {
         // add the entity to the list of entities to remove when the cleanup function is invoked
-        if (!world.deferredRemovals.entities.includes(idx)) {
-            orderedInsert(world.deferredRemovals.entities, idx)
+        if (!world.deferredRemovals.entities.has(entity)) {
+            world.deferredRemovals.entities.add(entity)
             world.stats.entityCount--
         }
     } else {
-        const shiftUpEntities = true
-        _removeEntity(world, entity, shiftUpEntities)
+        _removeEntity(world, entity)
     }
 }
 
@@ -574,7 +569,7 @@ function _removeComponent (world, entity, componentName) {
  * @param {World} world 
  * @param {Entity} entity 
  */
-function _removeEntity (world, entity, shiftUpEntities=false) {
+function _removeEntity (world, entity) {
     for (const componentName in entity)
         if (entity[componentName])
             world.stats.componentCount[componentName] -= 1
@@ -589,35 +584,20 @@ function _removeEntity (world, entity, shiftUpEntities=false) {
 
     removeItems(world.entities, entityToRemoveIdx, 1)
 
-    if (shiftUpEntities) {
-        for (let i=world.deferredRemovals.entities.length-1; i >= 0; i--) {
-            const idx = world.deferredRemovals.entities[i]
-            if (idx > entityToRemoveIdx) {
-                world.deferredRemovals.entities[i] -= 1
-            } else if (idx === entityToRemoveIdx) {
-                // if this entity was defer removed, but then insta-removed, we can remove
-                // this entity from the deferred removal list. e.g.,
-                //
-                // ECS.removeEntity(w, e, true)  // deferred removal
-                // ECS.removeEntity(w, e, false) // instant removal
-                //   <-- at this point, there shouldnt be anything in the deferred removal list for the cleanup step to run
-                // ECS.cleanup()
-                removeItems(world.deferredRemovals.entities, i, 1)
-            } 
-        }
+    // if this entity was defer removed, but then insta-removed, we can remove
+    // this entity from the deferred removal list. e.g.,
+    //
+    // ECS.removeEntity(w, e, true)  // deferred removal
+    // ECS.removeEntity(w, e, false) // instant removal
+    //   <-- at this point, there shouldnt be anything in the deferred removal list for the cleanup step to run
+    // ECS.cleanup()
+    world.deferredRemovals.entities.delete(entity)
 
-        for (let i=world.deferredRemovals.components.length-1; i >= 0; i--) {
-            const str = world.deferredRemovals.components[i]
-            let [ entityIdx, componentName ] = str.split('__@@ECS@@__')
-            entityIdx = parseInt(entityIdx, 10)
-        
-            if (entityIdx > entityToRemoveIdx) {
-                world.deferredRemovals.components[i] = `${entityIdx-1}__@@ECS@@__${componentName}`
-            }
-            else if (entityIdx === entityToRemoveIdx) {
-                // remove this component from the deferred list since the entity it belongs to has already been removed
-                removeItems(world.deferredRemovals.components, i, 1)
-            }
+    for (let i=world.deferredRemovals.components.length-1; i >= 0; i--) {
+        const [ e ] = world.deferredRemovals.components[i]
+        if (e === entity) {
+            // remove this component from the deferred list since the entity it belongs to has already been removed
+            removeItems(world.deferredRemovals.components, i, 1)
         }
     }
 
@@ -666,25 +646,18 @@ export function cleanup (world) {
 
 
     // process all entity components marked for deferred removal
-    //
-    // component removals MUST be processed before entity removals because
-    // the component removal items include an index into the entity array, and
-    // this will become invalid when entities are removed and the remaining items shift positions
     for (let i=0; i < world.deferredRemovals.components.length; i++) {
-        const [ entityIdx, componentName ] = world.deferredRemovals.components[i].split('__@@ECS@@__')
-        const entity = world.entities[entityIdx]
+        const [ entity, componentName ] = world.deferredRemovals.components[i]
         _removeComponent(world, entity, componentName)
     }
 
     world.deferredRemovals.components.length = 0
 
     // process all entities marked for deferred removal
-    for (const entityIdx of world.deferredRemovals.entities) {
-        const entity = world.entities[entityIdx]
+    for (const entity of world.deferredRemovals.entities)
         _removeEntity(world, entity)
-    }
 
-    world.deferredRemovals.entities.length = 0
+    world.deferredRemovals.entities.clear()
 
     if ((typeof window !== 'undefined') && window.__MREINSTEIN_ECS_DEVTOOLS) {
         // running at 60fps seems to queue up a lot of messages. I'm thinking it might just be more

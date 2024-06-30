@@ -17,7 +17,7 @@ tap.same(w, {
         _removed: new Set()
     },
     deferredRemovals: {
-        entities: [ ],
+        entities: new Set(),
         components: [ ]
     },
     stats: {
