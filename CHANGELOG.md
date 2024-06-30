@@ -1,3 +1,7 @@
+# 0.21.0
+* refactor `deferredRemovals` to not rely on entity indexes
+
+
 # 0.20.0
 * add `getEntityById(world, id)` and `getEntityId(world, entity)` functions
 
