@@ -49,9 +49,8 @@
  */
 /**
  * @typedef { Object } DeferredRemovalMap
- * @prop {number[]} entities indexes into entities array, sorted from highest to lowest
- * @prop {string[]} components [ entity index, component name ] pairs sorted from highest to lowest
- * Stored as a string but seperated with `__@@ECS@@__`
+ * @prop {number[]} entities
+ * @prop {string[]} components [ entity, component name ]
  */
 /**
  * @typedef { Object } WorldStats
@@ -213,11 +212,11 @@ declare namespace _default {
     export { cleanup };
 }
 export default _default;
-export type ListenerType = 'added' | 'removed';
+export type ListenerType = "added" | "removed";
 export type ListenerResult = Entity[];
 export type Component = any;
 export type Entity = {
-    [key: string]: any;
+    [key: string]: Component;
 };
 export type FilteredEntityList = Entity[];
 export type SystemUpdateFunction = (dt: number) => void;
@@ -229,10 +228,12 @@ export type System = {
     onUpdate?: SystemUpdateFunction;
     onPostUpdate?: SystemUpdateFunction;
 };
-export type SystemFunction = (world: World) => System;
+export type SystemFunction = {
+    (world: World): System;
+};
 export type Listener = any;
 export type ListenerMap = {
-    [key: string]: any;
+    [key: string]: Listener;
 };
 export type ListenerChangeMap = {
     added: ListenerMap;
@@ -242,13 +243,9 @@ export type FilterMap = {
     [filterId: string]: FilteredEntityList;
 };
 export type DeferredRemovalMap = {
-    /**
-     * indexes into entities array, sorted from highest to lowest
-     */
     entities: number[];
     /**
-     * [ entity index, component name ] pairs sorted from highest to lowest
-     * Stored as a string but seperated with `__@@ECS@@__`
+     * [ entity, component name ]
      */
     components: string[];
 };
