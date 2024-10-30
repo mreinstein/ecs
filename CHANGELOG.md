@@ -1,3 +1,12 @@
+# 0.22.0
+* Use `performance.now()` everywhere instead of falling back to `Date.now()`
+* make API simpler and more consistent:
+    * alias addWorld -> createWorld
+	* alias addEntity -> createEntity
+	* alias addComponent -> addComponentToEntity
+	* alias removeComponent -> removeComponentFromEntity
+
+
 # 0.21.0
 * refactor `deferredRemovals` to not rely on entity indexes
 
