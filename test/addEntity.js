@@ -2,8 +2,8 @@ import ECS from '../ecs.js'
 import tap from 'tap'
 
 
-const w = ECS.createWorld()
+const w = ECS.addWorld()
 
-const e = ECS.createEntity(w)
+const e = ECS.addEntity(w)
 
 tap.same(w.entities, [ e ])

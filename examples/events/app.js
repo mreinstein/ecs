@@ -20,7 +20,7 @@ const Global = {
 
 async function main () {
 	// init
-	Global.world = ECS.createWorld()
+	Global.world = ECS.addWorld()
 
 	// add all of the game's systems
 	ECS.addSystem(Global.world, widgetSpawnerSystem)
@@ -67,8 +67,8 @@ main()
 
 
 function createWidgetEntity (world) {
-	const w = ECS.createEntity(world)
-	ECS.addComponentToEntity(world, w, 'widget', {
+	const w = ECS.addEntity(world)
+	ECS.addComponent(world, w, 'widget', {
 		frameTTL: 60, // after 60 frames this widget should be removed 
 	})
 }

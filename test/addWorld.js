@@ -2,7 +2,7 @@ import ECS from '../ecs.js'
 import tap from 'tap'
 
 
-const w = ECS.createWorld()
+const w = ECS.addWorld()
 
 tap.same(w, {
     entityIds: new Map(),

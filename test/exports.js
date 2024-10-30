@@ -41,3 +41,9 @@ tap.ok(allECS.default.preUpdate);
 tap.ok(allECS.default.update);
 tap.ok(allECS.default.postUpdate);
 tap.notOk(allECS.default.emptyListeners);
+
+// aliased functions
+tap.ok(allECS.default.addWorld);
+tap.ok(allECS.default.addEntity);
+tap.ok(allECS.default.addComponent);
+tap.ok(allECS.default.removeComponent);

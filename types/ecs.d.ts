@@ -210,6 +210,10 @@ declare namespace _default {
     export { preUpdate };
     export { postUpdate };
     export { cleanup };
+    export { createWorld as addWorld };
+    export { createEntity as addEntity };
+    export { addComponentToEntity as addComponent };
+    export { removeComponentFromEntity as removeComponent };
 }
 export default _default;
 export type ListenerType = "added" | "removed";

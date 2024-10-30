@@ -2,9 +2,6 @@ import * as ComponentSet from './component-set.js'
 import removeItems       from 'remove-array-items'
 
 
-const now = (typeof performance === 'undefined') ? (() => Date.now()) : (() => performance.now())
-
-
 /**
  * @typedef { 'added' | 'removed' } ListenerType
  */
@@ -435,9 +432,9 @@ export function preFixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
-        const start = now()
+        const start = performance.now()
         system.onPreFixedUpdate(dt)
-        world.stats.systems[i].timeElapsed += (now() - start)
+        world.stats.systems[i].timeElapsed += (performance.now() - start)
     }
 }
 
@@ -451,9 +448,9 @@ export function fixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
-        const start = now()
+        const start = performance.now()
         system.onFixedUpdate(dt)
-        world.stats.systems[i].timeElapsed += (now() - start)
+        world.stats.systems[i].timeElapsed += (performance.now() - start)
     }
 }
 
@@ -466,9 +463,9 @@ export function postFixedUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
-        const start = now()
+        const start = performance.now()
         system.onPostFixedUpdate(dt)
-        world.stats.systems[i].timeElapsed += (now() - start)
+        world.stats.systems[i].timeElapsed += (performance.now() - start)
     }
 }
 
@@ -482,9 +479,9 @@ export function preUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
-        const start = now()
+        const start = performance.now()
         system.onPreUpdate(dt)
-        world.stats.systems[i].timeElapsed += (now() - start)
+        world.stats.systems[i].timeElapsed += (performance.now() - start)
     }
 }
 
@@ -497,9 +494,9 @@ export function update (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
-        const start = now()
+        const start = performance.now()
         system.onUpdate(dt)
-        world.stats.systems[i].timeElapsed += (now() - start)
+        world.stats.systems[i].timeElapsed += (performance.now() - start)
     }
 }
 
@@ -512,9 +509,9 @@ export function postUpdate (world, dt) {
     for (let i=0; i < world.systems.length; i++) {
         world.stats.currentSystem = i
         const system = world.systems[i]
-        const start = now()
+        const start = performance.now()
         system.onPostUpdate(dt)
-        world.stats.systems[i].timeElapsed += (now() - start)
+        world.stats.systems[i].timeElapsed += (performance.now() - start)
     }
 }
 
@@ -697,5 +694,11 @@ export default {
     update,
     preUpdate,
     postUpdate,
-    cleanup
+    cleanup,
+
+    // aliases. shorter == nicer :)
+    addWorld: createWorld,
+    addEntity: createEntity,
+    addComponent: addComponentToEntity,
+    removeComponent: removeComponentFromEntity
 }

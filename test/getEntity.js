@@ -3,7 +3,7 @@ import tap from 'tap'
 
 
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
 	const h = ECS.getEntity(w, [ 'hero' ])
 
@@ -12,10 +12,10 @@ import tap from 'tap'
 
 
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e, 'hero')
+	const e = ECS.addEntity(w)
+	ECS.addComponent(w, e, 'hero')
 
 	const h = ECS.getEntity(w, [ 'hero' ])
 
@@ -24,15 +24,15 @@ import tap from 'tap'
 
 
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e, 'hero')
-	ECS.addComponentToEntity(w, e, 'a')
+	const e = ECS.addEntity(w)
+	ECS.addComponent(w, e, 'hero')
+	ECS.addComponent(w, e, 'a')
 
-	const e2 = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e2, 'hero')
-	ECS.addComponentToEntity(w, e2, 'b')
+	const e2 = ECS.addEntity(w)
+	ECS.addComponent(w, e2, 'hero')
+	ECS.addComponent(w, e2, 'b')
 
 	const h = ECS.getEntity(w, [ 'hero' ])
 

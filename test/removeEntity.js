@@ -3,9 +3,9 @@ import tap from 'tap'
 
 
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
+	const e = ECS.addEntity(w)
 
 	tap.equal(w.entities.length, 1)
 
@@ -25,15 +25,15 @@ import tap from 'tap'
 
 
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
+	const e = ECS.addEntity(w)
 
 	ECS.getEntities(w, [ 'a' ])  // filter 1
 	ECS.getEntities(w, [ 'a', 'b' ])
 
-	ECS.addComponentToEntity(w, e, 'a', { a: 23 })
-	ECS.addComponentToEntity(w, e, 'b', { b: 64 })
+	ECS.addComponent(w, e, 'a', { a: 23 })
+	ECS.addComponent(w, e, 'b', { b: 64 })
 
 	tap.equal(w.filters['a'].length, 1)
 	tap.equal(w.filters['a,b'].length, 1)
@@ -49,16 +49,16 @@ import tap from 'tap'
 // while iterating over entities, removing an unvisited entity still gets processed
 // because the removal is defferred until the cleanup step
 {
-	const w2 = ECS.createWorld()
+	const w2 = ECS.addWorld()
 
-	const e3 = ECS.createEntity(w2)
-	ECS.addComponentToEntity(w2, e3, 'position', 'e3')
+	const e3 = ECS.addEntity(w2)
+	ECS.addComponent(w2, e3, 'position', 'e3')
 
-	const e4 = ECS.createEntity(w2)
-	ECS.addComponentToEntity(w2, e4, 'position', 'e4')
+	const e4 = ECS.addEntity(w2)
+	ECS.addComponent(w2, e4, 'position', 'e4')
 
-	const e5 = ECS.createEntity(w2)
-	ECS.addComponentToEntity(w2, e5, 'position', 'e5')
+	const e5 = ECS.addEntity(w2)
+	ECS.addComponent(w2, e5, 'position', 'e5')
 
 	let i = 0
 	const processed = { }
@@ -76,10 +76,10 @@ import tap from 'tap'
 	tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred removal')
 
 
-	const w3 = ECS.createWorld()
+	const w3 = ECS.addWorld()
 
-	const e6 = ECS.createEntity(w3)
-	ECS.addComponentToEntity(w3, e6, 'position')
+	const e6 = ECS.addEntity(w3)
+	ECS.addComponent(w3, e6, 'position')
 
 	ECS.getEntities(w3, [ 'position' ], 'removed')
 
@@ -105,10 +105,10 @@ import tap from 'tap'
 
 {
 	// deferred removal should immediately remove the entity
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e, 'testc')
+	const e = ECS.addEntity(w)
+	ECS.addComponent(w, e, 'testc')
 
 	tap.equal(ECS.getEntities(w, [ 'testc' ]).length, 1, '1 entity should be present')
 
@@ -121,16 +121,16 @@ import tap from 'tap'
 
 {
 	// removing an entity immediately doesn't screw up removing other entities via deferred removal
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e, 'e1')
+	const e = ECS.addEntity(w)
+	ECS.addComponent(w, e, 'e1')
 
-	const e2 = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e2, 'e2')
+	const e2 = ECS.addEntity(w)
+	ECS.addComponent(w, e2, 'e2')
 
-	const e3 = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e3, 'e3')
+	const e3 = ECS.addEntity(w)
+	ECS.addComponent(w, e3, 'e3')
 
 	ECS.cleanup(w)
 
@@ -148,10 +148,10 @@ import tap from 'tap'
 {
 	// defer remove an entity, then remove it immediately. Prior to cleanup should empty the deferredRemovals set.
 
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
-	ECS.addComponentToEntity(w, e, 'derp')
+	const e = ECS.addEntity(w)
+	ECS.addComponent(w, e, 'derp')
 
 	ECS.cleanup(w)
 
@@ -178,9 +178,9 @@ import tap from 'tap'
 {
 	// remove an entity immediately, then deferred remove it. Should still provide listners
 
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
+	const e = ECS.addEntity(w)
 
 	ECS.cleanup(w)
 
@@ -201,17 +201,17 @@ import tap from 'tap'
 {
 	// remove all values from the deferredRemovals.components list for an entity we just insta-removed
 
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e = ECS.createEntity(w)
+	const e = ECS.addEntity(w)
 
-	ECS.addComponentToEntity(w, e, 'a')
-	ECS.addComponentToEntity(w, e, 'b')
+	ECS.addComponent(w, e, 'a')
+	ECS.addComponent(w, e, 'b')
 
 	ECS.cleanup(w)
 
-	ECS.removeComponentFromEntity(w, e, 'a')
-	ECS.removeComponentFromEntity(w, e, 'b')
+	ECS.removeComponent(w, e, 'a')
+	ECS.removeComponent(w, e, 'b')
 	const deferredRemoval = false
 	ECS.removeEntity(w, e, deferredRemoval)
 

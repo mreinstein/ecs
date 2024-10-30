@@ -34,13 +34,13 @@ import clamp    from 'clamp'
 
 
 // generates a new entity component system
-const world = ECS.createWorld()
+const world = ECS.addWorld()
 
 
 // set up the player
-const PLAYER = ECS.createEntity(world)
-ECS.addComponentToEntity(world, PLAYER, 'position', { x: 15, y: 23 })
-ECS.addComponentToEntity(world, PLAYER, 'moveable', { dx: 0, dy: 0 })
+const PLAYER = ECS.addEntity(world)
+ECS.addComponent(world, PLAYER, 'position', { x: 15, y: 23 })
+ECS.addComponent(world, PLAYER, 'moveable', { dx: 0, dy: 0 })
 
 
 // update entity velocity based on key pressed
@@ -165,13 +165,13 @@ This is typically what you want, but if you want to immediately remove a compone
 ```javascript
 const componentName = 'aabb'
 
-const world = ECS.createWorld()
-const entity = ECS.createEntity(world)
-ECS.addComponentToEntity(world, entity, componentName)
+const world = ECS.addWorld()
+const entity = ECS.addEntity(world)
+ECS.addComponent(world, entity, componentName)
 
 
 const deferredRemoval = false  // by default this is true. setting it to false immediately removes the component
-ECS.removeComponentFromEntity(world, entity, componentName, deferredRemoval)
+ECS.removeComponent(world, entity, componentName, deferredRemoval)
 
 ECS.getEntities(world, [ componentName ]).length  // because we are not deferring the removal, length === 0 
 ```
@@ -185,9 +185,9 @@ This is typically what you want, but if you want to immediately remove an entity
 
 ```javascript
 
-const world = ECS.createWorld()
-const entity = ECS.createEntity(world)
-ECS.addComponentToEntity(world, entity, 'test_component')
+const world = ECS.addWorld()
+const entity = ECS.addEntity(world)
+ECS.addComponent(world, entity, 'test_component')
 
 
 const deferredRemoval = false  // by default this is true. setting it to false immediately removes the component
@@ -202,9 +202,9 @@ ECS.getEntities(world, [ 'test_component' ]).length  // because we are not defer
 ECS will generate a unique integer id for every entity created in a world:
 
 ```javascript
-const world = ECS.createWorld()
-const e = ECS.createEntity(world)
-const e2 = ECS.createEntity(world)
+const world = ECS.addWorld()
+const e = ECS.addEntity(world)
+const e2 = ECS.addEntity(world)
 
 const id1 = ECS.getEntityId(world, e)
 const id2 = ECS.getEntityId(world, e2)
@@ -243,20 +243,20 @@ Typescript and named exports are also supported:
 ```typescript
 import {
     default as ECS,
-    createWorld,
-    createEntity,
-    addComponentToEntity,
+    addWorld,
+    addEntity,
+    addComponent,
     getEntities,
     addSystem,
     SystemFunction,
     SystemUpdateFunction
 } from 'ecs'
 
-const world = createWorld()
+const world = addWorld()
 
-const PLAYER = createEntity(world);
-addComponentToEntity(world, PLAYER, 'position', { x: 15, y: 23 })
-addComponentToEntity(world, PLAYER, 'moveable', { dx: 0, dy: 0 })
+const PLAYER = addEntity(world);
+addComponent(world, PLAYER, 'position', { x: 15, y: 23 })
+addComponent(world, PLAYER, 'moveable', { dx: 0, dy: 0 })
 
 const movementSystem: SystemFunction = function (world) {
     const onUpdate: SystemUpdateFunction = function (dt) {

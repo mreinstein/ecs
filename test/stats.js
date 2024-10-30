@@ -10,7 +10,7 @@ async function sleep (ms) {
 
 
 async function main () {
-    const w = ECS.createWorld()
+    const w = ECS.addWorld()
 
     tap.same(w.stats, {
         entityCount: 0,
@@ -22,9 +22,9 @@ async function main () {
     }, 'initial stats data')
 
 
-    const e = ECS.createEntity(w)
-    ECS.addComponentToEntity(w, e, 'componentId1')
-    ECS.addComponentToEntity(w, e, 'componentId2')
+    const e = ECS.addEntity(w)
+    ECS.addComponent(w, e, 'componentId1')
+    ECS.addComponent(w, e, 'componentId2')
 
     tap.same(w.stats, {
         entityCount: 1,
@@ -40,10 +40,10 @@ async function main () {
 
 
 
-    const w2 = ECS.createWorld()
-    const e2 = ECS.createEntity(w2)
-    ECS.addComponentToEntity(w2, e2, 'componentId1')
-    ECS.addComponentToEntity(w2, e2, 'componentId1')
+    const w2 = ECS.addWorld()
+    const e2 = ECS.addEntity(w2)
+    ECS.addComponent(w2, e2, 'componentId1')
+    ECS.addComponent(w2, e2, 'componentId1')
 
     tap.same(w2.stats, {
         entityCount: 1,

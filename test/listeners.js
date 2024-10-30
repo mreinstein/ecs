@@ -3,13 +3,13 @@ import tap from 'tap'
 
 
 {
-    const w = ECS.createWorld()
+    const w = ECS.addWorld()
 
-    const e = ECS.createEntity(w)
+    const e = ECS.addEntity(w)
 
-    ECS.addComponentToEntity(w, e, 'a')
-    ECS.addComponentToEntity(w, e, 'b')
-    ECS.addComponentToEntity(w, e, 'c')
+    ECS.addComponent(w, e, 'a')
+    ECS.addComponent(w, e, 'b')
+    ECS.addComponent(w, e, 'c')
 
     const s = new Set()
     s.add(e)
@@ -24,9 +24,9 @@ import tap from 'tap'
 
 
 {
-    const w = ECS.createWorld()
+    const w = ECS.addWorld()
 
-    const e = ECS.createEntity(w) 
+    const e = ECS.addEntity(w) 
 
     ECS.cleanup(w)
 
@@ -45,9 +45,9 @@ import tap from 'tap'
 
 
 {
-    const w = ECS.createWorld()
+    const w = ECS.addWorld()
 
-    const e = ECS.createEntity(w)
+    const e = ECS.addEntity(w)
 
     ECS.cleanup(w)
 

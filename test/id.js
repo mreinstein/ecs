@@ -3,11 +3,11 @@ import tap from 'tap'
 
 
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e1 = ECS.createEntity(w)
-	const e2 = ECS.createEntity(w)
-	const e3 = ECS.createEntity(w)
+	const e1 = ECS.addEntity(w)
+	const e2 = ECS.addEntity(w)
+	const e3 = ECS.addEntity(w)
 
 	tap.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
 	tap.equal(ECS.getEntityId(w, e2), 2, 'generates an integer id')
@@ -21,9 +21,9 @@ import tap from 'tap'
 
 // immediate entity removal works as expected
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e1 = ECS.createEntity(w)
+	const e1 = ECS.addEntity(w)
 
 	tap.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
 	tap.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
@@ -40,9 +40,9 @@ import tap from 'tap'
 
 // deferred entity removal works as expected
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e1 = ECS.createEntity(w)
+	const e1 = ECS.addEntity(w)
 
 	tap.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
 	tap.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
@@ -65,11 +65,11 @@ import tap from 'tap'
 
 
 {
-	const w = ECS.createWorld()
+	const w = ECS.addWorld()
 
-	const e1 = ECS.createEntity(w)
-	const e2 = ECS.createEntity(w)
-	const e3 = ECS.createEntity(w)
+	const e1 = ECS.addEntity(w)
+	const e2 = ECS.addEntity(w)
+	const e3 = ECS.addEntity(w)
 
 	const deferredRemoval = true
 
@@ -79,7 +79,7 @@ import tap from 'tap'
 
 	ECS.cleanup(w)
 	
-	const e4 = ECS.createEntity(w)
+	const e4 = ECS.addEntity(w)
 	tap.equal(ECS.getEntityId(w, e4), 4, 'entity id still increments despite entity removal')
 }
 
