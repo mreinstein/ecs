@@ -27,7 +27,7 @@
     "type": "git",
     "url": "git+https://github.com/mreinstein/ecs.git"
   },
-  "author": "",
+  "author": "Michael Reinstein",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mreinstein/ecs/issues"
