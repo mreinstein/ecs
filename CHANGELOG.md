@@ -1,3 +1,7 @@
+#0.23.0
+* add `removeEntities` function (thank you @chriscoderdr !)
+
+
 # 0.22.0
 * Use `performance.now()` everywhere instead of falling back to `Date.now()`
 * make API simpler and more consistent:
