@@ -120,6 +120,13 @@ export function removeComponentFromEntity(world: World, entity: Entity, componen
  */
 export function removeEntity(world: World, entity: Entity, deferredRemoval?: boolean): void;
 /**
+ * Remove entities from the world that match the given component criteria.
+ * @param {World} world - The world containing the entities.
+ * @param {string[]} componentNames - Array of component names to filter by.
+ * Supports 'not' filters by prefixing component names with '!'.
+ */
+export function removeEntities(world: World, componentNames: string[]): void;
+/**
  * Get entities from the world with all provided components. Optionally,
  * @param {World} world
  * @param {string[]} componentNames A component filter used to match entities.

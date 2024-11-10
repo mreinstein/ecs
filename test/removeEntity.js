@@ -220,3 +220,42 @@ import tap from 'tap'
 
 	ECS.cleanup(w)
 }
+
+{
+    // Test removeEntities function with 'not' filter support
+    const w = ECS.addWorld();
+
+    const e1 = ECS.addEntity(w);
+    ECS.addComponent(w, e1, 'ephemeral', {});
+
+    const e2 = ECS.addEntity(w);
+    ECS.addComponent(w, e2, 'ephemeral', {});
+    ECS.addComponent(w, e2, 'health', { hp: 100 });
+
+    const e3 = ECS.addEntity(w);
+    ECS.addComponent(w, e3, 'transform', {});
+    ECS.addComponent(w, e3, 'health', { hp: 100 });
+
+    tap.equal(w.entities.length, 3, '3 entities should be present initially');
+
+    // Remove all entities with 'ephemeral' component
+    ECS.removeEntities(w, ['ephemeral']);
+    ECS.cleanup(w); // process deferred removals
+    tap.equal(w.entities.length, 1, 'only 1 entity should remain after removing all entities with "ephemeral"');
+
+    // Add entities again for next test
+    const e4 = ECS.addEntity(w);
+    ECS.addComponent(w, e4, 'transform', {});
+    ECS.addComponent(w, e4, 'ephemeral', {});
+
+    const e5 = ECS.addEntity(w);
+    ECS.addComponent(w, e5, 'transform', {});
+    ECS.addComponent(w, e5, 'health', { hp: 100 });
+
+    tap.equal(w.entities.length, 3, '3 entities should be present after adding new entities');
+
+    // Remove entities with 'transform' but not 'health'
+    ECS.removeEntities(w, ['transform', '!health']);
+    ECS.cleanup(w); // process deferred removals
+    tap.equal(w.entities.length, 2, '2 entities should remain after removing entities with "transform" but not "health"');
+}
