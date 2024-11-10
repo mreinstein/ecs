@@ -197,6 +197,26 @@ ECS.getEntities(world, [ 'test_component' ]).length  // because we are not defer
 ```
 
 
+
+### removeEntities Example
+
+You can use `ECS.removeEntities` to remove all entities with a specified component. For example, if you have entities with an `ephemeral` component and want to delete them from the world, you can do this:
+
+```javascript
+// remove all entities that have an 'ephemeral' component
+ECS.removeEntities(world, ['ephemeral']);
+```
+
+The `removeEntities` function also supports the **not filter**, which allows you to specify components that should **not** be present on the entities you want to remove. For example, to remove entities that have a `transform` component but lack a `health` component, you can use the following code:
+
+```javascript
+// remove all entities that have a 'transform' component and lack a 'health' component
+ECS.removeEntities(world, ['transform', '!health']);
+```
+
+This functionality can be useful for cleaning up entities that meet specific component criteria in your world.
+
+
 ### get entity by unique id
 
 ECS will generate a unique integer id for every entity created in a world:
