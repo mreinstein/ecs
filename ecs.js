@@ -289,6 +289,42 @@ export function addComponentToEntity (world, entity, componentName, componentDat
     }
 }
 
+/**
+ * Remove entities from the world that match the given component criteria.
+ * @param {World} world - The world containing the entities.
+ * @param {string[]} componentNames - Array of component names to filter by.
+ * Supports 'not' filters by prefixing component names with '!'.
+ */
+export function removeEntities(world, componentNames) {
+    const entitiesToRemove = world.entities.filter((entity) => {
+        for (const componentName of componentNames) {
+            const isNotFilter = componentName.startsWith('!');
+            const actualComponentName = isNotFilter
+                ? componentName.slice(1)
+                : componentName;
+
+            if (isNotFilter) {
+                // If it's a 'not' filter (prefixed with '!'), the entity should NOT have the component
+                if (entity[actualComponentName]) {
+                    return false;
+                }
+            } else {
+                // If it's a regular filter, the entity MUST have the component
+                if (!entity[actualComponentName]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    });
+
+    // Remove each matched entity
+    for (const entity of entitiesToRemove) {
+        removeEntity(world, entity, false); // remove immediately
+    }
+}
+
+
 
 /**
  * Get entities from the world with all provided components. Optionally,
@@ -687,6 +723,7 @@ export default {
     getEntities,
     getEntity,
     removeEntity,
+    removeEntities,
     addSystem,
     preFixedUpdate,
     fixedUpdate,
