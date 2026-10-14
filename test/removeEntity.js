@@ -1,30 +1,31 @@
 import ECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
 
-{
+test('deferred entity removal', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
 
-	tap.equal(w.entities.length, 1)
+	assert.equal(w.entities.length, 1)
 
 	const someNonEntity = { }
 	ECS.removeEntity(w, someNonEntity)
 
-	tap.equal(w.entities.length, 1, 'removing some other random object doesnt have any effect')
+	assert.equal(w.entities.length, 1, 'removing some other random object doesnt have any effect')
 
 	ECS.removeEntity(w, e)
 
 
-	tap.same(w.deferredRemovals.entities.values().next().value, e, 'entity is added to deferred entity remove list')
+	assert.deepEqual(w.deferredRemovals.entities.values().next().value, e, 'entity is added to deferred entity remove list')
 
 	ECS.cleanup(w) // process deferred removals
-	tap.equal(w.entities.length, 0, 'entity gets removed from the world')
-}
+	assert.equal(w.entities.length, 0, 'entity gets removed from the world')
+})
 
 
-{
+test('removing entities removes them from all matching filters', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -35,20 +36,21 @@ import tap from 'tap'
 	ECS.addComponent(w, e, 'a', { a: 23 })
 	ECS.addComponent(w, e, 'b', { b: 64 })
 
-	tap.equal(w.filters['a'].length, 1)
-	tap.equal(w.filters['a,b'].length, 1)
+	assert.equal(w.filters['a'].length, 1)
+	assert.equal(w.filters['a,b'].length, 1)
 
 	ECS.removeEntity(w, e)
 	ECS.cleanup(w) // process deferred removals
 
-	tap.equal(w.filters['a'].length, 0, 'removing entities removes them from all matching filters')
-	tap.equal(w.filters['a,b'].length, 0, 'removing entities removes them from all matching filters')
-}
+	assert.equal(w.filters['a'].length, 0, 'removing entities removes them from all matching filters')
+	assert.equal(w.filters['a,b'].length, 0, 'removing entities removes them from all matching filters')
+})
 
 
-// while iterating over entities, removing an unvisited entity still gets processed
-// because the removal is defferred until the cleanup step
-{
+test('removing an unvisited entity while iterating still gets processed', function () {
+	// while iterating over entities, removing an unvisited entity still gets processed
+	// because the removal is defferred until the cleanup step
+
 	const w2 = ECS.addWorld()
 
 	const e3 = ECS.addEntity(w2)
@@ -73,7 +75,7 @@ import tap from 'tap'
 		i++
 	}
 
-	tap.same(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred removal')
+	assert.deepEqual(processed, { e3: true, e4: true, e5: true }, 'all entities processed because of deferred removal')
 
 
 	const w3 = ECS.addWorld()
@@ -87,7 +89,7 @@ import tap from 'tap'
 	ECS.removeEntity(w3, e6)
 	ECS.removeEntity(w3, e6)
 
-	tap.same(w3.deferredRemovals.entities.values().next().value, e6)
+	assert.deepEqual(w3.deferredRemovals.entities.values().next().value, e6)
 
 	ECS.cleanup(w3)
 
@@ -98,29 +100,27 @@ import tap from 'tap'
 
 	ECS.getEntities(w3, [ 'position' ], 'removed', result)
 
-	tap.same(result.count, 1, 'multiple removals only appear once in the removed list')
-	tap.same(result.entries[0], e6, 'multiple removals only appear once in the removed list')
-}
+	assert.deepEqual(result.count, 1, 'multiple removals only appear once in the removed list')
+	assert.deepEqual(result.entries[0], e6, 'multiple removals only appear once in the removed list')
+})
 
 
-{
-	// deferred removal should immediately remove the entity
+test('non-deferred removal should immediately remove the entity', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
 	ECS.addComponent(w, e, 'testc')
 
-	tap.equal(ECS.getEntities(w, [ 'testc' ]).length, 1, '1 entity should be present')
+	assert.equal(ECS.getEntities(w, [ 'testc' ]).length, 1, '1 entity should be present')
 
 	const deferredRemoval = false
 	ECS.removeEntity(w, e, deferredRemoval)
 
-	tap.equal(ECS.getEntities(w, [ 'testc' ]).length, 0, 'no entities present because of immediate removal')
-}
+	assert.equal(ECS.getEntities(w, [ 'testc' ]).length, 0, 'no entities present because of immediate removal')
+})
 
 
-{
-	// removing an entity immediately doesn't screw up removing other entities via deferred removal
+test("removing an entity immediately doesn't screw up removing other entities via deferred removal", function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -141,13 +141,11 @@ import tap from 'tap'
 
 	ECS.cleanup(w)
 	
-	tap.same(w.entities, [ e ], 'none deferred entity removal does not interfere with regular deferred entity removal')
-}
+	assert.deepEqual(w.entities, [ e ], 'none deferred entity removal does not interfere with regular deferred entity removal')
+})
 
 
-{
-	// defer remove an entity, then remove it immediately. Prior to cleanup should empty the deferredRemovals set.
-
+test('defer remove an entity, then remove it immediately. Prior to cleanup should empty the deferredRemovals set', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -157,27 +155,25 @@ import tap from 'tap'
 
 	ECS.removeEntity(w, e, true)
 
-	tap.equal(w.deferredRemovals.entities.size, 1)
+	assert.equal(w.deferredRemovals.entities.size, 1)
 
 	ECS.removeEntity(w, e, false)
 
-	tap.equal(w.deferredRemovals.entities.size, 0)
-	tap.equal(w.deferredRemovals.components.length, 0)
-	tap.equal(w.listeners.removed.size, 0)
-	tap.equal(w.listeners._removed.size, 1)
+	assert.equal(w.deferredRemovals.entities.size, 0)
+	assert.equal(w.deferredRemovals.components.length, 0)
+	assert.equal(w.listeners.removed.size, 0)
+	assert.equal(w.listeners._removed.size, 1)
 
 	ECS.cleanup(w)
 
-	tap.equal(w.deferredRemovals.entities.size, 0)
-	tap.equal(w.deferredRemovals.components.length, 0)
-	tap.equal(w.listeners.removed.size, 1)
-	tap.equal(w.listeners._removed.size, 0)
-}
+	assert.equal(w.deferredRemovals.entities.size, 0)
+	assert.equal(w.deferredRemovals.components.length, 0)
+	assert.equal(w.listeners.removed.size, 1)
+	assert.equal(w.listeners._removed.size, 0)
+})
 
 
-{
-	// remove an entity immediately, then deferred remove it. Should still provide listners
-
+test('remove an entity immediately, then deferred remove it. Should still provide listeners', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -188,19 +184,17 @@ import tap from 'tap'
 
 	ECS.removeEntity(w, e, true)  // deferred removal
 
-	tap.equal(w.deferredRemovals.entities.size, 0)
-	tap.equal(w.deferredRemovals.components.length, 0)
+	assert.equal(w.deferredRemovals.entities.size, 0)
+	assert.equal(w.deferredRemovals.components.length, 0)
 
-	tap.equal(w.listeners.added.size, 1)
-	tap.equal(w.listeners._removed.size, 1)
+	assert.equal(w.listeners.added.size, 1)
+	assert.equal(w.listeners._removed.size, 1)
 
 	ECS.cleanup(w)
-}
+})
 
 
-{
-	// remove all values from the deferredRemovals.components list for an entity we just insta-removed
-
+test('remove all values from the deferredRemovals.components list for an entity we just insta-removed', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -215,14 +209,14 @@ import tap from 'tap'
 	const deferredRemoval = false
 	ECS.removeEntity(w, e, deferredRemoval)
 
-	tap.equal(w.deferredRemovals.components.length, 0)
-	tap.equal(w.deferredRemovals.entities.size, 0)
+	assert.equal(w.deferredRemovals.components.length, 0)
+	assert.equal(w.deferredRemovals.entities.size, 0)
 
 	ECS.cleanup(w)
-}
+})
 
-{
-    // Test removeEntities function with 'not' filter support
+
+test("removeEntities function with 'not' filter support", function () {
     const w = ECS.addWorld();
 
     const e1 = ECS.addEntity(w);
@@ -236,12 +230,12 @@ import tap from 'tap'
     ECS.addComponent(w, e3, 'transform', {});
     ECS.addComponent(w, e3, 'health', { hp: 100 });
 
-    tap.equal(w.entities.length, 3, '3 entities should be present initially');
+    assert.equal(w.entities.length, 3, '3 entities should be present initially');
 
     // Remove all entities with 'ephemeral' component
     ECS.removeEntities(w, ['ephemeral']);
     ECS.cleanup(w); // process deferred removals
-    tap.equal(w.entities.length, 1, 'only 1 entity should remain after removing all entities with "ephemeral"');
+    assert.equal(w.entities.length, 1, 'only 1 entity should remain after removing all entities with "ephemeral"');
 
     // Add entities again for next test
     const e4 = ECS.addEntity(w);
@@ -252,10 +246,10 @@ import tap from 'tap'
     ECS.addComponent(w, e5, 'transform', {});
     ECS.addComponent(w, e5, 'health', { hp: 100 });
 
-    tap.equal(w.entities.length, 3, '3 entities should be present after adding new entities');
+    assert.equal(w.entities.length, 3, '3 entities should be present after adding new entities');
 
     // Remove entities with 'transform' but not 'health'
     ECS.removeEntities(w, ['transform', '!health']);
     ECS.cleanup(w); // process deferred removals
-    tap.equal(w.entities.length, 2, '2 entities should remain after removing entities with "transform" but not "health"');
-}
+    assert.equal(w.entities.length, 2, '2 entities should remain after removing entities with "transform" but not "health"');
+})

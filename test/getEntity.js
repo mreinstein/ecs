@@ -1,17 +1,18 @@
 import ECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
 
-{
+test('no match returns undefined', function () {
 	const w = ECS.addWorld()
 
 	const h = ECS.getEntity(w, [ 'hero' ])
 
-	tap.equal(h, undefined, 'no match returns undefined')
-}
+	assert.equal(h, undefined)
+})
 
 
-{
+test('finds 1 matching entity', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -19,11 +20,11 @@ import tap from 'tap'
 
 	const h = ECS.getEntity(w, [ 'hero' ])
 
-	tap.equal(h, e, 'finds 1 matching entity')
-}
+	assert.equal(h, e)
+})
 
 
-{
+test('returns the first match even if there are more than one', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -36,5 +37,5 @@ import tap from 'tap'
 
 	const h = ECS.getEntity(w, [ 'hero' ])
 
-	tap.equal(h, e, 'returns the first match even if there are more than one')
-}
+	assert.equal(h, e)
+})

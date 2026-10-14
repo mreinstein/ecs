@@ -1,51 +1,50 @@
 import ECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
 
-{
+test('generates integer ids and retrieves entities by id', function () {
 	const w = ECS.addWorld()
 
 	const e1 = ECS.addEntity(w)
 	const e2 = ECS.addEntity(w)
 	const e3 = ECS.addEntity(w)
 
-	tap.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
-	tap.equal(ECS.getEntityId(w, e2), 2, 'generates an integer id')
-	tap.equal(ECS.getEntityId(w, e3), 3, 'generates an integer id')
+	assert.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
+	assert.equal(ECS.getEntityId(w, e2), 2, 'generates an integer id')
+	assert.equal(ECS.getEntityId(w, e3), 3, 'generates an integer id')
 
-	tap.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
-	tap.equal(e2, ECS.getEntityById(w, 2), 'retrieves entity by id')
-	tap.equal(e3, ECS.getEntityById(w, 3), 'retrieves entity by id')
-}
+	assert.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
+	assert.equal(e2, ECS.getEntityById(w, 2), 'retrieves entity by id')
+	assert.equal(e3, ECS.getEntityById(w, 3), 'retrieves entity by id')
+})
 
 
-// immediate entity removal works as expected
-{
+test('immediate entity removal works as expected', function () {
 	const w = ECS.addWorld()
 
 	const e1 = ECS.addEntity(w)
 
-	tap.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
-	tap.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
+	assert.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
+	assert.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
 
 	// removing an entity removes it's id
 
 	const deferredRemoval = false
 	ECS.removeEntity(w, e1, deferredRemoval)
 
-	tap.equal(ECS.getEntityId(w, e1), undefined, 'entity id is removed')
-	tap.equal(undefined, ECS.getEntityById(w, 1), 'entity is removed')
-}
+	assert.equal(ECS.getEntityId(w, e1), undefined, 'entity id is removed')
+	assert.equal(undefined, ECS.getEntityById(w, 1), 'entity is removed')
+})
 
 
-// deferred entity removal works as expected
-{
+test('deferred entity removal works as expected', function () {
 	const w = ECS.addWorld()
 
 	const e1 = ECS.addEntity(w)
 
-	tap.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
-	tap.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
+	assert.equal(ECS.getEntityId(w, e1), 1, 'generates an integer id')
+	assert.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
 
 	// removing an entity removes it's id
 
@@ -53,18 +52,18 @@ import tap from 'tap'
 	ECS.removeEntity(w, e1, deferredRemoval)
 
 	// entity is still present because we haven't cleaned up yet
-	tap.equal(ECS.getEntityId(w, e1), 1, 'entity id is removed')
-	tap.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
+	assert.equal(ECS.getEntityId(w, e1), 1, 'entity id is removed')
+	assert.equal(e1, ECS.getEntityById(w, 1), 'retrieves entity by id')
 
 	ECS.cleanup(w)
 
 	// now they should be gone
-	tap.equal(ECS.getEntityId(w, e1), undefined, 'entity id is removed')
-	tap.equal(undefined, ECS.getEntityById(w, 1), 'entity is removed')
-}
+	assert.equal(ECS.getEntityId(w, e1), undefined, 'entity id is removed')
+	assert.equal(undefined, ECS.getEntityById(w, 1), 'entity is removed')
+})
 
 
-{
+test('entity id still increments despite entity removal', function () {
 	const w = ECS.addWorld()
 
 	const e1 = ECS.addEntity(w)
@@ -80,8 +79,5 @@ import tap from 'tap'
 	ECS.cleanup(w)
 	
 	const e4 = ECS.addEntity(w)
-	tap.equal(ECS.getEntityId(w, e4), 4, 'entity id still increments despite entity removal')
-}
-
-
-
+	assert.equal(ECS.getEntityId(w, e4), 4)
+})

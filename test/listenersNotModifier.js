@@ -1,8 +1,9 @@
 import ECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
 
-{
+test('listeners with not modifier', function () {
 	const w = ECS.addWorld()
 
 	const e = ECS.addEntity(w)
@@ -19,8 +20,8 @@ import tap from 'tap'
 
 	const out = ECS.getEntities(w, [ 'a', '!b' ], 'removed', result)
 
-	tap.same(out, result, 'getEntities returns the passed in listener entity data structure')
+	assert.deepEqual(out, result, 'getEntities returns the passed in listener entity data structure')
 
-	tap.same(result.count, 1)
-	tap.same(result.entries[0], e, 'removed entity is included since weve run cleanup() (removed last frame)')
-}
+	assert.deepEqual(result.count, 1)
+	assert.deepEqual(result.entries[0], e, 'removed entity is included since weve run cleanup() (removed last frame)')
+})

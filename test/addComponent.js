@@ -1,18 +1,20 @@
 import ECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
 
-const w = ECS.addWorld()
+test('addComponent adds component data to entity', function () {
+	const w = ECS.addWorld()
 
-const e = ECS.addEntity(w)
+	const e = ECS.addEntity(w)
 
-ECS.addComponent(w, e, 'position', { x: 4, y: 12 })
+	ECS.addComponent(w, e, 'position', { x: 4, y: 12 })
 
-tap.same(w.entities, [ { position: { x: 4, y: 12 } } ])
+	assert.deepEqual(w.entities, [ { position: { x: 4, y: 12 } } ])
+})
 
 
-// adds are not lost when a system queries for a component before any are present
-{
+test('adds are not lost when a system queries for a component before any are present', function () {
 	const w = ECS.addWorld()
 	const e = ECS.addEntity(w)
 
@@ -26,10 +28,10 @@ tap.same(w.entities, [ { position: { x: 4, y: 12 } } ])
 	}
 
 	ECS.getEntities(w, [ 'dupe' ], 'added', result)
-	tap.same(result.entries[0], e, 'mocked system 1')
+	assert.deepEqual(result.entries[0], e, 'mocked system 1')
 
 	ECS.cleanup(w)
 
 	ECS.getEntities(w, [ 'dupe' ], 'added', result)
-	tap.same(result.count, 0, 'mocked system 1')
-}
+	assert.deepEqual(result.count, 0, 'mocked system 1')
+})

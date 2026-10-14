@@ -1,3 +1,8 @@
+# unreleased
+* replace `tap` with node's built-in test runner (`node --test`); requires node >= 20
+* update typescript to 7.x
+
+
 #0.23.0
 * add `removeEntities` function (thank you @chriscoderdr !)
 

@@ -1,49 +1,56 @@
 import * as allECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
-tap.ok(allECS.createWorld);
-tap.ok(allECS.createEntity);
-tap.ok(allECS.addComponentToEntity);
-tap.ok(allECS.removeComponentFromEntity);
-tap.ok(allECS.removeEntity);
-tap.ok(allECS.getEntities);
 
-tap.notOk(allECS._matchesFilter);
+test('named exports', function () {
+    assert.ok(allECS.createWorld);
+    assert.ok(allECS.createEntity);
+    assert.ok(allECS.addComponentToEntity);
+    assert.ok(allECS.removeComponentFromEntity);
+    assert.ok(allECS.removeEntity);
+    assert.ok(allECS.getEntities);
 
-tap.ok(allECS.addSystem);
-tap.ok(allECS.preFixedUpdate);
-tap.ok(allECS.fixedUpdate);
-tap.ok(allECS.postFixedUpdate);
-tap.ok(allECS.preUpdate);
-tap.ok(allECS.update);
-tap.ok(allECS.postUpdate);
+    assert.ok(!allECS._matchesFilter);
 
-tap.notOk(allECS.emptyListeners);
-tap.notOk(allECS._resetStats);
-tap.notOk(allECS._removeComponent);
-tap.notOk(allECS._removeEntity);
-tap.notOk(allECS._hasComponent);
+    assert.ok(allECS.addSystem);
+    assert.ok(allECS.preFixedUpdate);
+    assert.ok(allECS.fixedUpdate);
+    assert.ok(allECS.postFixedUpdate);
+    assert.ok(allECS.preUpdate);
+    assert.ok(allECS.update);
+    assert.ok(allECS.postUpdate);
 
-tap.ok(allECS.cleanup);
-tap.ok(allECS.default);
+    assert.ok(!allECS.emptyListeners);
+    assert.ok(!allECS._resetStats);
+    assert.ok(!allECS._removeComponent);
+    assert.ok(!allECS._removeEntity);
+    assert.ok(!allECS._hasComponent);
 
-tap.ok(allECS.default.createWorld);
-tap.ok(allECS.default.createEntity);
-tap.ok(allECS.default.addComponentToEntity);
-tap.ok(allECS.default.removeComponentFromEntity);
-tap.ok(allECS.default.removeEntity);
-tap.ok(allECS.default.getEntities);
-tap.ok(allECS.default.addSystem);
-tap.ok(allECS.default.preFixedUpdate);
-tap.ok(allECS.default.fixedUpdate);
-tap.ok(allECS.default.postFixedUpdate);
-tap.ok(allECS.default.preUpdate);
-tap.ok(allECS.default.update);
-tap.ok(allECS.default.postUpdate);
-tap.notOk(allECS.default.emptyListeners);
+    assert.ok(allECS.cleanup);
+    assert.ok(allECS.default);
+})
 
-// aliased functions
-tap.ok(allECS.default.addWorld);
-tap.ok(allECS.default.addEntity);
-tap.ok(allECS.default.addComponent);
-tap.ok(allECS.default.removeComponent);
+
+test('default export', function () {
+    assert.ok(allECS.default.createWorld);
+    assert.ok(allECS.default.createEntity);
+    assert.ok(allECS.default.addComponentToEntity);
+    assert.ok(allECS.default.removeComponentFromEntity);
+    assert.ok(allECS.default.removeEntity);
+    assert.ok(allECS.default.getEntities);
+    assert.ok(allECS.default.addSystem);
+    assert.ok(allECS.default.preFixedUpdate);
+    assert.ok(allECS.default.fixedUpdate);
+    assert.ok(allECS.default.postFixedUpdate);
+    assert.ok(allECS.default.preUpdate);
+    assert.ok(allECS.default.update);
+    assert.ok(allECS.default.postUpdate);
+    assert.ok(!allECS.default.emptyListeners);
+
+    // aliased functions
+    assert.ok(allECS.default.addWorld);
+    assert.ok(allECS.default.addEntity);
+    assert.ok(allECS.default.addComponent);
+    assert.ok(allECS.default.removeComponent);
+})
