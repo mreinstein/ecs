@@ -1,9 +1,12 @@
 import ECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
 
-const w = ECS.addWorld()
+test('addEntity adds entity to world', function () {
+	const w = ECS.addWorld()
 
-const e = ECS.addEntity(w)
+	const e = ECS.addEntity(w)
 
-tap.same(w.entities, [ e ])
+	assert.deepEqual(w.entities, [ e ])
+})

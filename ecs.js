@@ -46,7 +46,7 @@ import removeItems       from 'remove-array-items'
  */
 
 /**
- * @typedef { Object } Listener
+ * @typedef { any } Listener
  */
 
 /**

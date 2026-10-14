@@ -1,5 +1,6 @@
 import ECS from '../ecs.js'
-import tap from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
 
 
 async function sleep (ms) {
@@ -9,10 +10,10 @@ async function sleep (ms) {
 }
 
 
-async function main () {
+test('stats', async function () {
     const w = ECS.addWorld()
 
-    tap.same(w.stats, {
+    assert.deepEqual(w.stats, {
         entityCount: 0,
         componentCount: { },
         filterInvocationCount: { },
@@ -26,7 +27,7 @@ async function main () {
     ECS.addComponent(w, e, 'componentId1')
     ECS.addComponent(w, e, 'componentId2')
 
-    tap.same(w.stats, {
+    assert.deepEqual(w.stats, {
         entityCount: 1,
         componentCount: {
             componentId1: 1,
@@ -45,7 +46,7 @@ async function main () {
     ECS.addComponent(w2, e2, 'componentId1')
     ECS.addComponent(w2, e2, 'componentId1')
 
-    tap.same(w2.stats, {
+    assert.deepEqual(w2.stats, {
         entityCount: 1,
         componentCount: {
             componentId1: 1,
@@ -71,7 +72,7 @@ async function main () {
 
     ECS.addSystem(w, testSystem)
 
-    tap.same(w.stats, {
+    assert.deepEqual(w.stats, {
         entityCount: 1,
         componentCount: {
             componentId1: 1,
@@ -92,12 +93,12 @@ async function main () {
 
     ECS.fixedUpdate(w)
 
-    tap.same(w.stats.filterInvocationCount, {
+    assert.deepEqual(w.stats.filterInvocationCount, {
         'componentId1,componentId2': 1,
         'componentId3': 1
     }, 'running the systems updates filter counts')
 
-    tap.same(w.stats.systems[0].filters, {
+    assert.deepEqual(w.stats.systems[0].filters, {
         'componentId1,componentId2': 1,
         'componentId3': 0, // this is 0 because no entities have this component, so none matched
     }, 'running the systems updates filter counts')
@@ -106,7 +107,7 @@ async function main () {
     ECS.cleanup(w)
     await sleep(1)
 
-    tap.same(w.stats, {
+    assert.deepEqual(w.stats, {
         entityCount: 1,
         componentCount: {
             componentId1: 1,
@@ -135,7 +136,7 @@ async function main () {
     ECS.cleanup(w)
     await sleep(1)
 
-    tap.same(w.stats, {
+    assert.deepEqual(w.stats, {
         entityCount: 0,
         componentCount: {
             componentId1: 0,
@@ -158,8 +159,4 @@ async function main () {
         currentSystem: 0,
         lastSendTime: 0
     }, 'removing an entity cleanups up component and entity counts')
-
-}
-
-
-main()
+})

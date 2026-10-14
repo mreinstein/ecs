@@ -6,7 +6,7 @@
   "types": "types/ecs.d.ts",
   "type": "module",
   "scripts": {
-    "test": "tap test/",
+    "test": "node --test \"test/*.js\"",
     "build": "tsc",
     "prepublishOnly": "npm run build && npm test"
   },
@@ -20,8 +20,7 @@
     "remove-array-items": "^3.0.0"
   },
   "devDependencies": {
-    "tap": "^16.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "^7.0.2"
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,7 @@
     "url": "https://github.com/mreinstein/ecs/issues"
   },
   "engines": {
-    "node": ">=12.17"
+    "node": ">=20"
   },
   "homepage": "https://github.com/mreinstein/ecs#readme"
 }
