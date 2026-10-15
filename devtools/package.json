@@ -1,6 +1,6 @@
 {
   "name": "ecs-devtools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "in-page devtools panel for the ecs entity component system",
   "type": "module",
   "main": "index.js",
