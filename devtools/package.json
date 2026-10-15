@@ -21,7 +21,7 @@
     "gamedev"
   ],
   "dependencies": {
-    "snabbdom-timeline": "^0.9.1",
+    "snabbdom-timeline": "^0.11.0",
     "snabby": "^7.0.0"
   },
   "peerDependencies": {

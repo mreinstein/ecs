@@ -6,6 +6,7 @@ An in-page devtools panel for [ecs](https://github.com/mreinstein/ecs).
 
 It renders a floating panel docked to the right edge of the window showing
 entity and component counts over time, active filters, and how long each system takes per frame.
+It follows the browser's light/dark preference (`prefers-color-scheme`).
 
 
 ## usage

@@ -420,44 +420,40 @@ function filtersView (systems) {
 }
 
 
-function systemsOverviewGraphView (systems, totalTime) {
-    const segments = [ ]
-    const significant = [ ]
+// stable key for a system's elements, so snabbdom patches the same nodes every render
+function systemKey (system, i) {
+    return i + ':' + system.name
+}
 
-    if (totalTime > 0) {
-        // total of all preceding segments length, used in the stroke-dashoffset calculation
-        let totalPercent = 0
 
-        for (let i = 0; i < systems.length; i++) {
-            const system = systems[i]
-            const percent = Math.floor(system.timeElapsed / totalTime * 100)
+// every system always gets a donut segment and a legend row (even at 0ms), in system order,
+// so the list never reflows or flickers as timings fluctuate between samples.
+// shares: exact fraction (0..1) of total time per system
+function systemsOverviewGraphView (systems, shares) {
+    // the circle's circumference is 100 (r = 100 / 2π), so dash lengths are percentages.
+    // total of all preceding segment lengths, used in the stroke-dashoffset calculation
+    let offset = 0
 
-            if (percent === 0)
-                continue
+    const segments = systems.map((system, i) => {
+        const length = shares[i] * 100
+        const segment = html`<circle class="donut-segment" @key=${systemKey(system, i)} cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="${systemColor(i, systems.length)}" stroke-width="3" stroke-dasharray="${length} ${100 - length}" stroke-dashoffset="${-offset}"><title>${system.name}</title></circle>`
+        offset += length
+        return segment
+    })
 
-            const strokeColor = systemColor(i, systems.length)
-
-            if (percent > 3)
-                significant.push({ name: system.name, percent, strokeColor })
-
-            segments.push(html`<circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="${strokeColor}" stroke-width="3" stroke-dasharray="${percent} ${100 - percent}" stroke-dashoffset="${-totalPercent}"><title>${system.name}</title></circle>`)
-
-            totalPercent += percent
-        }
-    }
+    const legendRows = systems.map((system, i) => html`<div class="donut-legend-row" @key=${systemKey(system, i)}>
+        <div class="swatch" style="background-color: ${systemColor(i, systems.length)}"></div>
+        <div class="legend-percent">${Math.round(shares[i] * 100)}%</div>
+        <div class="legend-name" title="${system.name}">${system.name}</div>
+    </div>`)
 
     return html`<div class="donut">
         <svg width="110px" height="110px" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-            <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="#fff"/>
-            <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e2e3e4" stroke-width="3"/>
+            <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954"/>
+            <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke-width="3"/>
             ${segments}
         </svg>
-        <div class="donut-legend">
-            ${significant.map((s) => html`<div class="donut-legend-row">
-                <div class="swatch" style="background-color: ${s.strokeColor}"></div>
-                <div>${s.percent}% ${s.name}</div>
-            </div>`)}
-        </div>
+        <div class="donut-legend">${legendRows}</div>
     </div>`
 }
 
@@ -467,8 +463,11 @@ function systemsView (systems) {
     for (const s of systems)
         totalTime += s.timeElapsed
 
+    // computed once so the donut, legend and system rows always agree
+    const shares = systems.map((s) => totalTime > 0 ? s.timeElapsed / totalTime : 0)
+
     const systemViews = systems.map((s, i) => {
-        const percent = totalTime > 0 ? Math.round(s.timeElapsed / totalTime * 100) : 0
+        const percent = Math.round(shares[i] * 100)
 
         const filterViews = Object.keys(s.filters).map((f) => html`<div class="filter" @key=${f}>
             <div class="filter-components">
@@ -478,7 +477,7 @@ function systemsView (systems) {
             <div>${s.filters[f]}</div>
         </div>`)
 
-        return html`<div class="system" @key=${i + ':' + s.name}>
+        return html`<div class="system" @key=${systemKey(s, i)}>
             <div class="system-name" style="border-left-color: ${systemColor(i, systems.length)}">${s.name}</div>
             <div class="system-time">${s.timeElapsed.toFixed(2)}ms</div>
             <div class="system-percent">${percent}%</div>
@@ -489,7 +488,7 @@ function systemsView (systems) {
     return html`<section class="systems">
         <h3>Systems (${systems.length})</h3>
         <p>Total Time: ${totalTime.toFixed(2)}ms</p>
-        ${systemsOverviewGraphView(systems, totalTime)}
+        ${systemsOverviewGraphView(systems, shares)}
         ${systemViews}
     </section>`
 }
@@ -556,6 +555,48 @@ const CSS = `
     all: initial;
 }
 
+/* theme. light values are the defaults; dark mode follows the browser/os preference */
+.panel {
+    color-scheme: light dark;
+
+    --bg: #f3f4f5;
+    --fg: #222;
+    --border: #ccc;
+    --shadow: rgba(0, 0, 0, 0.25);
+    --surface: white;             /* graphs, filter lists, donut hole */
+    --ring: #e2e3e4;              /* empty donut track */
+    --tint-strong: rgba(0, 0, 0, 0.12);
+    --tint-weak: rgba(0, 0, 0, 0.05);
+    --chip-bg: rgba(0, 0, 0, 0.55);
+    --chip-fg: white;
+    --accent: rgba(41, 147, 251, 0.4);
+    --header-bg: #2b2d31;
+    --header-fg: #eee;
+    --header-name: #9ab;
+    --header-muted: #aaa;
+    --header-toggle: #ccc;
+}
+
+@media (prefers-color-scheme: dark) {
+    .panel {
+        --bg: #1e1f22;
+        --fg: #dcdde0;
+        --border: #3a3c40;
+        --shadow: rgba(0, 0, 0, 0.6);
+        --surface: #2b2d31;
+        --ring: #3a3c40;
+        --tint-strong: rgba(255, 255, 255, 0.08);
+        --tint-weak: rgba(255, 255, 255, 0.04);
+        --chip-bg: rgba(255, 255, 255, 0.16);
+        --chip-fg: #eee;
+        --header-bg: #141517;
+
+        /* graph value labels and axis, drawn by snabbdom-timeline */
+        --snabbdom-timeline-label-color: rgba(255, 255, 255, 0.75);
+        --snabbdom-timeline-axis-color: #666;
+    }
+}
+
 .panel {
     position: fixed;
     top: 0;
@@ -565,11 +606,11 @@ const CSS = `
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    background: #f3f4f5;
-    color: #222;
+    background: var(--bg);
+    color: var(--fg);
     font: 12px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.25);
-    border-left: 1px solid #ccc;
+    box-shadow: -2px 0 12px var(--shadow);
+    border-left: 1px solid var(--border);
 }
 
 .panel.collapsed {
@@ -601,7 +642,7 @@ const CSS = `
 
 .resize-handle:hover,
 .panel.resizing .resize-handle {
-    background: rgba(41, 147, 251, 0.4);
+    background: var(--accent);
 }
 
 header {
@@ -609,8 +650,8 @@ header {
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    background: #2b2d31;
-    color: #eee;
+    background: var(--header-bg);
+    color: var(--header-fg);
     cursor: pointer;
     user-select: none;
     flex: none;
@@ -622,12 +663,12 @@ header .title {
 }
 
 header .name {
-    color: #9ab;
+    color: var(--header-name);
 }
 
 header .summary {
     margin-left: auto;
-    color: #aaa;
+    color: var(--header-muted);
     font-variant-numeric: tabular-nums;
 }
 
@@ -636,7 +677,7 @@ header .toggle {
     cursor: pointer;
     width: 14px;
     text-align: center;
-    color: #ccc;
+    color: var(--header-toggle);
 }
 
 .body {
@@ -698,6 +739,11 @@ main {
     min-width: 0;
 }
 
+/* beats snabbdom-timeline's zero-specificity default (white) */
+snabbdom-timeline .graph {
+    background-color: var(--surface);
+}
+
 .component-name {
     display: flex;
     justify-content: flex-end;
@@ -710,7 +756,7 @@ main {
 
 .filter {
     padding: 6px 8px;
-    background-color: rgba(0, 0, 0, 0.12);
+    background-color: var(--tint-strong);
     margin-bottom: 2px;
     display: flex;
     flex-direction: row;
@@ -735,10 +781,10 @@ main {
 }
 
 .filter-component {
-    background-color: rgba(0, 0, 0, 0.55);
+    background-color: var(--chip-bg);
     border-radius: 6px;
     padding: 2px 6px;
-    color: white;
+    color: var(--chip-fg);
 }
 
 .donut {
@@ -750,27 +796,48 @@ main {
     flex: none;
 }
 
+.donut-hole { fill: var(--surface); }
+.donut-ring { stroke: var(--ring); }
+
 .donut-legend {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-width: 0;
     padding-left: 10px;
 }
 
 .donut-legend-row {
     display: flex;
     align-items: center;
+    font-variant-numeric: tabular-nums;
 }
 
 .swatch {
+    flex: none;
     width: 10px;
     height: 10px;
     margin-right: 5px;
 }
 
+/* fixed width so names don't shift as percentages change */
+.legend-percent {
+    flex: none;
+    width: 4ch;
+    margin-right: 6px;
+    text-align: right;
+}
+
+.legend-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .system {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: var(--tint-weak);
     margin-bottom: 16px;
     display: grid;
     grid-template-columns: 2fr 64px 44px 1fr;
@@ -793,6 +860,6 @@ main {
 .system-filters {
     grid-area: systemFilters;
     padding-left: 20px;
-    background-color: white;
+    background-color: var(--surface);
 }
 `
