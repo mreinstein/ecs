@@ -7,13 +7,28 @@ import 'snabbdom-timeline'  // registers the <snabbdom-timeline> custom element
 // inspired by ecsy https://blog.mozvr.com/ecsy-developer-tools/
 //
 // usage:
-//   import { createDevtools } from 'ecs/devtools.js'
+//   import { createDevtools } from 'ecs-devtools'
 //   const devtools = createDevtools(world)
+//
+// this package doesn't import ecs. it only reads `world.stats`, which ecs (>= 0.24) keeps
+// populated with the last completed frame's values.
 
 
 /**
- * @typedef { import('./ecs.js').World } World
- * @typedef { import('./ecs.js').WorldStats } WorldStats
+ * The subset of an ecs world the panel reads.
+ * @typedef { Object } WorldStats
+ * @prop {number} entityCount
+ * @prop {{ [ componentName: string ]: number }} componentCount
+ * @prop {{
+ *   name: string;
+ *   timeElapsed: number;
+ *   filters: { [ filterId: string ]: number };
+ * }[]} systems
+ */
+
+/**
+ * @typedef { Object } World
+ * @prop {WorldStats} stats
  */
 
 /**

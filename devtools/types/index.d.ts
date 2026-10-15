@@ -1,6 +1,20 @@
 import 'snabbdom-timeline';
-export type World = import('./ecs.js').World;
-export type WorldStats = import('./ecs.js').WorldStats;
+export type WorldStats = {
+    entityCount: number;
+    componentCount: {
+        [componentName: string]: number;
+    };
+    systems: {
+        name: string;
+        timeElapsed: number;
+        filters: {
+            [filterId: string]: number;
+        };
+    }[];
+};
+export type World = {
+    stats: WorldStats;
+};
 export type DevtoolsOptions = {
     /**
      * start expanded. Defaults to the last persisted state, or true
@@ -61,4 +75,4 @@ export type Devtools = {
  */
 export declare function createDevtools(world: World, options?: DevtoolsOptions): Devtools;
 export default createDevtools;
-//# sourceMappingURL=devtools.d.ts.map
+//# sourceMappingURL=index.d.ts.map

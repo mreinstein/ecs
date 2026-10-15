@@ -1,10 +1,11 @@
 # unreleased
 * replace `tap` with node's built-in test runner (`node --test`); requires node >= 20
 * update typescript to 7.x
-* BREAKING: remove the chrome devtools extension. It's replaced by an in-page panel: `import { createDevtools } from 'ecs/devtools.js'`
+* BREAKING: remove the chrome devtools extension. It's replaced by an in-page panel, published separately as `ecs-devtools`
 * BREAKING: remove the `window.__MREINSTEIN_ECS_DEVTOOLS` / `window.postMessage` stats protocol
 * BREAKING: remove `world.stats.lastSendTime`
 * BREAKING: per-frame stats now describe the previous frame
+* publish only `ecs.js`, `component-set.js` and `types/` (`files` allowlist replaces `.npmignore`)
 
 
 # 0.23.0

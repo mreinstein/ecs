@@ -17,9 +17,7 @@
     "entity component system"
   ],
   "dependencies": {
-    "remove-array-items": "^3.0.0",
-    "snabbdom-timeline": "^0.9.1",
-    "snabby": "^7.0.0"
+    "remove-array-items": "^3.0.0"
   },
   "devDependencies": {
     "typescript": "^7.0.2"
@@ -36,5 +34,14 @@
   "engines": {
     "node": ">=20"
   },
-  "homepage": "https://github.com/mreinstein/ecs#readme"
+  "homepage": "https://github.com/mreinstein/ecs#readme",
+  "files": [
+    "ecs.js",
+    "component-set.js",
+    "types",
+    "CHANGELOG.md"
+  ],
+  "workspaces": [
+    "devtools"
+  ]
 }

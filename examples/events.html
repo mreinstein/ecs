@@ -52,7 +52,7 @@
   {
     "imports": {
       "ecs": "../ecs.js",
-      "ecs/devtools.js": "../devtools.js",
+      "ecs-devtools": "../devtools/index.js",
       "remove-array-items": "https://esm.sh/remove-array-items@3",
       "snabby": "https://esm.sh/snabby@7",
       "snabbdom-timeline": "https://esm.sh/snabbdom-timeline@0.9.1"
@@ -62,7 +62,7 @@
 
 <script type="module">
 import ECS                from 'ecs'
-import { createDevtools } from 'ecs/devtools.js'
+import { createDevtools } from 'ecs-devtools'
 
 
 const WIDGET_QUERY = [ 'widget' ]

@@ -243,50 +243,24 @@ if you're running a networked simulation and need to refer to a specific entity 
 
 ### devtools panel
 
-If you'd like to see a real time view of the data in your ECS powered program, there is an in-page devtools panel. No browser extension needed:
+If you'd like to see a real time view of the data in your ECS powered program, there is an in-page devtools
+panel, published separately as [ecs-devtools](devtools/) so the core package stays dependency-light:
+
+```
+npm install --save-dev ecs-devtools
+```
 
 ```javascript
 import ECS                from 'ecs'
-import { createDevtools } from 'ecs/devtools.js'
+import { createDevtools } from 'ecs-devtools'
 
 const world = ECS.addWorld()
-
-const devtools = createDevtools(world)
+createDevtools(world)
 ```
 
-![alt text](devtools.png "screenshot of the ECS devtools in action")
+![alt text](devtools/devtools.webp "screenshot of the ECS devtools in action")
 
-It renders a floating panel docked to the right edge of the window (styles are isolated in a shadow DOM) showing
-entity and component counts over time, active filters, and how long each system takes per frame.
-
-* press <code>`</code> or click the header to collapse/expand it
-* drag the left edge to resize it; wider panels switch to a 2 or 3 column layout
-* open/closed state and width are remembered in `localStorage`
-
-Options (all optional):
-
-```javascript
-const devtools = createDevtools(world, {
-    open: true,        // start expanded
-    hotkey: '`',       // toggle key, or false to disable
-    sampleRate: 250,   // minimum ms between samples
-    maxSamples: 100,   // samples kept per graph
-    width: 420,        // initial width in pixels
-    name: 'main',      // label shown in the header, handy with multiple worlds
-    parent: document.body,
-})
-
-devtools.toggle()   // also .open() and .close()
-devtools.destroy()  // removes the panel and detaches from the world
-```
-
-The panel runs its own `requestAnimationFrame` loop that reads `world.stats` (so it pauses in hidden tabs).
-`world.stats` describes the last completed frame, which `ECS.cleanup()` publishes, so call `cleanup` once per
-frame as usual. ecs itself has no knowledge of the devtools.
-
-`ecs/devtools.js` is browser-only and depends on `snabby` and `snabbdom-timeline` (installed with `ecs`).
-Bundlers (vite, esbuild, webpack, etc.) handle it out of the box. If you're using native ES modules with an
-import map, see [examples/events.html](examples/events.html).
+See the [ecs-devtools readme](devtools/README.md) for options.
 
 ### Typescript Support
 

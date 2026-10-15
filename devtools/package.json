@@ -1,0 +1,49 @@
+{
+  "name": "ecs-devtools",
+  "version": "0.1.0",
+  "description": "in-page devtools panel for the ecs entity component system",
+  "type": "module",
+  "main": "index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "index.js",
+    "types",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ecs",
+    "entity component system",
+    "devtools",
+    "gamedev"
+  ],
+  "dependencies": {
+    "snabbdom-timeline": "^0.9.1",
+    "snabby": "^7.0.0"
+  },
+  "peerDependencies": {
+    "ecs": ">=0.24.0"
+  },
+  "peerDependenciesMeta": {
+    "ecs": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mreinstein/ecs.git",
+    "directory": "devtools"
+  },
+  "author": "Michael Reinstein",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mreinstein/ecs/issues"
+  },
+  "homepage": "https://github.com/mreinstein/ecs/tree/main/devtools#readme",
+  "engines": {
+    "node": ">=20"
+  }
+}

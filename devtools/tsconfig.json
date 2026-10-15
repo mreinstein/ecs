@@ -1,0 +1,14 @@
+{
+    "include": [
+        "index.js"
+    ],
+    "compilerOptions": {
+        // read JS files and emit only .d.ts files from their jsdoc
+        "allowJs": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "outDir": "./types",
+        "declarationMap": true,
+        "lib": [ "es2022", "dom" ]
+    }
+}
