@@ -17,7 +17,9 @@
     "entity component system"
   ],
   "dependencies": {
-    "remove-array-items": "^3.0.0"
+    "remove-array-items": "^3.0.0",
+    "snabbdom-timeline": "^0.9.1",
+    "snabby": "^7.0.0"
   },
   "devDependencies": {
     "typescript": "^7.0.2"

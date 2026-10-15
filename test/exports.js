@@ -22,7 +22,7 @@ test('named exports', function () {
     assert.ok(allECS.postUpdate);
 
     assert.ok(!allECS.emptyListeners);
-    assert.ok(!allECS._resetStats);
+    assert.ok(!allECS._publishStats);
     assert.ok(!allECS._removeComponent);
     assert.ok(!allECS._removeEntity);
     assert.ok(!allECS._hasComponent);

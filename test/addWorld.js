@@ -26,9 +26,9 @@ test('addWorld creates empty world', function () {
             entityCount: 0,
             componentCount: { },
             filterInvocationCount: { },
+            _filterInvocationCount: { },
             systems: [ ],
-            currentSystem: 0,
-            lastSendTime: 0
+            currentSystem: 0
         }
     })
 })

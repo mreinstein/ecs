@@ -35,36 +35,57 @@ export type DeferredRemovalMap = {
      */
     components: string[];
 };
+export type SystemStats = {
+    name: string;
+    /**
+     * milliseconds spent in this system during the last completed frame
+     */
+    timeElapsed: number;
+    /**
+     * key is filter id, value is the number of entities
+     * that matched the filter during the last completed frame
+     */
+    filters: {
+        [filterId: string]: number;
+    };
+    /**
+     * internal: accumulates the in-progress frame's time
+     */
+    _timeElapsed: number;
+    /**
+     * internal: accumulates the in-progress frame's filter matches
+     */
+    _filters: {
+        [filterId: string]: number;
+    };
+};
 export type WorldStats = {
     entityCount: number;
     /**
      * key is component id, value is instance count
      */
     componentCount: {
-        [key: number]: number;
+        [key: string]: number;
     };
     /**
-     * key is filter id, value is number of times this filter was run this frame
+     * key is filter id, value is number of
+     * times this filter was run during the last completed frame
      */
     filterInvocationCount: {
-        [key: number]: number;
+        [key: string]: number;
     };
-    systems: {
-        name: string;
-        timeElapsed: number;
-        filters: {
-            [key: string]: number;
-        };
-    }[];
+    /**
+     * internal: accumulates the in-progress frame's invocations
+     */
+    _filterInvocationCount: {
+        [key: string]: number;
+    };
+    systems: SystemStats[];
     /**
      * the array index of the currently processed system
      * used to determine which systems invoke queries
      */
     currentSystem: number;
-    /**
-     * time stats were last sent (used to throttle send)
-     */
-    lastSendTime: number;
 };
 export type World = {
     entities: Entity[];
@@ -129,20 +150,28 @@ export type World = {
  * @prop {string[]} components [ entity, component name ]
  */
 /**
+ * @typedef { Object } SystemStats
+ * @prop {string} name
+ * @prop {number} timeElapsed milliseconds spent in this system during the last completed frame
+ * @prop {{ [ filterId: string ]: number }} filters key is filter id, value is the number of entities
+ *   that matched the filter during the last completed frame
+ * @prop {number} _timeElapsed internal: accumulates the in-progress frame's time
+ * @prop {{ [ filterId: string ]: number }} _filters internal: accumulates the in-progress frame's filter matches
+ */
+/**
+ * World stats. `entityCount` and `componentCount` are always current. The per-frame values
+ * (`filterInvocationCount`, `systems[].timeElapsed`, `systems[].filters`) describe the last
+ * completed frame: they're published by `cleanup()`, so they can be read at any time.
+ *
  * @typedef { Object } WorldStats
  * @prop {number} entityCount
- * @prop {{ [ key: number ]: number }} componentCount key is component id, value is instance count
- * @prop {{ [ key: number ]: number }} filterInvocationCount key is filter id, value is number of times this filter was run this frame
- * @prop {{
- *   name: string;
- *   timeElapsed: number;
- *   filters: {
- *     [ key: string ]: number;
- *   };
- * }[]} systems
+ * @prop {{ [ key: string ]: number }} componentCount key is component id, value is instance count
+ * @prop {{ [ key: string ]: number }} filterInvocationCount key is filter id, value is number of
+ *   times this filter was run during the last completed frame
+ * @prop {{ [ key: string ]: number }} _filterInvocationCount internal: accumulates the in-progress frame's invocations
+ * @prop {SystemStats[]} systems
  * @prop {number} currentSystem the array index of the currently processed system
  *   used to determine which systems invoke queries
- * @prop {number} lastSendTime time stats were last sent (used to throttle send)
  */
 /**
  * @typedef { Object } World
@@ -154,8 +183,7 @@ export type World = {
  * @prop {WorldStats} stats
  */
 /**
- * Creates a world and sends window post message with id `mreinstein/ecs-source`
- * and method `worldCreated`
+ * Creates a world
  *
  * @param {number} worldId ID of the world to create
  * @returns {World} created world
@@ -271,7 +299,8 @@ export declare function update(world: World, dt: number): void;
  */
 export declare function postUpdate(world: World, dt: number): void;
 /**
- * necessary cleanup step at the end of each frame loop
+ * necessary cleanup step at the end of each frame loop. Processes deferred removals, rotates
+ * added/removed listeners, and publishes this frame's stats to `world.stats`.
  * @param {World} world
  */
 export declare function cleanup(world: World): void;

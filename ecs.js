@@ -70,20 +70,29 @@ import removeItems       from 'remove-array-items'
  */
 
 /**
+ * @typedef { Object } SystemStats
+ * @prop {string} name
+ * @prop {number} timeElapsed milliseconds spent in this system during the last completed frame
+ * @prop {{ [ filterId: string ]: number }} filters key is filter id, value is the number of entities
+ *   that matched the filter during the last completed frame
+ * @prop {number} _timeElapsed internal: accumulates the in-progress frame's time
+ * @prop {{ [ filterId: string ]: number }} _filters internal: accumulates the in-progress frame's filter matches
+ */
+
+/**
+ * World stats. `entityCount` and `componentCount` are always current. The per-frame values
+ * (`filterInvocationCount`, `systems[].timeElapsed`, `systems[].filters`) describe the last
+ * completed frame: they're published by `cleanup()`, so they can be read at any time.
+ *
  * @typedef { Object } WorldStats
  * @prop {number} entityCount
- * @prop {{ [ key: number ]: number }} componentCount key is component id, value is instance count
- * @prop {{ [ key: number ]: number }} filterInvocationCount key is filter id, value is number of times this filter was run this frame
- * @prop {{
- *   name: string;
- *   timeElapsed: number;
- *   filters: {
- *     [ key: string ]: number;
- *   };
- * }[]} systems
+ * @prop {{ [ key: string ]: number }} componentCount key is component id, value is instance count
+ * @prop {{ [ key: string ]: number }} filterInvocationCount key is filter id, value is number of
+ *   times this filter was run during the last completed frame
+ * @prop {{ [ key: string ]: number }} _filterInvocationCount internal: accumulates the in-progress frame's invocations
+ * @prop {SystemStats[]} systems
  * @prop {number} currentSystem the array index of the currently processed system
  *   used to determine which systems invoke queries
- * @prop {number} lastSendTime time stats were last sent (used to throttle send)
  */
 
 /**
@@ -97,8 +106,7 @@ import removeItems       from 'remove-array-items'
  */
 
 /**
- * Creates a world and sends window post message with id `mreinstein/ecs-source`
- * and method `worldCreated`
+ * Creates a world
  *
  * @param {number} worldId ID of the world to create
  * @returns {World} created world
@@ -136,17 +144,23 @@ export function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
             /*worldId, */
             entityCount: 0,
             componentCount: { }, // key is component id, value is instance count
-            filterInvocationCount: { }, // key is filter id, value is number of times this filter was run this frame
+
+            // per-frame stats. the public fields hold the last completed frame (published by
+            // cleanup()), the _ prefixed fields accumulate the frame currently in progress.
+            filterInvocationCount: { }, // key is filter id, value is number of times this filter was run
+            _filterInvocationCount: { },
             systems: [
                 /*
                 example format:
                     {
                         name: 'systemname',
-                        timeElapsed: 0, // milliseconds spent in this system this frame
+                        timeElapsed: 0, // milliseconds spent in this system
                         filters: {
                             filterId1: 0,  // number of entities that matched the filter
                             filterId2: 0,
-                        }
+                        },
+                        _timeElapsed: 0,
+                        _filters: { },
                     }
                 */
             ],
@@ -154,17 +168,7 @@ export function createWorld (worldId=Math.ceil(Math.random() * 999999999) ) {
             // the array index of the currently processed system
             // used to determine which systems invoke queries
             currentSystem: 0,
-
-            lastSendTime: 0, // time stats were last sent (used to throttle send)
         }
-    }
-
-    if ((typeof window !== 'undefined') && window.__MREINSTEIN_ECS_DEVTOOLS) {
-        window.postMessage({
-            id: 'mreinstein/ecs-source',
-            method: 'worldCreated',
-            data: world.stats,
-        }, '*');
     }
 
     return world
@@ -346,18 +350,13 @@ export function getEntities (world, componentNames, listenerType, listenerEntiti
     if (!world.filters[filterId])
         world.filters[filterId] = world.entities.filter((e) => _matchesFilter(filterId, e))
 
-    if (!world.stats.filterInvocationCount[filterId])
-        world.stats.filterInvocationCount[filterId] = 0
+    // accumulate stats for the in-progress frame. cleanup() publishes them.
+    const stats = world.stats
+    stats._filterInvocationCount[filterId] = (stats._filterInvocationCount[filterId] || 0) + 1
 
-    world.stats.filterInvocationCount[filterId] += 1;
-
-    const systemIdx = world.stats.currentSystem
-    if (world.stats.systems[systemIdx]) {
-        if (!world.stats.systems[systemIdx].filters[filterId])
-            world.stats.systems[systemIdx].filters[filterId] = 0
-
-        world.stats.systems[systemIdx].filters[filterId] += world.filters[filterId].length
-    }
+    const systemStats = stats.systems[stats.currentSystem]
+    if (systemStats)
+        systemStats._filters[filterId] = (systemStats._filters[filterId] || 0) + world.filters[filterId].length
 
     if (listenerType === 'added' || listenerType === 'removed') {
 
@@ -433,9 +432,11 @@ export function addSystem (world, fn) {
 
     world.stats.systems.push({
         name: fn.name || 'anonymousSystem',
-        timeElapsed: 0, // milliseconds spent in this system this frame
+        timeElapsed: 0, // milliseconds spent in this system during the last completed frame
         // key is filterId, value is number of entities that matched the filter
-        filters: { }
+        filters: { },
+        _timeElapsed: 0, // in-progress frame accumulators, published by cleanup()
+        _filters: { },
     })
 
     if (!system.onPreFixedUpdate)
@@ -470,7 +471,7 @@ export function preFixedUpdate (world, dt) {
         const system = world.systems[i]
         const start = performance.now()
         system.onPreFixedUpdate(dt)
-        world.stats.systems[i].timeElapsed += (performance.now() - start)
+        world.stats.systems[i]._timeElapsed += (performance.now() - start)
     }
 }
 
@@ -486,7 +487,7 @@ export function fixedUpdate (world, dt) {
         const system = world.systems[i]
         const start = performance.now()
         system.onFixedUpdate(dt)
-        world.stats.systems[i].timeElapsed += (performance.now() - start)
+        world.stats.systems[i]._timeElapsed += (performance.now() - start)
     }
 }
 
@@ -501,7 +502,7 @@ export function postFixedUpdate (world, dt) {
         const system = world.systems[i]
         const start = performance.now()
         system.onPostFixedUpdate(dt)
-        world.stats.systems[i].timeElapsed += (performance.now() - start)
+        world.stats.systems[i]._timeElapsed += (performance.now() - start)
     }
 }
 
@@ -517,7 +518,7 @@ export function preUpdate (world, dt) {
         const system = world.systems[i]
         const start = performance.now()
         system.onPreUpdate(dt)
-        world.stats.systems[i].timeElapsed += (performance.now() - start)
+        world.stats.systems[i]._timeElapsed += (performance.now() - start)
     }
 }
 
@@ -532,7 +533,7 @@ export function update (world, dt) {
         const system = world.systems[i]
         const start = performance.now()
         system.onUpdate(dt)
-        world.stats.systems[i].timeElapsed += (performance.now() - start)
+        world.stats.systems[i]._timeElapsed += (performance.now() - start)
     }
 }
 
@@ -547,25 +548,34 @@ export function postUpdate (world, dt) {
         const system = world.systems[i]
         const start = performance.now()
         system.onPostUpdate(dt)
-        world.stats.systems[i].timeElapsed += (performance.now() - start)
+        world.stats.systems[i]._timeElapsed += (performance.now() - start)
     }
 }
 
 /**
- * 
+ * publish the in-progress frame's stats into the public fields, and reset the accumulators
+ * for the next frame. Values are copied into the existing objects, so references stay valid.
  * @param {World} world 
  */
-function _resetStats (world) {
-    for (const filterId in world.stats.filterInvocationCount)
-        world.stats.filterInvocationCount[filterId] = 0
+function _publishStats (world) {
+    const stats = world.stats
 
-    for (const system of world.stats.systems) {
-        system.timeElapsed = 0
-        for (const filterId in system.filters)
-            system.filters[filterId] = 0
+    for (const filterId in stats._filterInvocationCount) {
+        stats.filterInvocationCount[filterId] = stats._filterInvocationCount[filterId]
+        stats._filterInvocationCount[filterId] = 0
     }
 
-    world.stats.currentSystem = 0
+    for (const system of stats.systems) {
+        system.timeElapsed = system._timeElapsed
+        system._timeElapsed = 0
+
+        for (const filterId in system._filters) {
+            system.filters[filterId] = system._filters[filterId]
+            system._filters[filterId] = 0
+        }
+    }
+
+    stats.currentSystem = 0
 }
 
 /**
@@ -657,7 +667,8 @@ function _hasComponent (filterId, component) {
 }
 
 /**
- * necessary cleanup step at the end of each frame loop
+ * necessary cleanup step at the end of each frame loop. Processes deferred removals, rotates
+ * added/removed listeners, and publishes this frame's stats to `world.stats`.
  * @param {World} world 
  */
 export function cleanup (world) {
@@ -692,22 +703,8 @@ export function cleanup (world) {
 
     world.deferredRemovals.entities.clear()
 
-    if ((typeof window !== 'undefined') && window.__MREINSTEIN_ECS_DEVTOOLS) {
-        // running at 60fps seems to queue up a lot of messages. I'm thinking it might just be more
-        // data than postMessage can send. capping it at some lower update rate seems to work better.
-        // for now capping this at 4fps. later we might investigate if sending deltas over postmessage
-        // solves the message piling up problem.
-        if (performance.now() - world.stats.lastSendTime > 250) {
-            world.stats.lastSendTime = performance.now();
-            window.postMessage({
-                id: 'mreinstein/ecs-source',
-                method: 'refreshData',
-                data: world.stats,
-            }, '*');
-        }
-    }
-
-    setTimeout(_resetStats, 0, world) // defer reset until next frame
+    // this frame is complete. make its stats readable until the next cleanup()
+    _publishStats(world)
 }
 
 
