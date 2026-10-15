@@ -1,10 +1,10 @@
 # ecs-devtools
 
-An in-page devtools panel for [ecs](https://github.com/mreinstein/ecs). No browser extension needed.
+An in-page devtools panel for [ecs](https://github.com/mreinstein/ecs).
 
 ![screenshot of the ECS devtools in action](devtools.webp)
 
-It renders a floating panel docked to the right edge of the window (styles are isolated in a shadow DOM) showing
+It renders a floating panel docked to the right edge of the window showing
 entity and component counts over time, active filters, and how long each system takes per frame.
 
 
