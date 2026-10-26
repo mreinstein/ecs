@@ -20,10 +20,7 @@ ECS is an alternative architecture:
 The entire ecs module here is about 100 lines of code, and offers an O(1) iterator at run time for querying for entities within systems.
 
 
-## usage example
-
-This is a minimal example of what you can do with `ecs`, illustrating how to declare
-your entities, components, and systems.
+## minimal example
 
 ```javascript
 import ECS      from 'ecs'
@@ -319,6 +316,3 @@ function gameLoop() {
 gameLoop()
 ```
 
-### references, honorable mentions, etc.
-
-If you'd like to explore other data oriented, highly performant ECS implementations, check out https://github.com/NateTheGreatt/bitECS I haven't personally used it yet, but browsing over the project, looks legit!
